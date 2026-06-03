@@ -10,13 +10,6 @@
     {
       "borderColor": "#FF858283",
       "color": "#000000",
-      "id": "gr",
-      "isExpanded": true,
-      "name": "Resolution"
-    },
-    {
-      "borderColor": "#FF858283",
-      "color": "#000000",
       "id": "gv",
       "isExpanded": true,
       "name": "Visual"
@@ -24,16 +17,16 @@
     {
       "borderColor": "#FF858283",
       "color": "#000000",
-      "id": "ga",
+      "id": "gr",
       "isExpanded": true,
-      "name": "Audio"
+      "name": "Resolution"
     },
     {
       "borderColor": "#FF858283",
       "color": "#000000",
-      "id": "ge",
+      "id": "ga",
       "isExpanded": true,
-      "name": "Encoder"
+      "name": "Audio"
     },
     {
       "borderColor": "#FF858283",
@@ -48,6 +41,13 @@
       "id": "gs",
       "isExpanded": true,
       "name": "Streaming"
+    },
+    {
+      "borderColor": "#FF858283",
+      "color": "#000000",
+      "id": "ge",
+      "isExpanded": true,
+      "name": "Encoder"
     }
   ],
   "filters": [
@@ -107,7 +107,7 @@
       "borderColor": "#FF858283",
       "groupId": "gq",
       "id": "src-hdtv",
-      "imageURL": "",
+      "imageURL": "https://raw.githubusercontent.com/Dabu-dot/Dabu-Collections-Nuvio/refs/heads/main/Ressources/Badges/Icons/Quality/Mono-HDTV.png",
       "isEnabled": true,
       "name": "HDTV",
       "pattern": "(?i)\\bhdtv\\b",
@@ -120,7 +120,7 @@
       "borderColor": "#FF858283",
       "groupId": "gq",
       "id": "src-hdrip",
-      "imageURL": "",
+      "imageURL": "https://raw.githubusercontent.com/Dabu-dot/Dabu-Collections-Nuvio/refs/heads/main/Ressources/Badges/Icons/Quality/Mono-HDRip.png",
       "isEnabled": true,
       "name": "HDRip",
       "pattern": "(?i)\\bhd[-_. ]?rip\\b",
@@ -185,7 +185,7 @@
       "borderColor": "#FF858283",
       "groupId": "gr",
       "id": "gr-480p",
-      "imageURL": "",
+      "imageURL": "https://raw.githubusercontent.com/Dabu-dot/Dabu-Collections-Nuvio/refs/heads/main/Ressources/Badges/Icons/Resolution/480p.png",
       "isEnabled": true,
       "name": "480p",
       "pattern": "(?i)\\\\b480p\\\\b",
@@ -198,7 +198,7 @@
       "borderColor": "#FF858283",
       "groupId": "gr",
       "id": "gq-360p",
-      "imageURL": "",
+      "imageURL": "https://raw.githubusercontent.com/Dabu-dot/Dabu-Collections-Nuvio/refs/heads/main/Ressources/Badges/Icons/Resolution/360p.png",
       "isEnabled": true,
       "name": "360p",
       "pattern": "(?i)\\\\b360p\\\\b",
@@ -299,14 +299,14 @@
       "type": "filter"
     },
     {
-      "borderColor": "",
+      "borderColor": "#FF858283",
       "groupId": "ga",
       "id": "a-dtsx",
       "imageURL": "https://raw.githubusercontent.com/9mousaa/BetterFormatter/main/images/dtsx.png",
       "isEnabled": true,
       "name": "DTS:X",
       "pattern": "(?i)\\bdts[-_.: ]?x\\b",
-      "tagColor": "",
+      "tagColor": "#1A1A1A",
       "tagStyle": "filled and bordered",
       "textColor": "#000000",
       "type": "filter"
