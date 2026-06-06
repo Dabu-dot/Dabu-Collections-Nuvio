@@ -1,10 +1,10 @@
-### VERSION MIXTE FILMS & SERIES ###
-name: Monthly Backdrops
+### VERSION MIXTE FILMS & SERIES (HEBDOMADAIRE) ###
+name: Weekly Backdrops
 
 on:
   schedule:
-    - cron: "0 4 * * 0"
-  workflow_dispatch:
+    - cron: "0 4 * * 0" # Exécution automatique tous les dimanches à 4h00 UTC
+  workflow_dispatch: # Permet toujours le déclenchement manuel
 
 permissions:
   contents: write
@@ -99,12 +99,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # On indexe d'abord explicitement le dossier pour que git détecte les nouvelles images
           git add "Ressources/Collections Covers/Genres/"
           
-          # On vérifie si le dossier indexé contient des changements réels
           if ! git diff --cached --exit-code --quiet; then
-            git commit -m "chore: refresh monthly genres backdrops (FR) [skip ci]"
+            git commit -m "chore: refresh weekly genres backdrops (FR) [skip ci]"
             git push origin main
           else
             echo "No changes to commit. Folder is already up to date."
