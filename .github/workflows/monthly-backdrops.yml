@@ -2,8 +2,8 @@ name: Monthly Backdrops
 
 on:
   schedule:
-    - cron: "0 4 1 * *" # Tourne le 1er de chaque mois
-  workflow_dispatch:   # Te permet de le lancer à la main depuis l'onglet Actions
+    - cron: "0 4 1 * *" # S'exécute automatiquement le 1er de chaque mois
+  workflow_dispatch:   # Te permet de lancer le test manuellement depuis GitHub
 
 permissions:
   contents: write
@@ -34,27 +34,59 @@ jobs:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
           FANART_API_KEY: ${{ secrets.FANART_API_KEY }}
         run: |
-          # --- GENRE : ACTION ---
-          python3 -B .github/scripts/backdrop.py \
-            --api-key "$TMDB_API_KEY" \
-            --fanart-key "$FANART_API_KEY" \
-            --label "Action" \
-            --tmdb-request "with_genres=28&sort_by=popularity.desc" \
-            --output "Ressources/Collections Covers/Genres/action.jpg" \
-            --profile compressed \
-            --size 1080p
+          # Variable réutilisable pour la commande de base
+          CMD="python3 -B .github/scripts/backdrop.py --api-key $TMDB_API_KEY --fanart-key $FANART_API_KEY --language fr,en --profile compressed --size 1080p"
 
-          # --- GENRE : SCIENCE-FICTION ---
-          python3 -B .github/scripts/backdrop.py \
-            --api-key "$TMDB_API_KEY" \
-            --fanart-key "$FANART_API_KEY" \
-            --label "Sci-Fi" \
-            --tmdb-request "with_genres=878&sort_by=popularity.desc" \
-            --output "Ressources/Collections Covers/Genres/scifi.jpg" \
-            --profile compressed \
-            --size 1080p
+          # 1. Action
+          $CMD --label "Action" --tmdb-request "with_genres=28&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/action.jpg"
 
-          # Tu peux dupliquer ce bloc pour chaque genre en changeant l'ID de genre TMDB (with_genres) et le chemin de sortie (--output) !
+          # 2. Aventure
+          $CMD --label "Aventure" --tmdb-request "with_genres=12&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/aventure.jpg"
+
+          # 3. Animation
+          $CMD --label "Animation" --tmdb-request "with_genres=16&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/animation.jpg"
+
+          # 4. Animation Japonaise (Filtre TMDB : Animation + Pays d'origine Japon)
+          $CMD --label "Animation Japonaise" --tmdb-request "with_genres=16&with_original_language=ja&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/animation-japonaise.jpg"
+
+          # 5. Comédie
+          $CMD --label "Comédie" --tmdb-request "with_genres=35&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/comedie.jpg"
+
+          # 6. Crime
+          $CMD --label "Crime" --tmdb-request "with_genres=80&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/crime.jpg"
+
+          # 7. Documentaire
+          $CMD --label "Documentaire" --tmdb-request "with_genres=99&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/documentaire.jpg"
+
+          # 8. Drame
+          $CMD --label "Drame" --tmdb-request "with_genres=18&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/drame.jpg"
+
+          # 9. Famille
+          $CMD --label "Famille" --tmdb-request "with_genres=10751&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/famille.jpg"
+
+          # 10. Fantastique
+          $CMD --label "Fantastique" --tmdb-request "with_genres=14&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/fantastique.jpg"
+
+          # 11. Guerre
+          $CMD --label "Guerre" --tmdb-request "with_genres=10752&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/guerre.jpg"
+
+          # 12. Histoire
+          $CMD --label "Histoire" --tmdb-request "with_genres=36&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/histoire.jpg"
+
+          # 13. Horreur
+          $CMD --label "Horreur" --tmdb-request "with_genres=27&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/horreur.jpg"
+
+          # 14. Romance
+          $CMD --label "Romance" --tmdb-request "with_genres=10749&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/romance.jpg"
+
+          # 15. Science-Fiction
+          $CMD --label "Science-Fiction" --tmdb-request "with_genres=878&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/science-fiction.jpg"
+
+          # 16. Thriller
+          $CMD --label "Thriller" --tmdb-request "with_genres=53&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/thriller.jpg"
+
+          # 17. Western
+          $CMD --label "Western" --tmdb-request "with_genres=37&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/western.jpg"
 
       - name: Clean Python cache folders
         run: |
@@ -70,5 +102,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "Ressources/Collections Covers/Genres/"
-          git commit -m "chore: refresh monthly backdrops"
+          git commit -m "chore: refresh monthly genres backdrops (FR/EN)"
           git push
