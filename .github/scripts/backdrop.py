@@ -751,7 +751,7 @@ def backdrops(
             f"{tmdb_fallbacks} TMDB fallback, "
             f"{other_language_fanart_hits} other-language Fanart).\n"
         )
-    else(tmdb_fallbacks > 0):
+    elif tmdb_fallbacks > 0:
         log(f"  Downloaded {len(tile_images)} images.\n")
 
     minimum_tiles = 12
