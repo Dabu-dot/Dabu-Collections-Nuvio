@@ -34,9 +34,11 @@ jobs:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
           FANART_API_KEY: ${{ secrets.FANART_API_KEY }}
         run: |
-          python3 -B collections/scripts/backdrops.py \
+          python3 -B .github/scripts/backdrops.py \
             --api-key "$TMDB_API_KEY" \
             --fanart-key "$FANART_API_KEY" \
+            --cover-root "Ressources" \
+            --output-root "Ressources" \
             --profile compressed \
             --parallelism 3
 
@@ -54,11 +56,11 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add collections templates .github/workflows collections/scripts
+          git add Ressources/ templates/ .github/
           git commit -m "chore: refresh collection backdrops"
           git push
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Purge jsDelivr backdrop cache
         if: steps.publish.outputs.changed == 'true'
-        run: python3 -B collections/scripts/purge.py
+        run: python3 -B .github/scripts/purge.py --collections-root "Ressources" --repo "Dabu-dot/Dabu-Collections-Nuvio"
