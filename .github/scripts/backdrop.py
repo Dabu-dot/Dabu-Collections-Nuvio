@@ -358,6 +358,41 @@ def download_tmdb_backdrop(path, retries=2):
     return download_image_url(f"{TMDB_IMG_BASE}/{BACKDROP_SIZE}{path}", retries=retries)
 
 
+def select_best_tmdb_backdrop(kind, tmdb_id, api_key, fallback_path, preferred_lang="fr"):
+    """
+    Fetch all backdrops from TMDB gallery and filter them by explicit language priority:
+    1. Preferred Language (ex: 'fr')
+    2. Fallback English ('en')
+    3. Textless / No Language (None)
+    """
+    try:
+        data = tmdb_get(f"/{kind}/{tmdb_id}/images", {}, api_key)
+        backdrops_list = data.get("backdrops", [])
+        if not backdrops_list:
+            return fallback_path
+
+        # 1. Recherche du Français (ou preferred_lang)
+        fr_imgs = [i for i in backdrops_list if i.get("iso_639_1") == preferred_lang]
+        if fr_imgs:
+            return max(fr_imgs, key=lambda x: x.get("vote_average", 0)).get("file_path")
+
+        # 2. Recherche de l'Anglais (pour capturer les logos si pas de FR)
+        if preferred_lang != "en":
+            en_imgs = [i for i in backdrops_list if i.get("iso_639_1") == "en"]
+            if en_imgs:
+                return max(en_imgs, key=lambda x: x.get("vote_average", 0)).get("file_path")
+
+        # 3. Recherche du Textless / Sans langue (None ou vide)
+        null_imgs = [i for i in backdrops_list if i.get("iso_639_1") is None or i.get("iso_639_1") == "null"]
+        if null_imgs:
+            return max(null_imgs, key=lambda x: x.get("vote_average", 0)).get("file_path")
+
+        # Repli ultime si aucun filtre ne matche
+        return backdrops_list[0].get("file_path")
+    except Exception:
+        return fallback_path
+
+
 def fetch_tile_image(kind, item, api_key, fanart_key, preferred_language):
     tmdb_id = item["id"]
     original_language = item.get("original_language")
@@ -401,7 +436,12 @@ def fetch_tile_image(kind, item, api_key, fanart_key, preferred_language):
         if image:
             return image, "fanart"
 
-    tmdb_image = download_tmdb_backdrop(item["backdrop_path"])
+    # --- REPRISE ET CORRECTION DE LA LOGIQUE TMDB ---
+    # Au lieu d'utiliser bêtement item["backdrop_path"], on interroge la galerie complète
+    # avec notre tri linguistique hiérarchisé.
+    best_backdrop_path = select_best_tmdb_backdrop(kind, tmdb_id, api_key, item["backdrop_path"], preferred_language)
+    
+    tmdb_image = download_tmdb_backdrop(best_backdrop_path)
     if tmdb_image:
         return tmdb_image, "tmdb"
 
@@ -711,7 +751,7 @@ def backdrops(
             f"{tmdb_fallbacks} TMDB fallback, "
             f"{other_language_fanart_hits} other-language Fanart).\n"
         )
-    else:
+    else(tmdb_fallbacks > 0):
         log(f"  Downloaded {len(tile_images)} images.\n")
 
     minimum_tiles = 12
