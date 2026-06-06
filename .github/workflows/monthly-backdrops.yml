@@ -1,107 +1,53 @@
-### VERSION MIXTE FILMS & SERIES ###
-name: Monthly Backdrops
+name: Generate Collections Covers
 
 on:
-  schedule:
-    - cron: "0 4 1 * *"
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Permet de lancer le script manuellement depuis l'onglet Actions
 
 permissions:
-  contents: write
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  contents: write # Crucial pour autoriser le push des images générées
 
 jobs:
-  generate-backdrops:
+  build-and-generate:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+    - name: Set up Python
+      uses: actions/checkout@v4
+      # Note: Si tu utilises une version spécifique ou setup-python, garde ta configuration.
+      # Ici on s'assure juste de récupérer le code du repo.
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install pillow requests
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        # Ajoute ici tes dépendances spécifiques (requests, pillow, etc.) si elles ne sont pas dans un requirements.txt
 
-      - name: Generate Genres Backdrops
-        env:
-          PYTHONDONTWRITEBYTECODE: "1"
-          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-          FANART_API_KEY: ${{ secrets.FANART_API_KEY }}
-        run: |
-          # 1. Action
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Action" --tmdb-request "movie:with_genres=28&sort_by=popularity.desc" --tmdb-request "tv:with_genres=10759&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/action.jpg"
+    - name: Run generation script
+      env:
+        TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }} # Ajuste avec le nom exact de tes secrets si nécessaire
+        FANART_API_KEY: ${{ secrets.FANART_API_KEY }}
+      run: |
+        # C'est ici que ton script s'exécute et crée les images dans "Ressources/Collections Covers/Genres/"
+        python ton_script_de_generation.py
 
-          # 2. Aventure
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Aventure" --tmdb-request "movie:with_genres=12&sort_by=popularity.desc" --tmdb-request "tv:with_genres=10759&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/aventure.jpg"
-
-          # 3. Animation
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Animation" --tmdb-request "movie:with_genres=16&sort_by=popularity.desc" --tmdb-request "tv:with_genres=16&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/animation.jpg"
-
-          # 4. Animation Japonaise
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Animation Japonaise" --tmdb-request "movie:with_genres=16&with_original_language=ja&sort_by=popularity.desc" --tmdb-request "tv:with_genres=16&with_original_language=ja&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/animation-japonaise.jpg"
-
-          # 5. Comédie
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Comédie" --tmdb-request "movie:with_genres=35&sort_by=popularity.desc" --tmdb-request "tv:with_genres=35&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/comedie.jpg"
-
-          # 6. Crime
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Crime" --tmdb-request "movie:with_genres=80&sort_by=popularity.desc" --tmdb-request "tv:with_genres=80&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/crime.jpg"
-
-          # 7. Documentaire
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Documentaire" --tmdb-request "movie:with_genres=99&sort_by=popularity.desc" --tmdb-request "tv:with_genres=99&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/documentaire.jpg"
-
-          # 8. Drame
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Drame" --tmdb-request "movie:with_genres=18&sort_by=popularity.desc" --tmdb-request "tv:with_genres=18&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/drame.jpg"
-
-          # 9. Famille
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Famille" --tmdb-request "movie:with_genres=10751&sort_by=popularity.desc" --tmdb-request "tv:with_genres=10751&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/famille.jpg"
-
-          # 10. Fantastique
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Fantastique" --tmdb-request "movie:with_genres=14&sort_by=popularity.desc" --tmdb-request "tv:with_genres=10765&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/fantastique.jpg"
-
-          # 11. Guerre
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Guerre" --tmdb-request "movie:with_genres=10752&sort_by=popularity.desc" --tmdb-request "tv:with_genres=10768&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/guerre.jpg"
-
-          # 12. Histoire
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Histoire" --tmdb-request "movie:with_genres=36&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/histoire.jpg"
-
-          # 13. Horreur
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Horreur" --tmdb-request "movie:with_genres=27&sort_by=popularity.desc" --tmdb-request "tv:with_genres=27&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/horreur.jpg"
-
-          # 14. Romance
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Romance" --tmdb-request "movie:with_genres=10749&sort_by=popularity.desc" --tmdb-request "tv:with_genres=10749&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/romance.jpg"
-
-          # 15. Science-Fiction
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Science-Fiction" --tmdb-request "movie:with_genres=878&sort_by=popularity.desc" --tmdb-request "tv:with_genres=10765&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/science-fiction.jpg"
-
-          # 16. Thriller
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Thriller" --tmdb-request "movie:with_genres=53&sort_by=popularity.desc" --tmdb-request "tv:with_genres=9648&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/thriller.jpg"
-
-          # 17. Western
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Western" --tmdb-request "movie:with_genres=37&sort_by=popularity.desc" --tmdb-request "tv:with_genres=37&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/western.jpg"
-
-      - name: Clean Python cache folders
-        run: |
-          find . -type d -name "__pycache__" -prune -exec rm -rf {} +
-
-      - name: Commit and push updated assets
-        id: publish
-        run: |
-          if git diff --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "Ressources/Collections Covers/Genres/"
-          git commit -m "chore: refresh monthly genres backdrops (FR)"
-          git push
+    - name: Commit and Push generated backdrops
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # On force l'ajout de tout ce qui a été créé dans le dossier des genres
+        git add "Ressources/Collections Covers/Genres/"
+        
+        # On vérifie s'il y a des changements pour éviter de faire planter le workflow s'il n'y a rien de neuf
+        if ! git diff --cached --exit-code --quiet; then
+          git commit -m "Chore: Auto-generate covers and backdrops [skip ci]"
+          git push origin main
+        else
+          echo "Aucune nouvelle image à ajouter, le dossier est déjà à jour."
+        fi
