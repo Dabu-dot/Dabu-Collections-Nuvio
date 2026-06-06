@@ -2,8 +2,8 @@ name: Monthly Backdrops
 
 on:
   schedule:
-    - cron: "0 4 1 * *"
-  workflow_dispatch:
+    - cron: "0 4 1 * *" # Tourne le 1er de chaque mois
+  workflow_dispatch:   # Te permet de le lancer à la main depuis l'onglet Actions
 
 permissions:
   contents: write
@@ -28,19 +28,33 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pillow requests
 
-      - name: Generate collection backdrops
+      - name: Generate Genres Backdrops
         env:
           PYTHONDONTWRITEBYTECODE: "1"
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
           FANART_API_KEY: ${{ secrets.FANART_API_KEY }}
         run: |
-          python3 -B .github/scripts/backdrops.py \
+          # --- GENRE : ACTION ---
+          python3 -B .github/scripts/backdrop.py \
             --api-key "$TMDB_API_KEY" \
             --fanart-key "$FANART_API_KEY" \
-            --cover-root "Ressources" \
-            --output-root "Ressources" \
+            --label "Action" \
+            --tmdb-request "with_genres=28&sort_by=popularity.desc" \
+            --output "Ressources/Collections Covers/Genres/action.jpg" \
             --profile compressed \
-            --parallelism 3
+            --size 1080p
+
+          # --- GENRE : SCIENCE-FICTION ---
+          python3 -B .github/scripts/backdrop.py \
+            --api-key "$TMDB_API_KEY" \
+            --fanart-key "$FANART_API_KEY" \
+            --label "Sci-Fi" \
+            --tmdb-request "with_genres=878&sort_by=popularity.desc" \
+            --output "Ressources/Collections Covers/Genres/scifi.jpg" \
+            --profile compressed \
+            --size 1080p
+
+          # Tu peux dupliquer ce bloc pour chaque genre en changeant l'ID de genre TMDB (with_genres) et le chemin de sortie (--output) !
 
       - name: Clean Python cache folders
         run: |
@@ -51,16 +65,10 @@ jobs:
         run: |
           if git diff --quiet; then
             echo "No changes to commit."
-            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Ressources/ templates/ .github/
-          git commit -m "chore: refresh collection backdrops"
+          git add "Ressources/Collections Covers/Genres/"
+          git commit -m "chore: refresh monthly backdrops"
           git push
-          echo "changed=true" >> "$GITHUB_OUTPUT"
-
-      - name: Purge jsDelivr backdrop cache
-        if: steps.publish.outputs.changed == 'true'
-        run: python3 -B .github/scripts/purge.py --collections-root "Ressources" --repo "Dabu-dot/Dabu-Collections-Nuvio"
