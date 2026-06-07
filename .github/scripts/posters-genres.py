@@ -37,8 +37,11 @@ GENRES_CONFIG = {
 OUTPUT_DIR = "Ressources/Collections Covers/Genres/Static Covers"
 detector = MTCNN()
 
+# Registre global anti-doublons (permet de ne jamais répéter un film d'un genre à un autre)
+PROCESSED_MOVIE_IDS = set()
+
 def get_popular_movies_by_genre(genre_key, config):
-    """Récupère les films populaires avec filtres géographiques, linguistiques et de genres croisés."""
+    """Récupère les films populaires avec requêtes chirurgicales par genre pour éviter les niches."""
     movies = []
     genre_id = config["id"]
     
@@ -46,19 +49,29 @@ def get_popular_movies_by_genre(genre_key, config):
     geo_filter = "&with_origin_country=US|FR|GB|CA|ES|DE|IT" if genre_key in global_genres else ""
 
     for page in [1, 2, 3]:
-        url = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_genres={genre_id}&sort_by=popularity.desc&page={page}&language=fr-FR{geo_filter}&vote_count.gte=100"
+        url = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_genres={genre_id}&sort_by=popularity.desc&page={page}&language=fr-FR{geo_filter}"
         
+        # Ajustement des filtres spécifiques selon les retours d'expérience
         if genre_key == "animation-japonaise":
-            url += "&with_original_language=ja"
+            url += "&with_original_language=ja&vote_count.gte=100"
         elif genre_key == "animation":
-            url += "&without_original_language=ja|ko|zh"
+            url += "&without_original_language=ja|ko|zh&vote_count.gte=100"
         elif genre_key == "aventure":
-            url += "&without_genres=16"
+            url += "&without_genres=16&vote_count.gte=100"
+        elif genre_key == "drame":
+            # Pour le Drame : Uniquement des films modernes et ultra-populaires (Culte)
+            url += "&primary_release_date.gte=2000-01-01&vote_count.gte=1000"
+        elif genre_key == "documentaire":
+            # Pour le Documentaire : Ciblage par mots-clés Nature (9827) ou Vie Sauvage (209386)
+            url += "&with_keywords=9827|209386&vote_count.gte=50"
+        else:
+            url += "&vote_count.gte=100"
             
         res = requests.get(url).json()
         if "results" in res and res["results"]:
             movies.extend(res["results"])
             
+    # Sécurité Aventure : si aucun film live-action n'est trouvé, on élargit
     if genre_key == "aventure" and not movies:
         url = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_genres={genre_id}&sort_by=popularity.desc&page=1&language=fr-FR"
         res = requests.get(url).json()
@@ -67,30 +80,25 @@ def get_popular_movies_by_genre(genre_key, config):
     return movies
 
 def get_movie_artworks(movie_id):
-    """Récupère les backdrops ET les posters natifs textless, puis les trie par pertinence."""
+    """Récupère les backdrops et les posters natifs textless, puis les trie par pertinence."""
     url = f"https://api.themoviedb.org/3/movie/{movie_id}/images?api_key={TMDB_API_KEY}"
     res = requests.get(url).json()
     
     backdrops = res.get("backdrops", [])
     posters = res.get("posters", [])
     
-    # Filtrer strictement les images labellisées sans texte (iso_639_1 à None)
     valid_backdrops = [b for b in backdrops if b.get("iso_639_1") is None]
     valid_posters = [p for p in posters if p.get("iso_639_1") is None]
     
-    # Marquage pour adapter la logique de découpe plus tard
     for b in valid_backdrops: b['artwork_type'] = 'backdrop'
     for p in valid_posters: p['artwork_type'] = 'poster'
     
-    # Fusion (on explore les posters natifs en premier car ils sont déjà au bon format)
     candidates = valid_posters + valid_backdrops
-    
-    # Tri qualitatif TMDB (Moyenne des votes * Nombre de votes)
     candidates.sort(key=lambda x: x.get("vote_average", 0) * x.get("vote_count", 0), reverse=True)
     return candidates
 
 def evaluate_image_quality(img, artwork_type):
-    """Analyse la netteté et rejette les images avec logos incrustés ou textes résiduels."""
+    """Analyse la netteté et rejette les images contenant des logos ou du texte vectoriel."""
     gray = img.convert("L")
     
     # 1. Calcul de la variance du Laplacien (Netteté globale)
@@ -98,7 +106,6 @@ def evaluate_image_quality(img, artwork_type):
     laplacian_img = gray.filter(ImageFilter.Kernel((3, 3), kernel.flatten(), scale=1, offset=0))
     variance_laplacian = np.array(laplacian_img, dtype=np.float32).var()
     
-    # Rejet si l'image est floue (seuil plus tolérant pour les posters d'origine souvent plus lisses)
     min_sharpness = 90 if artwork_type == 'poster' else 120
     if variance_laplacian < min_sharpness:
         print(f"   -> [REJET] Image trop floue ou plate (Variance: {variance_laplacian:.1f})")
@@ -109,7 +116,6 @@ def evaluate_image_quality(img, artwork_type):
     edges_np = np.array(edges)
     edge_density = np.sum(edges_np > 180) / edges_np.size
     
-    # Plus de 5% de contours vifs indique la présence de texte vectoriel ou de logos
     if edge_density > 0.05:
         print(f"   -> [REJET] Texte résiduel ou logo détecté par analyse ({edge_density*100:.2f}%)")
         return False
@@ -117,27 +123,50 @@ def evaluate_image_quality(img, artwork_type):
     return True
 
 def find_best_crop_x(img, target_w, faces):
-    """Trouve la zone de rognage horizontale optimale (visages IA ou détails Laplacien)."""
+    """Calcule le point de rognage optimal. Gère le barycentre des groupes pour éviter les coupures (Option B)."""
     W, H = img.size
     
     if faces:
-        main_face = max(faces, key=lambda f: f['box'][2] * f['box'][3])
-        fx, fy, fw, fh = main_face['box']
-        face_center_x = fx + (fw // 2)
+        # Récupération des centres X de tous les visages détectés
+        centers_x = []
+        for f in faces:
+            fx, _, fw, _ = f['box']
+            centers_x.append(fx + (fw // 2))
+            
+        # Option B améliorée : On calcule le milieu parfait entre le visage le plus à gauche et le plus à droite
+        min_x = min(centers_x)
+        max_x = max(centers_x)
+        group_center_x = (min_x + max_x) // 2
         
-        best_x_start = face_center_x - (target_w // 2)
+        # Point de départ théorique centré sur le groupe
+        best_x_start = group_center_x - (target_w // 2)
         best_x_start = max(0, min(best_x_start, W - target_w))
         
-        # Règle d'exclusion latérale stricte
+        # Vérification de sécurité : Est-ce qu'un des visages essentiels se fait couper avec ce point de vue ?
         crop_left = best_x_start
         crop_right = best_x_start + target_w
-        for face in faces:
-            x, y, w, h = face['box']
+        
+        for f in faces:
+            x, _, w, _ = f['box']
+            # Si une tête est coupée par la bordure gauche ou droite, on applique un ajustement dynamique (glissement)
+            if x < crop_left < x + w:
+                best_x_start = x - 20  # On décale un peu vers la gauche pour faire rentrer le personnage
+            if x < crop_right < x + w:
+                best_x_start = (x + w) - target_w + 20  # On décale vers la droite
+                
+        # Double sécurité après ajustement glissant
+        best_x_start = max(0, min(best_x_start, W - target_w))
+        crop_left = best_x_start
+        crop_right = best_x_start + target_w
+        
+        for f in faces:
+            x, _, w, _ = f['box']
             if (x < crop_left < x + w) or (x < crop_right < x + w):
-                return None
+                return None  # Trop large pour rentrer dans le cadre vertical, rejet.
+                
         return best_x_start
 
-    # Analyse fréquentielle par fenêtre glissante si pas de visage humain
+    # Balayage Laplacien si pas de visage humain (Créatures, Paysages)
     gray = img.convert("L")
     kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]], dtype=np.float32)
     laplacian_img = gray.filter(ImageFilter.Kernel((3, 3), kernel.flatten(), scale=1, offset=0))
@@ -160,7 +189,7 @@ def apply_duotone(img, target_color):
     gray = img.convert("L")
     gray_np = np.array(gray)
     
-    base_dark = np.array([12, 16, 26]) # Fond bleu-noir mat organique
+    base_dark = np.array([12, 16, 26])
     target_light = np.array(target_color)
     
     duotone = np.zeros((gray_np.shape[0], gray_np.shape[1], 3), dtype=np.uint8)
@@ -207,37 +236,34 @@ def process_and_crop(artwork, label, target_color, force_subject=True):
     img = Image.open(img_res.raw).convert("RGB")
     W, H = img.size
     
-    # Élimination des sources trop petites pour éviter le flou
     if W < 1000 or H < 720:
         return None
         
-    # Validation de la qualité intrinsèque (flou & logos)
     if not evaluate_image_quality(img, artwork_type):
         return None
         
     img_np = np.array(img)
     faces = detector.detect_faces(img_np)
     
-    # 1. RÈGLE ANTI-COLLAGE (Type Star Wars / Marvel à visages multiples)
+    # RÈGLE ANTI-COLLAGE (Sensibilité accrue pour rejeter les surcharges de personnages type Avengers/Mario)
     if len(faces) > 2:
         print(f"   -> [REJET] Composition surchargée ({len(faces)} visages détectés).")
         return None
         
-    # 2. RÈGLE ANTI-COMPOSITION COMPLEXE (Analyse de texture globale pour les posters natifs)
+    # RÈGLE ANTI-COMPOSITION BRUITÉE (Pour les affiches d'animation ou de synthèse complexes)
     if artwork_type == 'poster':
         edges = img.convert("L").filter(ImageFilter.FIND_EDGES)
         edge_density = np.sum(np.array(edges) > 150) / np.array(edges).size
-        if edge_density > 0.08: # Plus de 8% de contours durs sur l'image entière = surcharge visuelle
-            print(f"   -> [REJET] Poster natif trop bruité ou complexe ({edge_density*100:.2f}%)")
+        if edge_density > 0.07: # Abaissement de 0.08 à 0.07 pour éliminer plus de collages complexes
+            print(f"   -> [REJET] Poster natif trop dense ou surchargé ({edge_density*100:.2f}%)")
             return None
 
-    # Exclure les paysages vides sur les catégories clés
     if force_subject and not faces:
         if np.array(img.convert("L")).var() < 40:
             print("   -> [REJET] Absence de sujet ou contraste trop plat.")
             return None
 
-    # Découpage adaptatif selon le format initial
+    # Découpage adaptatif selon la source d'origine
     if artwork_type == 'backdrop':
         target_w = int(H * (2/3))
         if target_w > W:
@@ -248,28 +274,28 @@ def process_and_crop(artwork, label, target_color, force_subject=True):
             return None
         cropped_img = img.crop((best_x_start, 0, best_x_start + target_w, H))
     else:
-        # Si c'est déjà un poster en portrait, on applique une légère découpe latérale
-        # pour forcer le ratio parfait 2:3 (800x1200) sans étirer l'image
+        # CORRECTION TYPE MORTAL KOMBAT : Pour un poster vertical d'origine,
+        # l'ajustement du ratio doit impérativement se caler par le HAUT (Y=0) pour éviter de couper les têtes !
         current_ratio = W / H
-        if abs(current_ratio - (2/3)) > 0.05:
+        if abs(current_ratio - (2/3)) > 0.02:
             target_w = int(H * (2/3))
             if target_w <= W:
                 start_x = (W - target_w) // 2
+                # Rognage latéral centré, mais verrouillage vertical strict en haut (0) jusqu'à H
                 cropped_img = img.crop((start_x, 0, start_x + target_w, H))
             else:
                 cropped_img = img
         else:
             cropped_img = img
 
-    # Redimensionnement final standardisé Nuvio
+    # Redimensionnement standardisé Nuvio
     final_img = cropped_img.resize((800, 1200), Image.Resampling.LANCZOS)
     final_img = ImageEnhance.Contrast(final_img).enhance(1.20)
     
-    # Application de l'effet Duotone et de la typographie
+    # Effet Duotone et Scrim
     final_img = apply_duotone(final_img, target_color)
     draw = ImageDraw.Draw(final_img, "RGBA")
     
-    # Scrim dégradé
     for y in range(750, 1200):
         alpha = int(((y - 750) / 450) ** 2.3 * 245)
         draw.line([(0, y), (800, y)], fill=(0, 0, 0, alpha))
@@ -290,7 +316,7 @@ def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
     for genre_name, config in GENRES_CONFIG.items():
-        print(f"\n--- [PHASE 2.5] Traitement des Artworks pour : {config['label']} ---")
+        print(f"\n--- [PHASE 3] Analyse des Artworks pour : {config['label']} ---")
         movies = get_popular_movies_by_genre(genre_name, config)
         
         top_movies = movies[:6]
@@ -300,29 +326,39 @@ def main():
         poster_created = False
         
         for movie in ordered_movies:
-            print(f" -> Analyse du catalogue de : {movie.get('title')}")
-            artworks = get_movie_artworks(movie["id"])
+            movie_id = movie["id"]
+            
+            # FILTRE ANTI-DOUBLONS INTER-GENRES : On vérifie si ce film a déjà été sélectionné
+            if movie_id in PROCESSED_MOVIE_IDS:
+                print(f" -> [IGNORÉ] {movie.get('title')} ignoré car déjà utilisé dans une autre catégorie.")
+                continue
+                
+            print(f" -> Analyse du catalogue de : {movie.get('title')} (ID: {movie_id})")
+            artworks = get_movie_artworks(movie_id)
             
             if not artworks:
                 continue
                 
             force_subj = False if genre_name in ["documentaire", "histoire"] else True
             
-            # Analyse des 8 meilleures images filtrées par la communauté (posters + backdrops)
             for art in artworks[:8]:
                 final_poster = process_and_crop(art, config["label"], config["color"], force_subject=force_subj)
                 
                 if final_poster:
                     final_poster.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
                     final_poster.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
-                    print(f"==> [SUCCÈS] Poster généré ({art['artwork_type']}) avec le film : {movie.get('title')}.")
+                    print(f"==> [SUCCÈS] Poster généré avec le film : {movie.get('title')}.")
+                    
+                    # Enregistrement de l'ID du film pour le blacklister des genres suivants
+                    PROCESSED_MOVIE_IDS.add(movie_id)
                     poster_created = True
                     break
             if poster_created:
                 break
                 
         if not poster_created:
-            print(f" /!\\ ÉCHEC : Aucun artwork n'a validé les filtres d'épuration pour {genre_name}.")
+            print(f" /!\\ ÉCHEC : Aucun artwork n'a validé la charte graphique de la Phase 3 pour {genre_name}.")
 
 if __name__ == "__main__":
     main()
+            
