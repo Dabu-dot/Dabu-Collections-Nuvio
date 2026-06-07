@@ -23,7 +23,7 @@ HISTORY_FILE = ".github/scripts/posters_history.json"
 # Langues occidentales populaires autorisées (Filtre de base)
 ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it"}
 
-# Configuration chirurgicale des genres (Prête à recevoir ta future vague de tags fins)
+# Configuration chirurgicale des genres (Prête pour le scoring et tes futurs tags fins)
 GENRES_CONFIG = {
     "action": {"label": "Action", "color": (255, 90, 0), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16&with_keywords=9715|9717|1556"},
     "animation-japonaise": {"label": "Animation Japonaise", "color": (255, 0, 128), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True, "override_lang": True},
@@ -192,12 +192,12 @@ def apply_apple_tv_duotone(img, target_color):
     return Image.fromarray(duotone)
 
 def finalize_landscape_banner(img, label, target_color):
-    """Calcule et applique le texte Ultra-XXL (165px) avec un wrapping dynamique haut de gamme"""
+    """Calcule et applique le texte Ultra-XXL (165px) avec wrapping dynamique haut de gamme"""
     img = ImageOps.fit(img, (1920, 1080), method=Image.Resampling.LANCZOS)
     img = ImageEnhance.Contrast(img).enhance(1.18)
     img = apply_apple_tv_duotone(img, target_color)
     
-    # Dégradé de noir cinématique sur le bas pour asseoir le gros texte
+    # Dégradé cinématique
     gradient = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
     g_draw = ImageDraw.Draw(gradient)
     for y in range(400, 1080):
@@ -211,19 +211,16 @@ def finalize_landscape_banner(img, label, target_color):
     t_draw = ImageDraw.Draw(text_layer)
     s_draw = ImageDraw.Draw(shadow_layer)
     
-    # TYPOGRAPHIE PRODUCTION ULTRA-XXL (165px pour visibilité TV lointaine)
     font_size = 165
     try:
         font = ImageFont.truetype(".github/assets/fonts/SF-Pro-Display-Bold.otf", font_size)
     except IOError:
         font = ImageFont.load_default()
 
-    # Padding ergonomique stable
     padding_left = 130
     padding_bottom = 140
     max_text_width = 1920 - (padding_left * 2)
 
-    # Wrapping intelligent
     words = label.split(" ")
     lines = []
     current_line = ""
@@ -236,24 +233,18 @@ def finalize_landscape_banner(img, label, target_color):
             current_line = word
     if current_line: lines.append(current_line)
 
-    # Ajustement des interlignes pour les gros caractères
     line_spacing = 20
     line_height = font_size - 22
     total_text_height = (len(lines) * line_height) + ((len(lines) - 1) * line_spacing)
     
-    # Calcul dynamique de y : Remonte parfaitement si double ligne détectée
     base_y = (1080 - padding_bottom - line_height) - (total_text_height - line_height)
 
-    # Rendu des calques
     current_y = base_y
     for line in lines:
-        # Ombre portée cinéma diffuse
         s_draw.text((padding_left + 6, current_y + 10), line, fill=(0, 0, 0, 245), font=font)
-        # Texte de face blanc pur
         t_draw.text((padding_left, current_y), line, fill=(255, 255, 255, 255), font=font)
         current_y += line_height + line_spacing
 
-    # Flou gaussien pour une ombre diffuse haut de gamme (aucun effet de contour dur)
     shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(12))
     
     final_img = Image.alpha_composite(img, shadow_layer)
@@ -264,11 +255,8 @@ def finalize_landscape_banner(img, label, target_color):
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
-    for file in os.listdir(OUTPUT_DIR):
-        file_path = os.path.join(OUTPUT_DIR, file)
-        if os.path.isfile(file_path):
-            os.remove(file_path)
-            
+    # NOTE: On ne purge plus agressivement tout le dossier de sortie ici pour garder les anciens posters en cas d'échec
+    
     history = load_and_clean_history()
     excluded_keys = set(history.keys())
     
@@ -279,7 +267,9 @@ def main():
         
         candidates_pool = get_trending_media_for_genre(config, excluded_keys)
         if not candidates_pool:
-            print(f" /!\\ Aucun candidat éligible trouvé pour le genre {config['label']}")
+            # SYSTÈME DE SECOURS 1 : Pas de candidats renvoyés par l'API
+            print(f" [CONSERVATION] Aucun candidat éligible trouvé pour le genre {config['label']}. Ancien poster préservé.")
+            sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=200,title=Génération Sautée ({config['label']})::Aucun média valide trouvé dans l'API. L'ancien poster est conservé pour éviter un écran noir.\n")
             continue
             
         selected_media = random.choice(candidates_pool)
@@ -288,7 +278,7 @@ def main():
         composite_key = f"{media_type}_{media_id}"
         media_title = selected_media.get("title") or selected_media.get("name")
         
-        print(f" -> Œuvre validée : {media_title} ({media_type.upper()} - ID: {media_id})")
+        print(f" -> Œuvre sélectionnée : {media_title} ({media_type.upper()} - ID: {media_id})")
         
         backdrops_list = get_best_textless_backdrops(media_type, media_id, selected_media["backdrop_path"])
         time.sleep(0.2)
@@ -313,6 +303,7 @@ def main():
             
             final_banner = finalize_landscape_banner(winner_bg["image"], config["label"], config["color"])
             
+            # Écriture/Écrasement sécurisé du fichier propre à ce genre
             final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
             final_banner.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
             
@@ -323,12 +314,18 @@ def main():
                 "date": datetime.now().strftime("%Y-%m-%d")
             }
         else:
-            print(f" /!\\ Échec : Aucun visuel n'a pu être extrait pour {media_title}")
+            # SYSTÈME DE SECOURS 2 : Les candidats n'avaient pas de visuels téléchargeables
+            print(f" [CONSERVATION] Échec d'extraction visuelle pour {media_title}. L'ancien poster de {config['label']} reste en place.")
+            sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=240,title=Visuel Manquant ({config['label']})::Impossible d'extraire un fond pour '{media_title}'. L'ancien poster est conservé.\n")
+
+    # Tri de l'historique par date descendante pour le confort de lecture de l'humain (Table de hachage ordonnée)
+    sorted_history = dict(sorted(history.items(), key=lambda item: item[1]['date'], reverse=True))
 
     os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
-        json.dump(history, f, ensure_ascii=False, indent=4)
-    print("\n[SUCCESS] Déploiement terminé. Prise en charge de la police ultra-XXL active.")
+        json.dump(sorted_history, f, ensure_ascii=False, indent=4)
+        
+    print("\n[SUCCESS] Déploiement terminé. Protection contre les bannières vides active.")
 
 if __name__ == "__main__":
     main()
