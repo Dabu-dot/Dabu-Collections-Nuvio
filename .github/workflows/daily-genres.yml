@@ -8,6 +8,7 @@ on:
 jobs:
   generate-covers:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     
     permissions:
       contents: write
