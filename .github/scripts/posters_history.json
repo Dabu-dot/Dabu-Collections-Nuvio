@@ -483,5 +483,85 @@
         "title": "Bonanza",
         "genre": "western",
         "date": "2026-06-07"
+    },
+    "movie_603": {
+        "title": "The Matrix",
+        "genre": "action",
+        "date": "2026-06-07"
+    },
+    "tv_30984": {
+        "title": "Bleach",
+        "genre": "animation-japonaise",
+        "date": "2026-06-07"
+    },
+    "tv_1434": {
+        "title": "Family Guy",
+        "genre": "animation",
+        "date": "2026-06-07"
+    },
+    "tv_1399": {
+        "title": "Game of Thrones",
+        "genre": "aventure",
+        "date": "2026-06-07"
+    },
+    "movie_4257": {
+        "title": "Scary Movie 4",
+        "genre": "comedie",
+        "date": "2026-06-07"
+    },
+    "tv_41956": {
+        "title": "Death in Paradise",
+        "genre": "crime",
+        "date": "2026-06-07"
+    },
+    "tv_13805": {
+        "title": "A Girl's Guide to 21st Century Sex",
+        "genre": "documentaire",
+        "date": "2026-06-07"
+    },
+    "tv_124364": {
+        "title": "FROM",
+        "genre": "drame",
+        "date": "2026-06-07"
+    },
+    "tv_3452": {
+        "title": "Frasier",
+        "genre": "famille",
+        "date": "2026-06-07"
+    },
+    "movie_83533": {
+        "title": "Avatar: Fire and Ash",
+        "genre": "fantastique",
+        "date": "2026-06-07"
+    },
+    "tv_252107": {
+        "title": "Star City",
+        "genre": "guerre",
+        "date": "2026-06-07"
+    },
+    "tv_126308": {
+        "title": "Shōgun",
+        "genre": "histoire",
+        "date": "2026-06-07"
+    },
+    "movie_11012": {
+        "title": "Damage",
+        "genre": "romance",
+        "date": "2026-06-07"
+    },
+    "tv_4629": {
+        "title": "Stargate SG-1",
+        "genre": "science-fiction",
+        "date": "2026-06-07"
+    },
+    "tv_60574": {
+        "title": "Peaky Blinders",
+        "genre": "thriller",
+        "date": "2026-06-07"
+    },
+    "tv_1781": {
+        "title": "Little House on the Prairie",
+        "genre": "western",
+        "date": "2026-06-07"
     }
 }
