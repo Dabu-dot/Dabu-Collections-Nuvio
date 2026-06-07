@@ -9,6 +9,10 @@ jobs:
   generate-covers:
     runs-on: ubuntu-latest
     
+    # AJOUT ICI : Autorise explicitement l'action à écrire dans le dépôt
+    permissions:
+      contents: write
+    
     steps:
       - name: Checkout du dépôt
         uses: actions/checkout@v4
