@@ -5,6 +5,7 @@ import json
 import random
 import requests
 from datetime import datetime, timedelta
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageOps
 
 # Configuration TMDB
@@ -161,7 +162,6 @@ def analyze_and_score_backdrop(bg, item):
 
 def apply_apple_tv_duotone(img, target_color):
     """Génère un rendu Duotone contrasté calqué sur l'identité Apple TV"""
-    import numpy as np
     gray = img.convert("L")
     gray_np = np.array(gray)
     
