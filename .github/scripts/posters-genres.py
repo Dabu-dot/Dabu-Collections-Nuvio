@@ -13,7 +13,6 @@ if not TMDB_API_KEY:
     print("Erreur : La variable TMDB_API_KEY n'est pas définie.")
     sys.exit(1)
 
-# Liste RESTRICTIVE des 17 genres demandés avec IDs TMDB et Couleurs Nuvio
 GENRES_CONFIG = {
     "action": {"id": 28, "label": "ACTION", "color": (255, 90, 0)},
     "animation-japonaise": {"id": 16, "label": "ANIMATION JAPONAISE", "color": (255, 0, 128)}, 
@@ -36,12 +35,10 @@ GENRES_CONFIG = {
 
 OUTPUT_DIR = "Ressources/Collections Covers/Genres/Static Covers"
 detector = MTCNN()
-
-# Registre global anti-doublons inter-genres
 PROCESSED_MOVIE_IDS = set()
 
 def get_popular_movies_by_genre(genre_key, config):
-    """Récupère les films populaires avec les filtres de requêtes optimisés."""
+    """Découverte des films avec requêtes normalisées et nettoyées pour TMDB."""
     movies = []
     genre_id = config["id"]
     
@@ -60,21 +57,26 @@ def get_popular_movies_by_genre(genre_key, config):
         elif genre_key == "drame":
             url += "&primary_release_date.gte=2000-01-01&vote_count.gte=500"
         elif genre_key == "documentaire":
-            url += "&with_keywords=9827|209386&vote_count.gte=30"
+            # FIX DOCUMENTAIRE : Syntaxe simplifiée et robuste pour éviter le crash de l'URL
+            url = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_genres=99&with_keywords=209386&sort_by=vote_average.desc&vote_count.gte=20&page={page}"
         else:
             url += "&vote_count.gte=100"
             
-        res = requests.get(url).json()
-        if "results" in res and res["results"]:
-            movies.extend(res["results"])
+        try:
+            res = requests.get(url, timeout=10).json()
+            if "results" in res and res["results"]:
+                movies.extend(res["results"])
+        except Exception:
+            continue
             
     return movies
 
 def get_movie_artworks(movie_id):
-    """Débloque la mine d'or en ciblant spécifiquement le catalogue Textless (language=null)."""
-    # Utilisation du paramètre include_image_language=null pour cibler les versions sans texte
     url = f"https://api.themoviedb.org/3/movie/{movie_id}/images?api_key={TMDB_API_KEY}&include_image_language=null"
-    res = requests.get(url).json()
+    try:
+        res = requests.get(url, timeout=5).json()
+    except Exception:
+        return []
     
     backdrops = res.get("backdrops", [])
     posters = res.get("posters", [])
@@ -82,44 +84,65 @@ def get_movie_artworks(movie_id):
     for b in backdrops: b['artwork_type'] = 'backdrop'
     for p in posters: p['artwork_type'] = 'poster'
     
-    # On met les posters natifs en priorité absolue puisqu'ils sont déjà au format vertical
-    candidates = posters + backdrops
-    return candidates
+    return posters + backdrops
 
-def evaluate_image_quality(img, artwork_type):
-    """Vérification basique de la netteté de l'image source."""
+def analyze_grid_emptiness(img):
+    """Analyse si l'image est un immense aplat vide (Teaser / Logo)."""
     gray = img.convert("L")
-    kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]], dtype=np.float32)
-    laplacian_img = gray.filter(ImageFilter.Kernel((3, 3), kernel.flatten(), scale=1, offset=0))
-    variance_laplacian = np.array(laplacian_img, dtype=np.float32).var()
+    gray_np = np.array(gray)
+    h, w = gray_np.shape
     
-    # Les posters d'origine ou d'animation peuvent être lisses (dessin), on se montre tolérant
-    min_sharpness = 60 if artwork_type == 'poster' else 100
-    if variance_laplacian < min_sharpness:
-        print(f"   -> [REJET] Image trop floue ou plate (Variance: {variance_laplacian:.1f})")
-        return False
-    return True
+    # Découpage en une grille de 3x3 blocs
+    bh, bw = h // 3, w // 3
+    empty_blocks = 0
+    
+    for i in range(3):
+        for j in range(3):
+            block = gray_np[i*bh:(i+1)*bh, j*bw:(j+1)*bw]
+            if block.var() < 12.0:  # Bloc très uniforme / plat
+                empty_blocks += 1
+                
+    return empty_blocks >= 6  # Vrai si les 2/3 de l'image sont totalement vides
+
+def calculate_candidate_score(artwork_type, variance, faces, genre_name, is_teaser):
+    """Système de scoring prédictif pour élire la meilleure mise en page."""
+    score = 0
+    
+    if is_teaser:
+        return 5  # Pénalité quasi-éliminatoire pour les fonds noirs ou logos uniques
+        
+    if artwork_type == 'poster':
+        score += 35
+        
+    # Évaluation de la netteté globale
+    score += min(25, int(variance / 7))
+    
+    num_faces = len(faces)
+    # Règle d'incarnation par genre
+    if genre_name in ["action", "science-fiction", "thriller", "romance", "aventure"]:
+        if num_faces in [1, 2]:
+            score += 40  # Parfait pour l'identification du film
+        elif num_faces == 0:
+            score += 10  # Sanction si paysage trop anonyme pour de l'action
+        else:
+            score += 5
+    else:
+        # Pour le documentaire, l'histoire ou l'animation, les paysages ou structures sont bienvenus
+        if num_faces <= 1:
+            score += 40
+        else:
+            score += 15
+            
+    return score
 
 def find_best_crop_x(img, target_w, faces):
-    """Trouve la zone de coupe idéale pour transformer un backdrop horizontal en poster vertical."""
     W, H = img.size
-    
     if faces:
-        # Si un seul visage, focus centré dessus
-        if len(faces) == 1:
-            fx, _, fw, _ = faces[0]['box']
-            face_center_x = fx + (fw // 2)
-            best_x_start = face_center_x - (target_w // 2)
-        else:
-            # Si plusieurs visages, on prend le centre du visage principal (le plus grand à l'écran)
-            main_face = max(faces, key=lambda f: f['box'][2] * f['box'][3])
-            fx, _, fw, _ = main_face['box']
-            best_x_start = (fx + (fw // 2)) - (target_w // 2)
-            
-        best_x_start = max(0, min(best_x_start, W - target_w))
-        return best_x_start
+        main_face = max(faces, key=lambda f: f['box'][2] * f['box'][3])
+        fx, _, fw, _ = main_face['box']
+        best_x_start = (fx + (fw // 2)) - (target_w // 2)
+        return max(0, min(best_x_start, W - target_w))
 
-    # Fallback par analyse de détails (Laplacien)
     gray = img.convert("L")
     kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]], dtype=np.float32)
     laplacian_img = gray.filter(ImageFilter.Kernel((3, 3), kernel.flatten(), scale=1, offset=0))
@@ -141,7 +164,6 @@ def find_best_crop_x(img, target_w, faces):
 def apply_duotone(img, target_color):
     gray = img.convert("L")
     gray_np = np.array(gray)
-    
     base_dark = np.array([12, 16, 26])
     target_light = np.array(target_color)
     
@@ -151,98 +173,67 @@ def apply_duotone(img, target_color):
         
     return Image.fromarray(duotone)
 
-def draw_multiline_text_left(draw, label, font, max_width, start_x, base_y, line_spacing=12):
-    words = label.split()
-    lines = []
-    current_line = ""
-    
-    for word in words:
-        test_line = f"{current_line} {word}".strip()
-        if draw.textlength(test_line, font=font) <= max_width:
-            current_line = test_line
-        else:
-            if current_line:
-                lines.append(current_line)
-            current_line = word
-    if current_line:
-        lines.append(current_line)
-        
-    font_box = font.getbbox("A")
-    font_height = font_box[3] - font_box[1]
-    
-    if len(lines) <= 1:
-        draw.text((start_x, base_y), label, fill=(255, 255, 255, 255), font=font)
-    else:
-        adjusted_y = base_y - font_height - line_spacing
-        for line in lines[:2]:
-            draw.text((start_x, adjusted_y), line, fill=(255, 255, 255, 255), font=font)
-            adjusted_y += font_height + line_spacing
-
-def process_and_crop(artwork, label, target_color):
+def process_candidate(artwork, genre_name):
     img_url = f"https://image.tmdb.org/t/p/original{artwork['file_path']}"
     artwork_type = artwork['artwork_type']
     
-    img_res = requests.get(img_url, stream=True)
-    if img_res.status_code != 200:
+    try:
+        img_res = requests.get(img_url, stream=True, timeout=5)
+        if img_res.status_code != 200: return None
+        raw_img = Image.open(img_res.raw).convert("RGB")
+    except Exception:
         return None
         
-    raw_img = Image.open(img_res.raw).convert("RGB")
-    
-    # FIX AUTO-ORIENTATION : Corrige l'orientation EXIF (évite l'effet de l'affiche inversée)
     img = ImageOps.exif_transpose(raw_img)
     W, H = img.size
+    if W < 800 or H < 600: return None
     
-    if W < 800 or H < 600:
-        return None
-        
-    if not evaluate_image_quality(img, artwork_type):
-        return None
-        
-    # Analyse IA des visages
+    # Détection des arrières-plans vides ou teaser posters
+    is_teaser = analyze_grid_emptiness(img)
+    
+    gray = img.convert("L")
+    kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]], dtype=np.float32)
+    laplacian_img = gray.filter(ImageFilter.Kernel((3, 3), kernel.flatten(), scale=1, offset=0))
+    variance = np.array(laplacian_img, dtype=np.float32).var()
+    
+    if variance < 45: return None
+    
+    # Analyse MTCNN des sujets principaux
     img_np = np.array(img)
-    faces = detector.detect_faces(img_np)
+    try:
+        faces = detector.detect_faces(img_np)
+    except Exception:
+        faces = []
+        
+    if artwork_type == 'poster' and len(faces) > 4: return None
+    if artwork_type == 'backdrop' and len(faces) > 2: return None
     
-    # RÈGLES DE VALIDATION DIFFÉRENCIÉES (Posters vs Backdrops)
-    if artwork_type == 'poster':
-        # On fait confiance aux posters natifs de la section Textless : on autorise les petits groupes (ex: 1 à 4 visages)
-        # Mais on rejette si c'est une foule immense (> 4 visages détectés d'un coup)
-        if len(faces) > 4:
-            print(f"   -> [REJET POSTER] Trop de personnages/Foule détectée ({len(faces)} visages).")
-            return None
-    else:
-        # Pour les paysages horizontaux (backdrops), on reste strict pour s'assurer d'un sujet isolable et propre
-        if len(faces) > 2:
-            print(f"   -> [REJET BACKDROP] Composition horizontale trop complexe ({len(faces)} visages).")
-            return None
-
-    # Découpage au format vertical
     if artwork_type == 'backdrop':
         target_w = int(H * (2/3))
-        if target_w > W:
-            return None
+        if target_w > W: return None
         best_x_start = find_best_crop_x(img, target_w, faces)
-        if best_x_start is None:
-            return None
-        cropped_img = img.crop((best_x_start, 0, best_x_start + target_w, H))
+        if best_x_start is None: return None
+        cropped = img.crop((best_x_start, 0, best_x_start + target_w, H))
     else:
-        # Si c'est un poster natif, on ajuste juste les bandes latérales au ratio 2:3 en se calant sur le HAUT (Y=0)
         current_ratio = W / H
         if abs(current_ratio - (2/3)) > 0.02:
             target_w = int(H * (2/3))
             if target_w <= W:
                 start_x = (W - target_w) // 2
-                cropped_img = img.crop((start_x, 0, start_x + target_w, H))
-            else:
-                cropped_img = img
-        else:
-            cropped_img = img
+                cropped = img.crop((start_x, 0, start_x + target_w, H))
+            else: cropped = img
+        else: cropped = img
 
-    # Finalisation graphique standardisée Nuvio
-    final_img = cropped_img.resize((800, 1200), Image.Resampling.LANCZOS)
-    final_img = ImageEnhance.Contrast(final_img).enhance(1.15)
-    final_img = apply_duotone(final_img, target_color)
+    final_img = cropped.resize((800, 1200), Image.Resampling.LANCZOS)
+    score = calculate_candidate_score(artwork_type, variance, faces, genre_name, is_teaser)
     
-    draw = ImageDraw.Draw(final_img, "RGBA")
+    return final_img, score, artwork['file_path']
+
+def finalize_poster(img, label, target_color):
+    img = ImageEnhance.Contrast(img).enhance(1.15)
+    img = apply_duotone(img, target_color)
+    
+    draw = ImageDraw.Draw(img, "RGBA")
     for y in range(750, 1200):
         alpha = int(((y - 750) / 450) ** 2.3 * 245)
         draw.line([(0, y), (800, y)], fill=(0, 0, 0, alpha))
@@ -252,56 +243,73 @@ def process_and_crop(artwork, label, target_color):
     except IOError:
         font = ImageFont.load_default()
         
-    margin_left = 60
-    max_text_width = 800 - (margin_left * 2)
-    target_base_y = 1070
+    words = label.split()
+    lines = []
+    current_line = ""
+    for word in words:
+        test = f"{current_line} {word}".strip()
+        if draw.textlength(test, font=font) <= 680: current_line = test
+        else:
+            if current_line: lines.append(current_line)
+            current_line = word
+    if current_line: lines.append(current_line)
     
-    draw_multiline_text_left(draw, label, font, max_text_width, margin_left, target_base_y)
-    return final_img
+    font_box = font.getbbox("A")
+    fh = font_box[3] - font_box[1]
+    
+    if len(lines) <= 1:
+        draw.text((60, 1070), label, fill=(255, 255, 255, 255), font=font)
+    else:
+        ay = 1070 - fh - 12
+        for line in lines[:2]:
+            draw.text((60, ay), line, fill=(255, 255, 255, 255), font=font)
+            ay += fh + 12
+            
+    return img
 
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
     for genre_name, config in GENRES_CONFIG.items():
-        print(f"\n--- [PHASE 4] Traitement de la mine d'or Textless pour : {config['label']} ---")
+        print(f"\n--- [TOURNOI FILTRÉ] Sélection intelligente pour : {config['label']} ---")
         movies = get_popular_movies_by_genre(genre_name, config)
         
-        top_movies = movies[:8]
-        random.shuffle(top_movies)
-        ordered_movies = top_movies + movies[8:]
+        candidate_movies = movies[:8]
+        pool_candidates = []
         
-        poster_created = False
-        
-        for movie in ordered_movies:
+        for movie in candidate_movies:
             movie_id = movie["id"]
+            if movie_id in PROCESSED_MOVIE_IDS: continue
             
-            # Anti-doublons strict
-            if movie_id in PROCESSED_MOVIE_IDS:
-                continue
-                
-            print(f" -> Analyse du catalogue Textless de : {movie.get('title')} (ID: {movie_id})")
             artworks = get_movie_artworks(movie_id)
+            if not artworks: continue
             
-            if not artworks:
-                continue
-                
-            # On parcourt les 12 meilleures images de la section Textless (priorité absolue aux posters d'origine)
-            for art in artworks[:12]:
-                final_poster = process_and_crop(art, config["label"], config["color"])
-                
-                if final_poster:
-                    final_poster.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
-                    final_poster.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
-                    print(f"==> [SUCCÈS] Poster généré avec {movie.get('title')} ({art['artwork_type']}).")
-                    
-                    PROCESSED_MOVIE_IDS.add(movie_id)
-                    poster_created = True
-                    break
-            if poster_created:
-                break
-                
-        if not poster_created:
-            print(f" /!\\ REPLI : Aucun artwork strict validé pour {genre_name}. Conservation de l'existant.")
+            for art in artworks[:4]:
+                result = process_candidate(art, genre_name)
+                if result:
+                    processed_img, score, file_path = result
+                    pool_candidates.append({
+                        "image": processed_img,
+                        "score": score,
+                        "movie_title": movie.get("title"),
+                        "movie_id": movie_id,
+                        "path": file_path
+                    })
+        
+        if pool_candidates:
+            pool_candidates.sort(key=lambda x: x["score"], reverse=True)
+            winner = pool_candidates[0]
+            
+            print(f" -> {len(pool_candidates)} candidats analysés avec la grille de contraste.")
+            print(f" ==> ÉLU : '{winner['movie_title']}' avec un score de {winner['score']}/100. (Asset: {winner['path']})")
+            
+            final_poster = finalize_poster(winner["image"], config["label"], config["color"])
+            final_poster.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
+            final_poster.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
+            
+            PROCESSED_MOVIE_IDS.add(winner["movie_id"])
+        else:
+            print(f" /!\\ CONSERVATION : Aucun candidat idéal validé pour {genre_name}.")
 
 if __name__ == "__main__":
     main()
