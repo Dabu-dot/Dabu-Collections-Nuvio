@@ -26,10 +26,10 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Installation des dépendances Python (Traitement Image + IA)
+      - name: Installation des dépendances Python (Traitement Image Léger)
         run: |
           python -m pip install --upgrade pip
-          pip install requests pillow numpy mtcnn tensorflow-cpu
+          pip install requests pillow numpy opencv-python
 
       - name: Exécution du générateur de posters
         env:
