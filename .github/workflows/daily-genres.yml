@@ -1,51 +1,54 @@
-name: Daily Genres Posters
+name: Daily Genres Posters Generator
 
 on:
   schedule:
-    - cron: '0 4 * * *' # Exécution quotidienne à 4h00 UTC
-  workflow_dispatch: # Permet le lancement manuel pour tes tests
+    - cron: "0 5 * * *"  # Tous les jours à 5h00 UTC
+  workflow_dispatch:      # Permet de lancer le script manuellement si besoin
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
-  generate-covers:
+  generate-posters:
     runs-on: ubuntu-latest
-    
-    permissions:
-      contents: write
-    
+
     steps:
-      - name: Checkout du dépôt
+      - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Installation des dépendances système (OpenCV / Graphics)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgl1 libglib2.0-0
-
-      - name: Configuration de Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.12"
 
-      - name: Installation des dépendances Python (Traitement Image Léger)
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests pillow numpy opencv-python
+          python -m pip install pillow requests
 
-      - name: Exécution du générateur de posters
+      - name: Run Posters Generator
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-        run: python .github/scripts/posters-genres.py
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python3 .github/scripts/generate_posters.py
 
-      - name: Mise à jour du dépôt (Commit & Push)
+      - name: Commit and Push Changes
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
+          # Indexation des images et du fichier d'historique
           git add "Ressources/Collections Covers/Genres/Static Covers/"
+          git add ".github/scripts/posters_history.json"
           
-          if ! git diff --staged --quiet; then
-            git commit -m "UI: Mise à jour automatique des posters de genre"
-            git push
+          if ! git diff --cached --exit-code; then
+            git commit -m "Changement quotidien automatique des posters de genres"
+            git push origin main
           else
-            echo "Aucun changement détecté, pas de commit."
+            print("Aucun changement détecté.")
           fi
