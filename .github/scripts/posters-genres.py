@@ -158,8 +158,9 @@ def process_and_crop(img_url, label, target_color):
         alpha = int(((y - 750) / 450) ** 2.2 * 245)
         draw.line([(0, y), (800, y)], fill=(0, 0, 0, alpha))
         
+    # Essai de chargement de la police OpenType demandée
     try:
-        font = ImageFont.truetype(".github/assets/fonts/SF-Pro-Bold.ttf", 54)
+        font = ImageFont.truetype(".github/assets/fonts/SF-Pro-Display-Bold.otf", 54)
     except IOError:
         font = ImageFont.load_default()
         
@@ -208,4 +209,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-  
+        
