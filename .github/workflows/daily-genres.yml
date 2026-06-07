@@ -1,1 +1,47 @@
+name: Daily Genres Posters
 
+on:
+  schedule:
+    - cron: '0 4 * * *' # Exécution quotidienne à 4h00 UTC
+  workflow_dispatch: # Permet le lancement manuel pour tes tests
+
+jobs:
+  generate-covers:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout du dépôt
+        uses: actions/checkout@v4
+
+      - name: Configuration de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Installation des dépendances (Traitement Image + IA)
+        run: |
+          python -m pip install --upgrade pip
+          # Installation des bibliothèques nécessaires pour Pillow et le détecteur MTCNN
+          pip install requests pillow numpy mtcnn tensorflow-cpu
+
+      - name: Exécution du générateur de posters
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: python .github/scripts/posters-genres.py
+
+      - name: Mise à jour du dépôt (Commit & Push)
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Ajout uniquement des fichiers générés dans ton répertoire cible
+          git add "Ressources/Collections Covers/Genres/Static Covers/"
+          
+          # Vérification si des changements ont eu lieu avant de commit
+          if ! git diff --staged --quiet; then
+            git commit -m "UI: Mise à jour automatique des posters de genre"
+            git push
+          else
+            echo "Aucun changement détecté, pas de commit."
+          fi
