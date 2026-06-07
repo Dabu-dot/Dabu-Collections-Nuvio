@@ -25,36 +25,45 @@ ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it"}
 
 # Configuration chirurgicale des genres (Prête pour le scoring et tes futurs tags fins)
 GENRES_CONFIG = {
-    "action": {"label": "Action", "color": (255, 90, 0), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16&with_keywords=9715|9717|1556"},
-    "animation-japonaise": {"label": "Animation Japonaise", "color": (255, 0, 128), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True, "override_lang": True},
+    "action": {"label": "Action", "color": (255, 90, 0), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16&with_keywords=9715|9717|1556", "scoring_keywords": []},
+    "animation-japonaise": {"label": "Animation Japonaise", "color": (255, 0, 128), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True, "override_lang": True, "scoring_keywords": []},
     "animation": {
         "label": "Animation", 
         "color": (0, 200, 255), 
         "movie_genre": 16, 
         "tv_genre": 16, 
         "extra": "&without_genres=99&without_original_language=ja|ko|zh&without_keywords=210024|287513",
-        "min_popularity": 80
+        "min_popularity": 80,
+        "scoring_keywords": []
     },
-    "aventure": {"label": "Aventure", "color": (245, 158, 11), "movie_genre": 12, "tv_genre": 10759, "extra": "&without_genres=16&with_keywords=4814|1563"},
-    "comedie": {"label": "Comédie", "color": (250, 204, 21), "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16"},
-    "crime": {"label": "Crime", "color": (107, 114, 128), "movie_genre": 80, "tv_genre": 80, "extra": "&without_genres=16&with_keywords=9826|10331"},
+    "aventure": {
+        "label": "Aventure", 
+        "color": (245, 158, 11), 
+        "movie_genre": 12, 
+        "tv_genre": 10759, 
+        "extra": "&without_genres=16",
+        "scoring_keywords": [195114, 161176, 818, 4152, 170362, 210246, 10364, 41586, 6956, 269233]
+    },
+    "comedie": {"label": "Comédie", "color": (250, 204, 21), "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16", "scoring_keywords": []},
+    "crime": {"label": "Crime", "color": (107, 114, 128), "movie_genre": 80, "tv_genre": 80, "extra": "&without_genres=16&with_keywords=9826|10331", "scoring_keywords": []},
     "documentaire": {
         "label": "Documentaire", 
         "color": (34, 197, 94), 
         "movie_genre": 99, 
         "tv_genre": 99,
-        "extra": "&with_keywords=221355|305903|343303|284176&without_genres=16"
+        "extra": "&with_keywords=221355|305903|343303|284176&without_genres=16",
+        "scoring_keywords": []
     },
-    "drame": {"label": "Drame", "color": (14, 165, 233), "movie_genre": 18, "tv_genre": 18, "extra": "&without_genres=16"},
-    "famille": {"label": "Famille", "color": (217, 70, 239), "movie_genre": 10751, "tv_genre": 10751, "extra": "&without_genres=16"},
-    "fantastique": {"label": "Fantastique", "color": (168, 85, 247), "movie_genre": 14, "tv_genre": 10765, "extra": "&without_genres=16"},
-    "guerre": {"label": "Guerre", "color": (120, 113, 108), "movie_genre": 10752, "tv_genre": 10768, "extra": "&without_genres=16"},
-    "histoire": {"label": "Histoire", "color": (180, 83, 9), "movie_genre": 36, "tv_genre": 10768, "extra": "&without_genres=16"},
-    "horreur": {"label": "Horreur", "color": (239, 68, 68), "movie_genre": 27, "tv_genre": 27, "extra": "&without_genres=16&with_keywords=3358|9748|6152"},
-    "romance": {"label": "Romance", "color": (244, 63, 94), "movie_genre": 10749, "tv_genre": 10749, "extra": "&without_genres=16&without_original_language=ko|ja|zh"},
-    "science-fiction": {"label": "Science-Fiction", "color": (6, 182, 212), "movie_genre": 878, "tv_genre": 10765, "extra": "&without_genres=16&with_keywords=4565|9882"},
-    "thriller": {"label": "Thriller", "color": (29, 78, 216), "movie_genre": 53, "tv_genre": 80, "extra": "&without_genres=16&with_keywords=9826|10123"},
-    "western": {"label": "Western", "color": (214, 100, 42), "movie_genre": 37, "tv_genre": 37, "extra": "&without_genres=16"}
+    "drame": {"label": "Drame", "color": (14, 165, 233), "movie_genre": 18, "tv_genre": 18, "extra": "&without_genres=16", "scoring_keywords": []},
+    "famille": {"label": "Famille", "color": (217, 70, 239), "movie_genre": 10751, "tv_genre": 10751, "extra": "&without_genres=16", "scoring_keywords": []},
+    "fantastique": {"label": "Fantastique", "color": (168, 85, 247), "movie_genre": 14, "tv_genre": 10765, "extra": "&without_genres=16", "scoring_keywords": []},
+    "guerre": {"label": "Guerre", "color": (120, 113, 108), "movie_genre": 10752, "tv_genre": 10768, "extra": "&without_genres=16", "scoring_keywords": []},
+    "histoire": {"label": "Histoire", "color": (180, 83, 9), "movie_genre": 36, "tv_genre": 10768, "extra": "&without_genres=16", "scoring_keywords": []},
+    "horreur": {"label": "Horreur", "color": (239, 68, 68), "movie_genre": 27, "tv_genre": 27, "extra": "&without_genres=16&with_keywords=3358|9748|6152", "scoring_keywords": []},
+    "romance": {"label": "Romance", "color": (244, 63, 94), "movie_genre": 10749, "tv_genre": 10749, "extra": "&without_genres=16&without_original_language=ko|ja|zh", "scoring_keywords": []},
+    "science-fiction": {"label": "Science-Fiction", "color": (6, 182, 212), "movie_genre": 878, "tv_genre": 10765, "extra": "&without_genres=16&with_keywords=4565|9882", "scoring_keywords": []},
+    "thriller": {"label": "Thriller", "color": (29, 78, 216), "movie_genre": 53, "tv_genre": 80, "extra": "&without_genres=16&with_keywords=9826|10123", "scoring_keywords": []},
+    "western": {"label": "Western", "color": (214, 100, 42), "movie_genre": 37, "tv_genre": 37, "extra": "&without_genres=16", "scoring_keywords": []}
 }
 
 RUN_PROCESSED_IDS = set()
@@ -99,25 +108,36 @@ def get_trending_media_for_genre(config, excluded_keys):
     movie_pool = []
     tv_pool = []
     
-    movie_url = f"/discover/movie?sort_by=popularity.desc&with_genres={config['movie_genre']}{config.get('extra', '')}"
-    try:
-        movie_data = tmdb_api_call(movie_url)
-        for item in movie_data.get("results", []):
-            if item.get("backdrop_path"):
-                item["media_type"] = "movie"
-                movie_pool.append(item)
-    except Exception as e:
-        print(f"      Alerte discover movie: {e}")
+    # Récupération de 3 pages de tendances pour avoir un grand pool de candidats
+    for page in range(1, 4):
+        movie_url = f"/discover/movie?sort_by=popularity.desc&with_genres={config['movie_genre']}{config.get('extra', '')}&page={page}"
+        try:
+            movie_data = tmdb_api_call(movie_url)
+            results = movie_data.get("results", [])
+            if not results:
+                break
+            for item in results:
+                if item.get("backdrop_path"):
+                    item["media_type"] = "movie"
+                    movie_pool.append(item)
+        except Exception as e:
+            print(f"      Alerte discover movie (page {page}): {e}")
+            break
 
-    tv_url = f"/discover/tv?sort_by=popularity.desc&with_genres={config['tv_genre']}{config.get('extra', '')}"
-    try:
-        tv_data = tmdb_api_call(tv_url)
-        for item in tv_data.get("results", []):
-            if item.get("backdrop_path"):
-                item["media_type"] = "tv"
-                tv_pool.append(item)
-    except Exception as e:
-        print(f"      Alerte discover tv: {e}")
+    for page in range(1, 4):
+        tv_url = f"/discover/tv?sort_by=popularity.desc&with_genres={config['tv_genre']}{config.get('extra', '')}&page={page}"
+        try:
+            tv_data = tmdb_api_call(tv_url)
+            results = tv_data.get("results", [])
+            if not results:
+                break
+            for item in results:
+                if item.get("backdrop_path"):
+                    item["media_type"] = "tv"
+                    tv_pool.append(item)
+        except Exception as e:
+            print(f"      Alerte discover tv (page {page}): {e}")
+            break
 
     combined_pool = tv_pool + movie_pool if config.get("prefer_tv", False) else movie_pool + tv_pool
     filtered_pool = []
@@ -137,8 +157,29 @@ def get_trending_media_for_genre(config, excluded_keys):
             
         filtered_pool.append(item)
         
-    filtered_pool.sort(key=lambda x: x.get("popularity", 0), reverse=True)
-    return filtered_pool[:20]
+    print(f"   Pool éligible après filtrage : {len(filtered_pool)} œuvres (Films & Séries).")
+    
+    # Sélection aléatoire de 50 candidats parmi les œuvres éligibles
+    if len(filtered_pool) > 50:
+        selected_pool = random.sample(filtered_pool, 50)
+        print(f"   Sélection aléatoire de 50 candidats parmi les {len(filtered_pool)} œuvres.")
+        return selected_pool
+    else:
+        print(f"   Conservation de l'intégralité du pool ({len(filtered_pool)} candidats éligibles).")
+        return filtered_pool
+
+def get_media_keywords(media_type, media_id):
+    try:
+        endpoint = f"/{media_type}/{media_id}/keywords"
+        data = tmdb_api_call(endpoint)
+        if not data:
+            return set()
+        # TMDB renvoie "keywords" pour les films et "results" pour les séries
+        keyword_list = data.get("keywords") or data.get("results") or []
+        return {kw["id"] for kw in keyword_list if "id" in kw}
+    except Exception as e:
+        print(f"      Alerte keywords pour {media_type} {media_id}: {e}")
+        return set()
 
 def get_best_textless_backdrops(media_type, media_id, fallback_path):
     try:
@@ -272,13 +313,50 @@ def main():
             sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=200,title=Génération Sautée ({config['label']})::Aucun média valide trouvé dans l'API. L'ancien poster est conservé pour éviter un écran noir.\n")
             continue
             
-        selected_media = random.choice(candidates_pool)
+        scoring_keywords = set(config.get("scoring_keywords", []))
+        scored_candidates = []
+        
+        print(f" -> Évaluation par mots-clés de {len(candidates_pool)} candidats...")
+        for idx, item in enumerate(candidates_pool):
+            media_type = item["media_type"]
+            media_id = item["id"]
+            media_title = item.get("title") or item.get("name")
+            
+            # Récupération des mots-clés de l'œuvre
+            keywords = get_media_keywords(media_type, media_id)
+            
+            # Calcul du score : 10 points par mot-clé correspondant
+            matching_keywords = keywords.intersection(scoring_keywords)
+            tag_score = len(matching_keywords) * 10
+            
+            scored_candidates.append({
+                "item": item,
+                "score": tag_score,
+                "keywords_found": list(matching_keywords)
+            })
+            
+            if tag_score > 0:
+                print(f"      [{idx+1}/{len(candidates_pool)}] {media_title} ({media_type.upper()}) - Score: {tag_score} (Tags: {list(matching_keywords)})")
+                
+            time.sleep(0.05)  # Pause légère pour respecter les limites TMDB
+            
+        # Tri : Score de tags décroissant, puis popularité décroissante en bris d'égalité
+        scored_candidates.sort(key=lambda x: (x["score"], x["item"].get("popularity", 0)), reverse=True)
+        
+        winner_data = scored_candidates[0]
+        selected_media = winner_data["item"]
+        winner_score = winner_data["score"]
+        
         media_id = selected_media["id"]
         media_type = selected_media["media_type"]
         composite_key = f"{media_type}_{media_id}"
         media_title = selected_media.get("title") or selected_media.get("name")
         
-        print(f" -> Œuvre sélectionnée : {media_title} ({media_type.upper()} - ID: {media_id})")
+        print(f" -> Vainqueur sélectionné : {media_title} ({media_type.upper()} - ID: {media_id})")
+        if scoring_keywords:
+            print(f"    Score final : {winner_score} points (Mots-clés associés: {winner_data['keywords_found']})")
+        else:
+            print(f"    Sélection par popularité par défaut (Pas de mots-clés configurés pour ce genre)")
         
         backdrops_list = get_best_textless_backdrops(media_type, media_id, selected_media["backdrop_path"])
         time.sleep(0.2)
