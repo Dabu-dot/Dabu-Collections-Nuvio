@@ -25,8 +25,8 @@ ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it"}
 
 # Configuration chirurgicale des genres (Prête pour le scoring et tes futurs tags fins)
 GENRES_CONFIG = {
-    "action": {"label": "Action", "color": (255, 90, 0), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16&with_keywords=9715|9717|1556", "scoring_keywords": []},
-    "animation-japonaise": {"label": "Animation Japonaise", "color": (255, 0, 128), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True, "override_lang": True, "scoring_keywords": []},
+    "action": {"label": "Action", "color": (255, 90, 0), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [3930, 6054, 12993, 9951, 8440, 188955, 226499, 83, 312, 779, 4565, 14955, 853, 9665, 10044]},
+    "animation-japonaise": {"label": "Animation Japonaise", "color": (255, 0, 128), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True, "override_lang": True, "scoring_keywords": [210024, 13141, 207826]},
     "animation": {
         "label": "Animation", 
         "color": (0, 200, 255), 
@@ -34,7 +34,7 @@ GENRES_CONFIG = {
         "tv_genre": 16, 
         "extra": "&without_genres=99&without_original_language=ja|ko|zh&without_keywords=210024|287513",
         "min_popularity": 80,
-        "scoring_keywords": []
+        "scoring_keywords": [272909, 7376, 278823, 234183, 179411, 234662, 290589, 297442, 339048, 366485]
     },
     "aventure": {
         "label": "Aventure", 
@@ -44,15 +44,15 @@ GENRES_CONFIG = {
         "extra": "&without_genres=16",
         "scoring_keywords": [195114, 161176, 818, 4152, 170362, 210246, 10364, 41586, 6956, 269233]
     },
-    "comedie": {"label": "Comédie", "color": (250, 204, 21), "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16", "scoring_keywords": []},
-    "crime": {"label": "Crime", "color": (107, 114, 128), "movie_genre": 80, "tv_genre": 80, "extra": "&without_genres=16&with_keywords=9826|10331", "scoring_keywords": []},
+    "comedie": {"label": "Comédie", "color": (250, 204, 21), "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16", "scoring_keywords": [8201, 9755, 9964, 375047, 6241, 9253]},
+    "crime": {"label": "Crime", "color": (107, 114, 128), "movie_genre": 80, "tv_genre": 80, "extra": "&without_genres=16", "scoring_keywords": [2095, 9748, 181644, 157241, 206958, 268067, 703, 5340, 6149, 9826, 155790, 207046]},
     "documentaire": {
         "label": "Documentaire", 
         "color": (34, 197, 94), 
         "movie_genre": 99, 
         "tv_genre": 99,
-        "extra": "&with_keywords=221355|305903|343303|284176&without_genres=16",
-        "scoring_keywords": []
+        "extra": "&without_genres=16",
+        "scoring_keywords": [221355, 305903, 343303, 284176]
     },
     "drame": {"label": "Drame", "color": (14, 165, 233), "movie_genre": 18, "tv_genre": 18, "extra": "&without_genres=16", "scoring_keywords": []},
     "famille": {"label": "Famille", "color": (217, 70, 239), "movie_genre": 10751, "tv_genre": 10751, "extra": "&without_genres=16", "scoring_keywords": []},
@@ -110,7 +110,7 @@ def get_trending_media_for_genre(config, excluded_keys):
     
     # Récupération de 3 pages de tendances pour avoir un grand pool de candidats
     for page in range(1, 4):
-        movie_url = f"/discover/movie?sort_by=popularity.desc&with_genres={config['movie_genre']}{config.get('extra', '')}&page={page}"
+        movie_url = f"/discover/movie?sort_by=popularity.desc&with_genres={config['movie_genre']}{config.get('extra', '')}&page={page}&include_adult=false"
         try:
             movie_data = tmdb_api_call(movie_url)
             results = movie_data.get("results", [])
@@ -125,7 +125,7 @@ def get_trending_media_for_genre(config, excluded_keys):
             break
 
     for page in range(1, 4):
-        tv_url = f"/discover/tv?sort_by=popularity.desc&with_genres={config['tv_genre']}{config.get('extra', '')}&page={page}"
+        tv_url = f"/discover/tv?sort_by=popularity.desc&with_genres={config['tv_genre']}{config.get('extra', '')}&page={page}&include_adult=false"
         try:
             tv_data = tmdb_api_call(tv_url)
             results = tv_data.get("results", [])
@@ -148,6 +148,9 @@ def get_trending_media_for_genre(config, excluded_keys):
         composite_key = f"{item['media_type']}_{item['id']}"
         popularity = item.get("popularity", 0)
         
+        # Filtrage éliminatoire : Exclure la pornographie (adult content)
+        if item.get("adult") is True:
+            continue
         if popularity < min_pop_threshold:
             continue
         if not config.get("override_lang", False) and lang not in ALLOWED_LANGUAGES:
@@ -167,6 +170,17 @@ def get_trending_media_for_genre(config, excluded_keys):
     else:
         print(f"   Conservation de l'intégralité du pool ({len(filtered_pool)} candidats éligibles).")
         return filtered_pool
+
+def get_keyword_id_by_name(name):
+    try:
+        data = tmdb_api_call("/search/keyword", {"query": name})
+        if data and "results" in data:
+            for kw in data["results"]:
+                if kw.get("name", "").lower() == name.lower():
+                    return kw["id"]
+    except Exception as e:
+        print(f"      Alerte recherche de mot-clé '{name}': {e}")
+    return None
 
 def get_media_keywords(media_type, media_id):
     try:
@@ -298,6 +312,20 @@ def main():
     
     # NOTE: On ne purge plus agressivement tout le dossier de sortie ici pour garder les anciens posters en cas d'échec
     
+    # Résolution des mots-clés à exclure globalement (tags éliminatoires)
+    EXCLUDED_KEYWORD_IDS = set()
+    raw_excludes = []  # On pourra ajouter des mots-clés ici à l'avenir pour les exclure du scoring
+    for name_or_id in raw_excludes:
+        if isinstance(name_or_id, int):
+            EXCLUDED_KEYWORD_IDS.add(name_or_id)
+        elif isinstance(name_or_id, str):
+            kw_id = get_keyword_id_by_name(name_or_id)
+            if kw_id:
+                EXCLUDED_KEYWORD_IDS.add(kw_id)
+                print(f"Mot-clé à exclure résolu : '{name_or_id}' -> ID {kw_id}")
+            else:
+                print(f"Alerte : Impossible de résoudre le mot-clé à exclure '{name_or_id}' (Il sera résolu si l'API est accessible)")
+    
     history = load_and_clean_history()
     excluded_keys = set(history.keys())
     
@@ -325,6 +353,12 @@ def main():
             # Récupération des mots-clés de l'œuvre
             keywords = get_media_keywords(media_type, media_id)
             
+            # Filtrage par tags éliminatoires
+            bad_tags = keywords.intersection(EXCLUDED_KEYWORD_IDS)
+            if bad_tags:
+                print(f"      [{idx+1}/{len(candidates_pool)}] {media_title} ({media_type.upper()}) - ÉLIMINÉ (contient un tag exclu : {list(bad_tags)})")
+                continue
+            
             # Calcul du score : 10 points par mot-clé correspondant
             matching_keywords = keywords.intersection(scoring_keywords)
             tag_score = len(matching_keywords) * 10
@@ -339,6 +373,12 @@ def main():
                 print(f"      [{idx+1}/{len(candidates_pool)}] {media_title} ({media_type.upper()}) - Score: {tag_score} (Tags: {list(matching_keywords)})")
                 
             time.sleep(0.05)  # Pause légère pour respecter les limites TMDB
+            
+        if not scored_candidates:
+            # SYSTÈME DE SECOURS 3 : Tous les candidats ont été éliminés par le filtrage
+            print(f" [CONSERVATION] Aucun candidat éligible restant après filtrage par tags éliminatoires pour {config['label']}. Ancien poster préservé.")
+            sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=320,title=Tous Éliminés ({config['label']})::Tous les candidats ont été éliminés par les tags exclus. L'ancien poster est conservé.\n")
+            continue
             
         # Tri : Score de tags décroissant, puis popularité décroissante en bris d'égalité
         scored_candidates.sort(key=lambda x: (x["score"], x["item"].get("popularity", 0)), reverse=True)
