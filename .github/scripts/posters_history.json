@@ -333,5 +333,80 @@
         "title": "Westworld",
         "genre": "western",
         "date": "2026-06-07"
+    },
+    "tv_202555": {
+        "title": "Daredevil: Born Again",
+        "genre": "action",
+        "date": "2026-06-07"
+    },
+    "movie_372058": {
+        "title": "Your Name.",
+        "genre": "animation-japonaise",
+        "date": "2026-06-07"
+    },
+    "tv_65334": {
+        "title": "Miraculous: Tales of Ladybug & Cat Noir",
+        "genre": "animation",
+        "date": "2026-06-07"
+    },
+    "movie_1273221": {
+        "title": "Scary Movie",
+        "genre": "comedie",
+        "date": "2026-06-07"
+    },
+    "tv_4920": {
+        "title": "Damages",
+        "genre": "crime",
+        "date": "2026-06-07"
+    },
+    "movie_936075": {
+        "title": "Michael",
+        "genre": "drame",
+        "date": "2026-06-07"
+    },
+    "tv_14929": {
+        "title": "Heartland",
+        "genre": "famille",
+        "date": "2026-06-07"
+    },
+    "tv_39351": {
+        "title": "Grimm",
+        "genre": "fantastique",
+        "date": "2026-06-07"
+    },
+    "tv_63333": {
+        "title": "The Last Kingdom",
+        "genre": "guerre",
+        "date": "2026-06-07"
+    },
+    "tv_2947": {
+        "title": "Veep",
+        "genre": "histoire",
+        "date": "2026-06-07"
+    },
+    "movie_1038392": {
+        "title": "The Conjuring: Last Rites",
+        "genre": "horreur",
+        "date": "2026-06-07"
+    },
+    "movie_48650": {
+        "title": "Room in Rome",
+        "genre": "romance",
+        "date": "2026-06-07"
+    },
+    "movie_157336": {
+        "title": "Interstellar",
+        "genre": "science-fiction",
+        "date": "2026-06-07"
+    },
+    "tv_1396": {
+        "title": "Breaking Bad",
+        "genre": "thriller",
+        "date": "2026-06-07"
+    },
+    "tv_4324": {
+        "title": "Dr. Quinn, Medicine Woman",
+        "genre": "western",
+        "date": "2026-06-07"
     }
 }
