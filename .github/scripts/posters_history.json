@@ -168,5 +168,90 @@
         "title": "Yellowstone",
         "genre": "western",
         "date": "2026-06-07"
+    },
+    "tv_62688": {
+        "title": "Supergirl",
+        "genre": "action",
+        "date": "2026-06-07"
+    },
+    "movie_129": {
+        "title": "Spirited Away",
+        "genre": "animation-japonaise",
+        "date": "2026-06-07"
+    },
+    "movie_1084242": {
+        "title": "Zootopia 2",
+        "genre": "animation",
+        "date": "2026-06-07"
+    },
+    "tv_2288": {
+        "title": "Prison Break",
+        "genre": "aventure",
+        "date": "2026-06-07"
+    },
+    "tv_1668": {
+        "title": "Friends",
+        "genre": "comedie",
+        "date": "2026-06-07"
+    },
+    "tv_61056": {
+        "title": "How to Get Away with Murder",
+        "genre": "crime",
+        "date": "2026-06-07"
+    },
+    "tv_21145": {
+        "title": "Natural World",
+        "genre": "documentaire",
+        "date": "2026-06-07"
+    },
+    "tv_549": {
+        "title": "Law & Order",
+        "genre": "drame",
+        "date": "2026-06-07"
+    },
+    "movie_1301421": {
+        "title": "The Sheep Detectives",
+        "genre": "famille",
+        "date": "2026-06-07"
+    },
+    "movie_1368881": {
+        "title": "Ladies First",
+        "genre": "fantastique",
+        "date": "2026-06-07"
+    },
+    "tv_113962": {
+        "title": "Lioness",
+        "genre": "guerre",
+        "date": "2026-06-07"
+    },
+    "movie_1579": {
+        "title": "Apocalypto",
+        "genre": "histoire",
+        "date": "2026-06-07"
+    },
+    "movie_1340110": {
+        "title": "Redux Redux",
+        "genre": "horreur",
+        "date": "2026-06-07"
+    },
+    "tv_2942": {
+        "title": "The Tudors",
+        "genre": "romance",
+        "date": "2026-06-07"
+    },
+    "tv_63639": {
+        "title": "The Expanse",
+        "genre": "science-fiction",
+        "date": "2026-06-07"
+    },
+    "tv_39185": {
+        "title": "Vera",
+        "genre": "thriller",
+        "date": "2026-06-07"
+    },
+    "tv_6081": {
+        "title": "Wagon Train",
+        "genre": "western",
+        "date": "2026-06-07"
     }
 }
