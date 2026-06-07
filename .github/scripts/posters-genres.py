@@ -6,7 +6,7 @@ import random
 import requests
 from datetime import datetime, timedelta
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageOps
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageOps, ImageFilter
 
 # Configuration TMDB
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
@@ -23,37 +23,37 @@ HISTORY_FILE = ".github/scripts/posters_history.json"
 # Langues occidentales populaires autorisées + Coréen + Japonais
 ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it", "ja", "ko"}
 
-# Configuration brute des genres (Uniquement via IDs généraux et filtre Documentaire Nature)
+# Configuration des genres avec isolation stricte Animation vs Live-Action
 GENRES_CONFIG = {
-    "action": {"label": "Action", "color": (255, 90, 0), "movie_genre": 28, "tv_genre": 10759},
-    "animation-japonaise": {"label": "Animation Japonaise", "color": (255, 0, 128), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja"},
-    "animation": {"label": "Animation", "color": (0, 200, 255), "movie_genre": 16, "tv_genre": 16, "extra": "&without_genres=99&without_original_language=ja"},
-    "aventure": {"label": "Aventure", "color": (245, 158, 11), "movie_genre": 12, "tv_genre": 10759},
-    "comedie": {"label": "Comédie", "color": (250, 204, 21), "movie_genre": 35, "tv_genre": 35},
-    "crime": {"label": "Crime", "color": (107, 114, 128), "movie_genre": 80, "tv_genre": 80},
+    "action": {"label": "Action", "color": (255, 90, 0), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16"},
+    "animation-japonaise": {"label": "Animation Japonaise", "color": (255, 0, 128), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True},
+    "animation": {"label": "Animation", "color": (0, 200, 255), "movie_genre": 16, "tv_genre": 16, "extra": "&without_genres=99&without_original_language=ja|ko|zh"},
+    "aventure": {"label": "Aventure", "color": (245, 158, 11), "movie_genre": 12, "tv_genre": 10759, "extra": "&without_genres=16"},
+    "comedie": {"label": "Comédie", "color": (250, 204, 21), "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16"},
+    "crime": {"label": "Crime", "color": (107, 114, 128), "movie_genre": 80, "tv_genre": 80, "extra": "&without_genres=16"},
     "documentaire": {
         "label": "Documentaire", 
         "color": (34, 197, 94), 
         "movie_genre": 99, 
         "tv_genre": 99,
-        "extra": "&with_keywords=221355|305903|343303|284176" # Filtres Nature et Animaux demandés
+        "extra": "&with_keywords=221355|305903|343303|284176&without_genres=16"
     },
-    "drame": {"label": "Drame", "color": (14, 165, 233), "movie_genre": 18, "tv_genre": 18},
-    "famille": {"label": "Famille", "color": (217, 70, 239), "movie_genre": 10751, "tv_genre": 10751},
-    "fantastique": {"label": "Fantastique", "color": (168, 85, 247), "movie_genre": 14, "tv_genre": 10765},
-    "guerre": {"label": "Guerre", "color": (120, 113, 108), "movie_genre": 10752, "tv_genre": 10768},
-    "histoire": {"label": "Histoire", "color": (180, 83, 9), "movie_genre": 36, "tv_genre": 10768},
-    "horreur": {"label": "Horreur", "color": (239, 68, 68), "movie_genre": 27, "tv_genre": 27},
-    "romance": {"label": "Romance", "color": (244, 63, 94), "movie_genre": 10749, "tv_genre": 10749},
-    "science-fiction": {"label": "Science-Fiction", "color": (6, 182, 212), "movie_genre": 878, "tv_genre": 10765},
-    "thriller": {"label": "Thriller", "color": (29, 78, 216), "movie_genre": 53, "tv_genre": 80},
-    "western": {"label": "Western", "color": (214, 100, 42), "movie_genre": 37, "tv_genre": 37}
+    "drame": {"label": "Drame", "color": (14, 165, 233), "movie_genre": 18, "tv_genre": 18, "extra": "&without_genres=16"},
+    "famille": {"label": "Famille", "color": (217, 70, 239), "movie_genre": 10751, "tv_genre": 10751, "extra": "&without_genres=16"},
+    "fantastique": {"label": "Fantastique", "color": (168, 85, 247), "movie_genre": 14, "tv_genre": 10765, "extra": "&without_genres=16"},
+    "guerre": {"label": "Guerre", "color": (120, 113, 108), "movie_genre": 10752, "tv_genre": 10768, "extra": "&without_genres=16"},
+    "histoire": {"label": "Histoire", "color": (180, 83, 9), "movie_genre": 36, "tv_genre": 10768, "extra": "&without_genres=16"},
+    "horreur": {"label": "Horreur", "color": (239, 68, 68), "movie_genre": 27, "tv_genre": 27, "extra": "&without_genres=16"},
+    "romance": {"label": "Romance", "color": (244, 63, 94), "movie_genre": 10749, "tv_genre": 10749, "extra": "&without_genres=16"},
+    "science-fiction": {"label": "Science-Fiction", "color": (6, 182, 212), "movie_genre": 878, "tv_genre": 10765, "extra": "&without_genres=16"},
+    "thriller": {"label": "Thriller", "color": (29, 78, 216), "movie_genre": 53, "tv_genre": 80, "extra": "&without_genres=16"},
+    "western": {"label": "Western", "color": (214, 100, 42), "movie_genre": 37, "tv_genre": 37, "extra": "&without_genres=16"}
 }
 
-RUN_PROCESSED_IDS = set()  # Évite les doublons inter-genres au sein d'un même run
+RUN_PROCESSED_IDS = set()  # Évite les doublons inter-genres au sein du même run
 
 def tmdb_api_call(endpoint, params=None):
-    """Effectue un appel GET vers TMDB avec gestion des retries contre les rate limits"""
+    """Effectue un appel GET vers TMDB avec gestion des retries"""
     if params is None:
         params = {}
     params["api_key"] = TMDB_API_KEY
@@ -91,8 +91,9 @@ def load_and_clean_history():
     return cleaned_history
 
 def get_trending_media_for_genre(config, excluded_keys):
-    """Récupère les œuvres tendances (Films et TV) associées au genre et non-exclues"""
-    media_pool = []
+    """Récupère les œuvres tendances associées au genre, triées et filtrées"""
+    movie_pool = []
+    tv_pool = []
     
     # 1. Collecte Films
     movie_url = f"/discover/movie?sort_by=popularity.desc&with_genres={config['movie_genre']}{config.get('extra', '')}"
@@ -101,7 +102,7 @@ def get_trending_media_for_genre(config, excluded_keys):
         for item in movie_data.get("results", []):
             if item.get("backdrop_path"):
                 item["media_type"] = "movie"
-                media_pool.append(item)
+                movie_pool.append(item)
     except Exception as e:
         print(f"      Alerte discover movie: {e}")
 
@@ -112,13 +113,20 @@ def get_trending_media_for_genre(config, excluded_keys):
         for item in tv_data.get("results", []):
             if item.get("backdrop_path"):
                 item["media_type"] = "tv"
-                media_pool.append(item)
+                tv_pool.append(item)
     except Exception as e:
         print(f"      Alerte discover tv: {e}")
 
+    # Fusion intelligente ou priorité structurelle (ex: Animation Japonaise)
+    combined_pool = []
+    if config.get("prefer_tv", False):
+        combined_pool = tv_pool + movie_pool  # Les séries passent devant pour le tirage
+    else:
+        combined_pool = movie_pool + tv_pool
+
     # Filtrage linguistique, doublons et historique glissant
     filtered_pool = []
-    for item in media_pool:
+    for item in combined_pool:
         lang = item.get("original_language", "")
         composite_key = f"{item['media_type']}_{item['id']}"
         
@@ -129,12 +137,12 @@ def get_trending_media_for_genre(config, excluded_keys):
             
         filtered_pool.append(item)
         
-    # Tri par popularité décroissante et isolation des 15 meilleurs candidats pour le tirage au sort
+    # Tri par popularité décroissante et isolation des 20 meilleurs candidats pour le tirage au sort
     filtered_pool.sort(key=lambda x: x.get("popularity", 0), reverse=True)
-    return filtered_pool[:15]
+    return filtered_pool[:20]
 
 def get_best_textless_backdrops(media_type, media_id, fallback_path):
-    """Interroge la section d'images TMDB sans langue (null) pour garantir le textless strict (pas de logos)"""
+    """Interroge la section d'images TMDB sans langue (null) pour garantir le textless strict"""
     try:
         data = tmdb_api_call(f"/{media_type}/{media_id}/images", {"include_image_language": "null"})
         backdrops = data.get("backdrops", [])
@@ -147,16 +155,27 @@ def get_best_textless_backdrops(media_type, media_id, fallback_path):
         return [{"file_path": fallback_path, "width": 1920}]
 
 def analyze_and_score_backdrop(bg, item):
-    """Calcule le score d'un asset basé sur sa définition native et sa popularité TMDB"""
-    score = 50
+    """Calcule le score d'un asset basé sur sa définition native, la popularité, et favorise le récent"""
+    score = 40
     width = bg.get("width", 0)
     popularity = item.get("popularity", 0)
     
-    if width >= 3840: score += 25
-    elif width >= 1920: score += 15
+    # Extraire l'année de sortie pour valoriser la modernité des visuels
+    release_date_str = item.get("release_date") or item.get("first_air_date") or ""
+    if release_date_str:
+        try:
+            year = datetime.strptime(release_date_str, "%Y-%m-%d").year
+            if year >= 2020: score += 30      # Très récent, bonus maximum
+            elif year >= 2012: score += 15    # Moderne
+            elif year < 2000: score -= 15     # Malus sur les vieux contenus rétro ou datés
+        except ValueError:
+            pass
+
+    if width >= 3840: score += 15
+    elif width >= 1920: score += 10
         
-    if popularity > 120: score += 25
-    elif popularity > 40: score += 15
+    if popularity > 120: score += 15
+    elif popularity > 40: score += 5
         
     return score
 
@@ -165,7 +184,7 @@ def apply_apple_tv_duotone(img, target_color):
     gray = img.convert("L")
     gray_np = np.array(gray)
     
-    base_dark = np.array([12, 16, 26])  # Couleur de fond sombre d'interface
+    base_dark = np.array([12, 16, 26])  # Teinte de fond sombre d'interface
     target_light = np.array(target_color)
     
     duotone = np.zeros((gray_np.shape[0], gray_np.shape[1], 3), dtype=np.uint8)
@@ -175,29 +194,76 @@ def apply_apple_tv_duotone(img, target_color):
     return Image.fromarray(duotone)
 
 def finalize_landscape_banner(img, label, target_color):
-    """Force le cadrage 16:9 Landscape, applique le style et ajoute la typographie en Title Case"""
-    # Recadrage et redimensionnement strict en 1920x1080 (Pas de déformation)
+    """Force le cadrage 16:9, applique le style Apple TV, l'ombre portée douce et le texte XXL dynamique"""
+    # Recadrage et redimensionnement strict en 1920x1080
     img = ImageOps.fit(img, (1920, 1080), method=Image.Resampling.LANCZOS)
     img = ImageEnhance.Contrast(img).enhance(1.15)
-    
-    # Passage au filtre Duotone
     img = apply_apple_tv_duotone(img, target_color)
     
-    # Dégradé cinématique linéaire sombre sur la partie basse
-    draw = ImageDraw.Draw(img, "RGBA")
-    for y in range(600, 1080):
-        alpha = int(((y - 600) / 480) ** 2.2 * 240)
-        draw.line([(0, y), (1920, y)], fill=(0, 0, 0, alpha))
-        
-    # Chargement de la police SF Pro Display Bold
+    # Dégradé cinématique inférieur
+    gradient = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
+    g_draw = ImageDraw.Draw(gradient)
+    for y in range(500, 1080):
+        alpha = int(((y - 500) / 580) ** 2.0 * 245)
+        g_draw.line([(0, y), (1920, y)], fill=(0, 0, 0, alpha))
+    img = Image.alpha_composite(img.convert("RGBA"), gradient)
+
+    # Préparation du calque de texte et d'ombre douce portée
+    text_layer = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
+    shadow_layer = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
+    
+    t_draw = ImageDraw.Draw(text_layer)
+    s_draw = ImageDraw.Draw(shadow_layer)
+    
+    # Chargement de la police SF Pro Display Bold à taille augmentée (110px)
+    font_size = 110
     try:
-        font = ImageFont.truetype(".github/assets/fonts/SF-Pro-Display-Bold.otf", 76)
+        font = ImageFont.truetype(".github/assets/fonts/SF-Pro-Display-Bold.otf", font_size)
     except IOError:
         font = ImageFont.load_default()
-        
-    # Écriture du texte (Label déjà formaté en beau titre "Title Case")
-    draw.text((90, 920), label, fill=(255, 255, 255, 255), font=font)
-    return img
+
+    # Découpage et wrapping intelligent multi-lignes si le titre est trop long (seuil à 1740px)
+    max_text_width = 1740
+    words = label.split(" ")
+    lines = []
+    current_line = ""
+    
+    for word in words:
+        test_line = f"{current_line} {word}".strip()
+        w = t_draw.textlength(test_line, font=font)
+        if w <= max_text_width:
+            current_line = test_line
+        else:
+            if current_line: lines.append(current_line)
+            current_line = word
+    if current_line:
+        lines.append(current_line)
+
+    # Calcul de la hauteur totale et remontée automatique du point de départ y si double ligne
+    line_spacing = 15
+    line_height = font_size - 10
+    total_text_height = (len(lines) * line_height) + ((len(lines) - 1) * line_spacing)
+    
+    base_y = 930 - (total_text_height - line_height)
+    margin_x = 95
+
+    # Écriture des lignes sur leurs calques respectifs (Ombre douce floutée d'un côté, texte blanc de l'autre)
+    current_y = base_y
+    for line in lines:
+        # Ombre portée structurelle (légèrement décalée vers le bas)
+        s_draw.text((margin_x + 4, current_y + 6), line, fill=(0, 0, 0, 220), font=font)
+        # Texte de face blanc épuré
+        t_draw.text((margin_x, current_y), line, fill=(255, 255, 255, 255), font=font)
+        current_y += line_height + line_spacing
+
+    # Application d'un flou gaussien sur le calque d'ombre pour un effet diffus premium (pas de contours durs)
+    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(8))
+    
+    # Assemblage final par transparence
+    final_img = Image.alpha_composite(img, shadow_layer)
+    final_img = Image.alpha_composite(final_img, text_layer)
+    
+    return final_img.convert("RGB")
 
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -222,7 +288,7 @@ def main():
             print(f" /!\\ Aucun candidat disponible pour le genre {config['label']}")
             continue
             
-        # Tirage au sort parmi les 15 œuvres les plus populaires
+        # Tirage au sort parmi les meilleurs candidats
         selected_media = random.choice(candidates_pool)
         media_id = selected_media["id"]
         media_type = selected_media["media_type"]
@@ -275,7 +341,7 @@ def main():
     os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(history, f, ensure_ascii=False, indent=4)
-    print("\n[SUCCESS] Script exécuté. Nouveaux posters en place et historique JSON rafraîchi.")
+    print("\n[SUCCESS] Script exécuté avec succès. Prise en charge multi-lignes et filtres stricts appliqués.")
 
 if __name__ == "__main__":
     main()
