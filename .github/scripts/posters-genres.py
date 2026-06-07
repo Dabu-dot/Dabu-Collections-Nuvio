@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from urllib.parse import parse_qsl
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter, ImageOps
+import cv2
 
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 TMDB_BASE = "https://api.themoviedb.org/3"
@@ -14,7 +15,7 @@ if not TMDB_API_KEY:
     print("Erreur : La variable TMDB_API_KEY n'est pas définie.")
     sys.exit(1)
 
-# Configuration hybride enrichie (Vague 1)
+# Configuration hybride enrichie (Vague 1) - Requêtes calquées sur ton fichier YAML
 GENRES_CONFIG = {
     "action": {
         "label": "ACTION", 
@@ -66,8 +67,12 @@ GENRES_CONFIG = {
 OUTPUT_DIR = "Ressources/Collections Covers/Genres/Static Covers"
 PROCESSED_MEDIA_IDS = set()
 
+# Initialisation du cascade classifier pour l'analyse faciale d'origine
+face_cascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+face_cascade = cv2.CascadeClassifier(face_cascade_path)
+
 def tmdb_get(endpoint, params):
-    """Effectue une requête GET sur TMDB avec gestion robuste des retries (anti-rate limit)"""
+    """Effectue une requête GET sur TMDB avec gestion des retries (anti-rate limit de backdrop.py)"""
     query = dict(params)
     query["api_key"] = TMDB_API_KEY
     last_error = None
@@ -90,7 +95,7 @@ def tmdb_get(endpoint, params):
     raise last_error
 
 def parse_request_spec(spec):
-    """Découpe la spécification de la requête (ex: movie:with_genres=28...)"""
+    """Découpe l'argument de requête (ex: 'movie:with_genres=28...')"""
     try:
         raw_media_type, raw_request = spec.split(":", 1)
     except ValueError as exc:
@@ -108,7 +113,7 @@ def parse_request_spec(spec):
     return {"mode": "discover", "media_type": media_type, "params": params}
 
 def fetch_titles_for_genres(tmdb_requests, count=30):
-    """Récupère et entrelace intelligemment les résultats de films et de séries"""
+    """Récupère et entrelace les résultats de films et de séries de manière équitable"""
     request_specs = [parse_request_spec(spec) for spec in tmdb_requests]
     per_spec_items = []
 
@@ -149,134 +154,214 @@ def fetch_titles_for_genres(tmdb_requests, count=30):
                 
     return unique_titles
 
-def select_best_textless_backdrop(media_type, media_id, fallback_path):
-    """
-    Parcourt la galerie TMDB pour extraire le meilleur fond strictement textless.
-    Priorise les listes sans langue (null) pour garantir l'absence totale de logos.
-    """
+def get_exclusive_textless_backdrops(media_type, media_id):
+    """Récupère la galerie d'images filtrée strictement sur l'absence de texte (langue 'null')"""
     try:
         data = tmdb_get(f"/{media_type}/{media_id}/images", {"include_image_language": "null"})
-        backdrops_list = data.get("backdrops", [])
-        if not backdrops_list:
-            return fallback_path
-
-        # On prend le plus voté de la section sans texte (null)
-        best_textless = max(backdrops_list, key=lambda x: (x.get("vote_count", 0), x.get("vote_average", 0)))
-        return best_textless.get("file_path")
+        backdrops = data.get("backdrops", [])
+        backdrops.sort(key=lambda x: (x.get("vote_count", 0), x.get("vote_average", 0)), reverse=True)
+        return backdrops
     except Exception:
-        return fallback_path
+        return []
 
-def calculate_landscape_score(backdrop_data, item, media_type):
-    """Système de notation déterministe basé sur la qualité et la popularité de l'œuvre"""
-    score = 50
-    w = backdrop_data.get("width", 0)
-    popularity = item.get("popularity", 0)
-    
-    if w >= 3840: score += 20
-    elif w >= 1920: score += 10
-        
-    if popularity > 100: score += 20
-    elif popularity > 30: score += 10
-        
-    if media_type == "movie": score += 10  # Léger avantage pour le cadrage cinéma natif
-    return score
-
-def apply_landscape_duotone(img, target_color):
+def analyze_image_layout(img):
+    """Écarte les fonds noirs trop vides (teasers)"""
     gray = img.convert("L")
     gray_np = np.array(gray)
-    base_dark = np.array([12, 16, 26]) # Fond Apple TV
-    target_light = np.array(target_color)
+    h, w = gray_np.shape
+    dark_pixels = np.sum(gray_np < 20)
+    if (dark_pixels / (h * w)) > 0.60:
+        return "teaser"
+    return "ok"
+
+def calculate_candidate_score(variance, num_faces, genre_name, layout_status, item):
+    if layout_status == "teaser": return 5
     
+    score = 50  
+    score += min(20, int(variance / 8))
+    
+    # Bonus de popularité hérité de la logique d'importance globale
+    popularity = item.get("popularity", 0)
+    if popularity > 120: score += 10
+    
+    if genre_name in ["action", "science-fiction", "thriller", "romance", "aventure"]:
+        if num_faces in [1, 2]: score += 20
+        elif num_faces == 0: score += 5
+    else:
+        if num_faces <= 1: score += 20
+        else: score += 5
+        
+    return max(0, score)
+
+def find_best_crop_x(img, target_w, faces):
+    W, H = img.size
+    if len(faces) > 0:
+        main_face = max(faces, key=lambda f: f[2] * f[3])
+        fx, _, fw, fh = main_face
+        if fh / H <= 0.35:
+            best_x_start = (fx + (fw // 2)) - (target_w // 2)
+            return max(0, min(best_x_start, W - target_w))
+
+    gray = img.convert("L")
+    kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]], dtype=np.float32)
+    laplacian_img = gray.filter(ImageFilter.Kernel((3, 3), kernel.flatten(), scale=1, offset=0))
+    lap_np = np.array(laplacian_img)
+
+    best_x_start = (W - target_w) // 2
+    max_detail_score = 0
+    step = max(1, (W - target_w) // 10)
+    
+    for x_start in range(0, W - target_w + 1, step):
+        window_lap = lap_np[:, x_start:x_start + target_w]
+        detail_score = np.sum(window_lap > 45)
+        if detail_score > max_detail_score:
+            max_detail_score = detail_score
+            best_x_start = x_start
+            
+    return best_x_start
+
+def process_candidate(backdrop, genre_name, item):
+    img_url = f"https://image.tmdb.org/t/p/original{backdrop['file_path']}"
+    try:
+        img_res = requests.get(img_url, stream=True, timeout=5)
+        if img_res.status_code != 200: return None
+        raw_img = Image.open(img_res.raw).convert("RGB")
+    except Exception:
+        return None
+        
+    img = ImageOps.exif_transpose(raw_img)
+    W, H = img.size
+    if W < 1000 or H < 600: return None
+    
+    layout_status = analyze_image_layout(img)
+    gray = img.convert("L")
+    kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]], dtype=np.float32)
+    laplacian_img = gray.filter(ImageFilter.Kernel((3, 3), kernel.flatten(), scale=1, offset=0))
+    variance = np.array(laplacian_img, dtype=np.float32).var()
+    
+    if variance < 35: return None
+    
+    img_np = np.array(img)
+    gray_np = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
+    try:
+        faces = face_cascade.detectMultiScale(gray_np, scaleFactor=1.1, minNeighbors=5, minSize=(35, 35))
+    except Exception:
+        faces = []
+        
+    num_faces = len(faces)
+    if num_faces > 3: return None
+    
+    target_w = int(H * (2/3))
+    if target_w > W: return None
+    
+    best_x_start = find_best_crop_x(img, target_w, faces)
+    if best_x_start is None: return None
+    cropped = img.crop((best_x_start, 0, best_x_start + target_w, H))
+
+    final_img = cropped.resize((800, 1200), Image.Resampling.LANCZOS)
+    score = calculate_candidate_score(variance, num_faces, genre_name, layout_status, item)
+    
+    return final_img, score, backdrop['file_path']
+
+def apply_duotone(img, target_color):
+    gray = img.convert("L")
+    gray_np = np.array(gray)
+    base_dark = np.array([12, 16, 26])
+    target_light = np.array(target_color)
     duotone = np.zeros((gray_np.shape[0], gray_np.shape[1], 3), dtype=np.uint8)
     for i in range(3):
         duotone[..., i] = base_dark[i] + (gray_np / 255.0) * (target_light[i] - base_dark[i])
     return Image.fromarray(duotone)
 
-def finalize_landscape_poster(img, label, target_color):
-    img = img.resize((1920, 1080), Image.Resampling.LANCZOS)
-    img = ImageEnhance.Contrast(img).enhance(1.12)
-    img = apply_landscape_duotone(img, target_color)
+def finalize_poster(img, label, target_color):
+    img = ImageEnhance.Contrast(img).enhance(1.15)
+    img = apply_duotone(img, target_color)
     
     draw = ImageDraw.Draw(img, "RGBA")
-    
-    # Dégradé cinématique linéaire bas
-    for y in range(650, 1080):
-        alpha = int(((y - 650) / 430) ** 2.0 * 230)
-        draw.line([(0, y), (1920, y)], fill=(0, 0, 0, alpha))
+    for y in range(750, 1200):
+        alpha = int(((y - 750) / 450) ** 2.3 * 245)
+        draw.line([(0, y), (800, y)], fill=(0, 0, 0, alpha))
         
     try:
-        font = ImageFont.truetype(".github/assets/fonts/SF-Pro-Display-Bold.otf", 72)
+        font = ImageFont.truetype(".github/assets/fonts/SF-Pro-Display-Bold.otf", 54)
     except IOError:
         font = ImageFont.load_default()
         
-    draw.text((90, 930), label, fill=(255, 255, 255, 255), font=font)
+    words = label.split()
+    lines = []
+    current_line = ""
+    for word in words:
+        test = f"{current_line} {word}".strip()
+        if draw.textlength(test, font=font) <= 680: current_line = test
+        else:
+            if current_line: lines.append(current_line)
+            current_line = word
+    if current_line: lines.append(current_line)
+    
+    font_box = font.getbbox("A")
+    fh = font_box[3] - font_box[1]
+    
+    if len(lines) <= 1:
+        draw.text((60, 1070), label, fill=(255, 255, 255, 255), font=font)
+    else:
+        ay = 1070 - fh - 12
+        for line in lines[:2]:
+            draw.text((60, ay), line, fill=(255, 255, 255, 255), font=font)
+            ay += fh + 12
+            
     return img
 
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
     for genre_name, config in GENRES_CONFIG.items():
-        print(f"\n--- [BANNIÈRE LANDSCAPE] Traitement du genre : {config['label']} ---")
+        print(f"\n--- [TOURNOI PREMIUM TEXTLESS] Genre : {config['label']} ---")
         
         try:
-            titles_pool = fetch_titles_for_genres(config["requests"], count=15)
-            time.sleep(0.5) # Anti rate-limit post discovery
+            balanced_pool = fetch_titles_for_genres(config["requests"], count=15)
+            time.sleep(0.4) # Respiration API post-discovery
             
             pool_candidates = []
-            for media_type, item in titles_pool:
+            for media_type, item in balanced_pool:
                 media_id = item["id"]
                 composite_key = f"{media_type}_{media_id}"
+                if composite_key in PROCESSED_MEDIA_IDS: continue
                 
-                if composite_key in PROCESSED_MEDIA_IDS: 
-                    continue
+                # Isolation stricte des backdrops communautaires tagués sans texte (langue = null)
+                backdrops = get_exclusive_textless_backdrops(media_type, media_id)
+                time.sleep(0.15) # Pause réglementaire anti-rate limit
+                if not backdrops: continue
                 
-                # Récupération stricte de l'asset sans texte
-                best_path = select_best_textless_backdrop(media_type, media_id, item.get("backdrop_path"))
-                time.sleep(0.2) # Respiration API
-                
-                if not best_path: 
-                    continue
-                    
-                img_url = f"https://image.tmdb.org/t/p/original{best_path}"
-                try:
-                    img_res = requests.get(img_url, stream=True, timeout=8)
-                    if img_res.status_code == 200:
-                        raw_img = Image.open(img_res.raw).convert("RGB")
-                        img = ImageOps.exif_transpose(raw_img)
-                        
-                        # Création d'un dictionnaire d'infos d'image minimal pour le score
-                        bg_info = {"width": img.size[0], "file_path": best_path}
-                        score = calculate_landscape_score(bg_info, item, media_type)
-                        
+                for bg in backdrops[:3]:
+                    result = process_candidate(bg, genre_name, item)
+                    if result:
+                        processed_img, score, file_path = result
                         pool_candidates.append({
-                            "image": img,
+                            "image": processed_img,
                             "score": score,
                             "title": item.get("title") or item.get("name"),
-                            "key": composite_key
+                            "key": composite_key,
+                            "path": file_path,
+                            "type": media_type
                         })
-                except Exception as img_err:
-                    print(f"      [Alerte Download] Échec de l'asset {img_url}: {img_err}")
-                    continue
-                    
+            
             if pool_candidates:
                 pool_candidates.sort(key=lambda x: x["score"], reverse=True)
                 winner = pool_candidates[0]
                 
-                print(f" ==> BANNIÈRE RETENUE : {winner['title']} (Score: {winner['score']}/100)")
+                print(f" ==> VAINQUEUR ASSURÉ SANS LOGO : {winner['type'].upper()} '{winner['title']}' (Score: {winner['score']}/100)")
                 
-                final_landscape = finalize_landscape_poster(winner["image"], config["label"], config["color"])
-                
-                # Sauvegarde finale synchronisée
-                final_landscape.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
-                final_landscape.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
+                final_poster = finalize_poster(winner["image"], config["label"], config["color"])
+                final_poster.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
+                final_poster.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
                 
                 PROCESSED_MEDIA_IDS.add(winner["key"])
             else:
-                print(f" /!\\ CONSERVATION : Aucun nouvel asset validé pour {config['label']}.")
+                print(f" /!\\ CONSERVATION : Aucun asset textless validé pour {config['label']}.")
                 
         except Exception as genre_err:
-            print(f" /!\\ [ERREUR CRITIQUE] Le traitement du genre {config['label']} a échoué : {genre_err}")
-            print("Passage immédiat au genre suivant pour préserver le run...")
+            print(f" /!\\ [ALERTE GENRE] Échec sur le genre {config['label']}: {genre_err}")
+            print("Passage au genre suivant pour ne pas bloquer le déploiement Git.")
             continue
 
 if __name__ == "__main__":
