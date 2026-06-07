@@ -253,5 +253,85 @@
         "title": "Wagon Train",
         "genre": "western",
         "date": "2026-06-07"
+    },
+    "tv_67178": {
+        "title": "Marvel's The Punisher",
+        "genre": "action",
+        "date": "2026-06-07"
+    },
+    "tv_120089": {
+        "title": "SPY x FAMILY",
+        "genre": "animation-japonaise",
+        "date": "2026-06-07"
+    },
+    "movie_1297842": {
+        "title": "GOAT",
+        "genre": "animation",
+        "date": "2026-06-07"
+    },
+    "tv_61818": {
+        "title": "Late Night with Seth Meyers",
+        "genre": "comedie",
+        "date": "2026-06-07"
+    },
+    "tv_21728": {
+        "title": "The Alfred Hitchcock Hour",
+        "genre": "crime",
+        "date": "2026-06-07"
+    },
+    "tv_14951": {
+        "title": "Nature",
+        "genre": "documentaire",
+        "date": "2026-06-07"
+    },
+    "tv_299167": {
+        "title": "Dutton Ranch",
+        "genre": "drame",
+        "date": "2026-06-07"
+    },
+    "tv_49009": {
+        "title": "The Goldbergs",
+        "genre": "famille",
+        "date": "2026-06-07"
+    },
+    "movie_120": {
+        "title": "The Lord of the Rings: The Fellowship of the Ring",
+        "genre": "fantastique",
+        "date": "2026-06-07"
+    },
+    "tv_71789": {
+        "title": "SEAL Team",
+        "genre": "guerre",
+        "date": "2026-06-07"
+    },
+    "tv_61378": {
+        "title": "Madam Secretary",
+        "genre": "histoire",
+        "date": "2026-06-07"
+    },
+    "movie_1304313": {
+        "title": "Lee Cronin's The Mummy",
+        "genre": "horreur",
+        "date": "2026-06-07"
+    },
+    "movie_1325734": {
+        "title": "The Drama",
+        "genre": "romance",
+        "date": "2026-06-07"
+    },
+    "movie_687163": {
+        "title": "Project Hail Mary",
+        "genre": "science-fiction",
+        "date": "2026-06-07"
+    },
+    "tv_764": {
+        "title": "Midsomer Murders",
+        "genre": "thriller",
+        "date": "2026-06-07"
+    },
+    "tv_63247": {
+        "title": "Westworld",
+        "genre": "western",
+        "date": "2026-06-07"
     }
 }
