@@ -408,5 +408,80 @@
         "title": "Dr. Quinn, Medicine Woman",
         "genre": "western",
         "date": "2026-06-07"
+    },
+    "tv_76479": {
+        "title": "The Boys",
+        "genre": "action",
+        "date": "2026-06-07"
+    },
+    "tv_233643": {
+        "title": "Secret Mission - Undercover Agents Never Back Down!",
+        "genre": "animation-japonaise",
+        "date": "2026-06-07"
+    },
+    "movie_1007757": {
+        "title": "Swapped",
+        "genre": "animation",
+        "date": "2026-06-07"
+    },
+    "movie_122": {
+        "title": "The Lord of the Rings: The Return of the King",
+        "genre": "aventure",
+        "date": "2026-06-07"
+    },
+    "tv_34307": {
+        "title": "Shameless",
+        "genre": "comedie",
+        "date": "2026-06-07"
+    },
+    "movie_976912": {
+        "title": "Graphic Desires",
+        "genre": "crime",
+        "date": "2026-06-07"
+    },
+    "tv_220102": {
+        "title": "Spider-Noir",
+        "genre": "drame",
+        "date": "2026-06-07"
+    },
+    "tv_40": {
+        "title": "Dallas",
+        "genre": "famille",
+        "date": "2026-06-07"
+    },
+    "movie_454639": {
+        "title": "Masters of the Universe",
+        "genre": "fantastique",
+        "date": "2026-06-07"
+    },
+    "tv_44217": {
+        "title": "Vikings",
+        "genre": "guerre",
+        "date": "2026-06-07"
+    },
+    "tv_1407": {
+        "title": "Homeland",
+        "genre": "histoire",
+        "date": "2026-06-07"
+    },
+    "movie_1358005": {
+        "title": "Office Romance",
+        "genre": "romance",
+        "date": "2026-06-07"
+    },
+    "movie_1116201": {
+        "title": "Iron Lung",
+        "genre": "science-fiction",
+        "date": "2026-06-07"
+    },
+    "movie_462183": {
+        "title": "Wild Awakening",
+        "genre": "thriller",
+        "date": "2026-06-07"
+    },
+    "tv_1018": {
+        "title": "Bonanza",
+        "genre": "western",
+        "date": "2026-06-07"
     }
 }
