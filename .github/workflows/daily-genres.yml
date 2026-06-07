@@ -42,7 +42,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # Indexation des images générées et du fichier JSON d'historique glissant
+          # Indexation des bannières générées et de l'historique de rotation
           git add "Ressources/Collections Covers/Genres/Static Covers/"
           git add ".github/scripts/posters_history.json"
           
