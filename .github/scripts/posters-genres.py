@@ -5,7 +5,7 @@ import requests
 from datetime import datetime, timedelta
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter, ImageOps
-from mtcnn import MTCNN
+import cv2
 
 # Récupération de la clé API via les secrets GitHub
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
@@ -36,8 +36,11 @@ GENRES_CONFIG = {
 }
 
 OUTPUT_DIR = "Ressources/Collections Covers/Genres/Static Covers"
-detector = MTCNN()
 PROCESSED_MEDIA_IDS = set()
+
+# Chargement du classificateur de visages OpenCV (fourni nativement avec cv2)
+face_cascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+face_cascade = cv2.CascadeClassifier(face_cascade_path)
 
 def is_mature_release(date_str):
     """Vérifie si le média est sorti depuis au moins 14 jours (évite les coquilles vides)."""
@@ -45,7 +48,6 @@ def is_mature_release(date_str):
         return False
     try:
         release_date = datetime.strptime(date_str, "%Y-%m-%d")
-        # Seuil de sécurité : au moins 2 semaines d'existence
         safety_threshold = datetime.now() - timedelta(days=14)
         return release_date <= safety_threshold
     except ValueError:
@@ -56,7 +58,6 @@ def get_balanced_trending_media(genre_key, config):
     trending_movies = []
     trending_shows = []
     
-    # On scanne un peu plus de pages des tendances de la semaine pour remplir nos quotas équitablement
     for page in [1, 2, 3, 4, 5]:
         if len(trending_movies) >= 5 and len(trending_shows) >= 5:
             break
@@ -73,7 +74,6 @@ def get_balanced_trending_media(genre_key, config):
             genre_ids = item.get("genre_ids", [])
             org_lang = item.get("original_language", "")
             
-            # Récupération et filtrage par date selon le type de média
             date_str = item.get("release_date") if media_type == "movie" else item.get("first_air_date")
             if not is_mature_release(date_str):
                 continue
@@ -81,7 +81,6 @@ def get_balanced_trending_media(genre_key, config):
             target_genre_id = config["id"] if media_type == "movie" else config.get("tv_id", config["id"])
             
             if target_genre_id in genre_ids:
-                # Séparation Animation Japonaise / Animation internationale
                 if genre_key == "animation-japonaise" and (16 not in genre_ids or org_lang != "ja"):
                     continue
                 if genre_key == "animation" and (16 not in genre_ids or org_lang == "ja"):
@@ -126,13 +125,12 @@ def analyze_grid_emptiness(img):
                 
     return empty_blocks >= 6
 
-def calculate_candidate_score(artwork_type, variance, faces, genre_name, is_teaser):
+def calculate_candidate_score(artwork_type, variance, num_faces, genre_name, is_teaser):
     score = 0
     if is_teaser: return 5
     if artwork_type == 'poster': score += 35
     
     score += min(25, int(variance / 7))
-    num_faces = len(faces)
     
     if genre_name in ["action", "science-fiction", "thriller", "romance", "aventure"]:
         if num_faces in [1, 2]: score += 40
@@ -146,9 +144,10 @@ def calculate_candidate_score(artwork_type, variance, faces, genre_name, is_teas
 
 def find_best_crop_x(img, target_w, faces):
     W, H = img.size
-    if faces:
-        main_face = max(faces, key=lambda f: f['box'][2] * f['box'][3])
-        fx, _, fw, _ = main_face['box']
+    if len(faces) > 0:
+        # Trouver le plus grand visage détecté par OpenCV (w * h)
+        main_face = max(faces, key=lambda f: f[2] * f[3])
+        fx, _, fw, _ = main_face
         best_x_start = (fx + (fw // 2)) - (target_w // 2)
         return max(0, min(best_x_start, W - target_w))
 
@@ -206,14 +205,19 @@ def process_candidate(artwork, genre_name):
     
     if variance < 45: return None
     
+    # Détection de visages ultra-rapide avec OpenCV
     img_np = np.array(img)
+    gray_np = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
+    
     try:
-        faces = detector.detect_faces(img_np)
+        # scaleFactor=1.1, minNeighbors=5 balancent bien précision/vitesse
+        faces = face_cascade.detectMultiScale(gray_np, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
     except Exception:
         faces = []
         
-    if artwork_type == 'poster' and len(faces) > 4: return None
-    if artwork_type == 'backdrop' and len(faces) > 2: return None
+    num_faces = len(faces)
+    if artwork_type == 'poster' and num_faces > 4: return None
+    if artwork_type == 'backdrop' and num_faces > 2: return None
     
     if artwork_type == 'backdrop':
         target_w = int(H * (2/3))
@@ -232,7 +236,7 @@ def process_candidate(artwork, genre_name):
         else: cropped = img
 
     final_img = cropped.resize((800, 1200), Image.Resampling.LANCZOS)
-    score = calculate_candidate_score(artwork_type, variance, faces, genre_name, is_teaser)
+    score = calculate_candidate_score(artwork_type, variance, num_faces, genre_name, is_teaser)
     
     return final_img, score, artwork['file_path']
 
@@ -322,4 +326,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-                
