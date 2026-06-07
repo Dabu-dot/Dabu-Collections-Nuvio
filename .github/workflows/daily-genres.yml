@@ -9,7 +9,6 @@ jobs:
   generate-covers:
     runs-on: ubuntu-latest
     
-    # AJOUT ICI : Autorise explicitement l'action à écrire dans le dépôt
     permissions:
       contents: write
     
@@ -20,7 +19,7 @@ jobs:
       - name: Installation des dépendances système (OpenCV / Graphics)
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgl1-mesa-glx libglib2.0-0
+          sudo apt-get install -y libgl1 libglib2.0-0
 
       - name: Configuration de Python
         uses: actions/setup-python@v5
@@ -50,4 +49,3 @@ jobs:
           else
             echo "Aucun changement détecté, pas de commit."
           fi
-          
