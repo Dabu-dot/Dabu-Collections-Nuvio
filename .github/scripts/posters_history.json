@@ -83,5 +83,90 @@
         "title": "Lawman",
         "genre": "western",
         "date": "2026-06-07"
+    },
+    "movie_1472951": {
+        "title": "Infiltrate",
+        "genre": "action",
+        "date": "2026-06-07"
+    },
+    "tv_46298": {
+        "title": "Hunter x Hunter",
+        "genre": "animation-japonaise",
+        "date": "2026-06-07"
+    },
+    "tv_241002": {
+        "title": "Adam's Sweet Agony",
+        "genre": "animation",
+        "date": "2026-06-07"
+    },
+    "tv_66732": {
+        "title": "Stranger Things",
+        "genre": "aventure",
+        "date": "2026-06-07"
+    },
+    "tv_2316": {
+        "title": "The Office",
+        "genre": "comedie",
+        "date": "2026-06-07"
+    },
+    "tv_79744": {
+        "title": "The Rookie",
+        "genre": "crime",
+        "date": "2026-06-07"
+    },
+    "tv_74313": {
+        "title": "Blue Planet II",
+        "genre": "documentaire",
+        "date": "2026-06-07"
+    },
+    "tv_273240": {
+        "title": "Off Campus",
+        "genre": "drame",
+        "date": "2026-06-07"
+    },
+    "tv_71728": {
+        "title": "Young Sheldon",
+        "genre": "famille",
+        "date": "2026-06-07"
+    },
+    "tv_63174": {
+        "title": "Lucifer",
+        "genre": "fantastique",
+        "date": "2026-06-07"
+    },
+    "movie_1318413": {
+        "title": "Pressure",
+        "genre": "guerre",
+        "date": "2026-06-07"
+    },
+    "movie_872585": {
+        "title": "Oppenheimer",
+        "genre": "histoire",
+        "date": "2026-06-07"
+    },
+    "movie_1339713": {
+        "title": "Obsession",
+        "genre": "horreur",
+        "date": "2026-06-07"
+    },
+    "tv_64770": {
+        "title": "Potato Star 2013QR3",
+        "genre": "romance",
+        "date": "2026-06-07"
+    },
+    "tv_1411": {
+        "title": "Person of Interest",
+        "genre": "science-fiction",
+        "date": "2026-06-07"
+    },
+    "tv_308014": {
+        "title": "Berlin and the Lady with an Ermine",
+        "genre": "thriller",
+        "date": "2026-06-07"
+    },
+    "tv_73586": {
+        "title": "Yellowstone",
+        "genre": "western",
+        "date": "2026-06-07"
     }
 }
