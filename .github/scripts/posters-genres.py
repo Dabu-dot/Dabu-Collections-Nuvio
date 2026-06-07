@@ -13,14 +13,58 @@ if not TMDB_API_KEY:
     print("Erreur : La variable TMDB_API_KEY n'est pas définie.")
     sys.exit(1)
 
+# Configuration hybride enrichie grâce à ta Vague 1 de terrain
 GENRES_CONFIG = {
-    "action": {"id": 28, "tv_id": 10759, "label": "ACTION", "color": (255, 90, 0)},
-    "animation-japonaise": {"id": 16, "tv_id": 16, "label": "ANIMATION JAPONAISE", "color": (255, 0, 128)}, 
-    "animation": {"id": 16, "tv_id": 16, "label": "ANIMATION", "color": (0, 200, 255)}, 
-    "aventure": {"id": 12, "tv_id": 10759, "label": "AVENTURE", "color": (245, 158, 11)},
-    "comedie": {"id": 35, "tv_id": 35, "label": "COMÉDIE", "color": (250, 204, 21)},
+    "action": {
+        "id": 28, 
+        "tv_id": 10759, 
+        "label": "ACTION", 
+        "color": (255, 90, 0),
+        "keywords": "3930,6054,12993,9951,8440,188955,226499,83,312,779,4565,14955,853,9665,10044",
+        "exclude_genres": "16,99" # Exclut l'animation et le documentaire pour garder du live-action
+    },
+    "animation-japonaise": {
+        "id": 16, 
+        "tv_id": 16, 
+        "label": "ANIMATION JAPONAISE", 
+        "color": (255, 0, 128),
+        "keywords": "210024,13141,207826",
+        "exclude_genres": "99"
+    }, 
+    "animation": {
+        "id": 16, 
+        "tv_id": 16, 
+        "label": "ANIMATION", 
+        "color": (0, 200, 255),
+        "keywords": "272909,7376,278823,234183,179411,234662,290589,297442,339048,366485",
+        "exclude_genres": "99"
+    }, 
+    "aventure": {
+        "id": 12, 
+        "tv_id": 10759, 
+        "label": "AVENTURE", 
+        "color": (245, 158, 11),
+        "keywords": "195114,161176,818,4152,170362,210246,10364,41586,6956,269233",
+        "exclude_genres": "16,99"
+    },
+    "comedie": {
+        "id": 35, 
+        "tv_id": 35, 
+        "label": "COMÉDIE", 
+        "color": (250, 204, 21),
+        "keywords": "8201,9755,9964,375047,6241,9253",
+        "exclude_genres": "16,99"
+    },
+    "documentaire": {
+        "id": 99, 
+        "tv_id": 99, 
+        "label": "DOCUMENTAIRE", 
+        "color": (34, 197, 94),
+        "keywords": "221355,305903,343303,284176",
+        "exclude_genres": "28,14,878" # Sécurité renforcée anti-blockbusters
+    },
+    # Mode de repli temporaire pour les autres genres en attendant la Vague 2
     "crime": {"id": 80, "tv_id": 80, "label": "CRIME", "color": (107, 114, 128)},
-    "documentaire": {"id": 99, "tv_id": 99, "label": "DOCUMENTAIRE", "color": (34, 197, 94)},
     "drame": {"id": 18, "tv_id": 18, "label": "DRAME", "color": (14, 165, 233)},
     "famille": {"id": 10751, "tv_id": 10751, "label": "FAMILLE", "color": (217, 70, 239)},
     "fantastique": {"id": 14, "tv_id": 10765, "label": "FANTASTIQUE", "color": (168, 85, 247)},
@@ -48,31 +92,42 @@ def is_mature_release(date_str):
     except ValueError:
         return False
 
-def get_pure_documentaries():
-    """Endpoint spécifique pour éviter l'infiltration de blockbusters de fiction dans Documentaire."""
-    docs = []
-    # 1. Récupération des films documentaires populaires (sans SF, Fantastique ni Action)
-    url_movies = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_genres=99&without_genres=28,14,878&sort_by=popularity.desc&language=fr-FR&page=1"
-    # 2. Récupération des séries documentaires populaires
-    url_tv = f"https://api.themoviedb.org/3/discover/tv?api_key={TMDB_API_KEY}&with_genres=99&sort_by=popularity.desc&language=fr-FR&page=1"
-    
-    try:
-        res_m = requests.get(url_movies, timeout=10).json().get("results", [])
-        for item in res_m: 
-            item["media_type"] = "movie"
-            docs.append(item)
-        res_t = requests.get(url_tv, timeout=10).json().get("results", [])
-        for item in res_t: 
-            item["media_type"] = "tv"
-            docs.append(item)
-    except Exception:
-        pass
-    return docs[:10]
-
 def get_balanced_trending_media(genre_key, config):
-    if genre_key == "documentaire":
-        return get_pure_documentaries()
+    """Filtre de manière chirurgicale via l'endpoint discover si les mots-clés existent, sinon utilise les tendances."""
+    if "keywords" in config:
+        docs_movies = []
+        docs_tv = []
         
+        target_genre_id = config["id"]
+        target_tv_genre_id = config.get("tv_id", config["id"])
+        keywords = config["keywords"]
+        exclude = config.get("exclude_genres", "")
+        
+        url_movies = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_genres={target_genre_id}&with_keywords={keywords}&without_genres={exclude}&sort_by=popularity.desc&language=fr-FR&page=1"
+        url_tv = f"https://api.themoviedb.org/3/discover/tv?api_key={TMDB_API_KEY}&with_genres={target_tv_genre_id}&with_keywords={keywords}&without_genres={exclude}&sort_by=popularity.desc&language=fr-FR&page=1"
+        
+        try:
+            res_m = requests.get(url_movies, timeout=10).json().get("results", [])
+            for item in res_m: 
+                item["media_type"] = "movie"
+                org_lang = item.get("original_language", "")
+                if genre_key == "animation-japonaise" and org_lang != "ja": continue
+                if genre_key == "animation" and org_lang == "ja": continue
+                docs_movies.append(item)
+                
+            res_t = requests.get(url_tv, timeout=10).json().get("results", [])
+            for item in res_t: 
+                item["media_type"] = "tv"
+                org_lang = item.get("original_language", "")
+                if genre_key == "animation-japonaise" and org_lang != "ja": continue
+                if genre_key == "animation" and org_lang == "ja": continue
+                docs_tv.append(item)
+        except Exception as e:
+            print(f"   [Erreur Collecte] Erreur lors du discover pour {genre_key}: {e}")
+            
+        return docs_movies[:6] + docs_tv[:6]
+
+    # --- Mode de repli global pour les genres n'ayant pas encore de mots-clés ---
     trending_movies = []
     trending_shows = []
     
@@ -89,17 +144,13 @@ def get_balanced_trending_media(genre_key, config):
         for item in results:
             media_type = item.get("media_type")
             genre_ids = item.get("genre_ids", [])
-            org_lang = item.get("original_language", "")
             
             date_str = item.get("release_date") if media_type == "movie" else item.get("first_air_date")
             if not is_mature_release(date_str): continue
                 
-            target_genre_id = config["id"] if media_type == "movie" else config.get("tv_id", config["id"])
+            target_id = config["id"] if media_type == "movie" else config.get("tv_id", config["id"])
             
-            if target_genre_id in genre_ids:
-                if genre_key == "animation-japonaise" and (16 not in genre_ids or org_lang != "ja"): continue
-                if genre_key == "animation" and (16 not in genre_ids or org_lang == "ja"): continue
-                
+            if target_id in genre_ids:
                 if media_type == "movie" and len(trending_movies) < 5 and item not in trending_movies:
                     trending_movies.append(item)
                 elif media_type == "tv" and len(trending_shows) < 5 and item not in trending_shows:
@@ -107,72 +158,45 @@ def get_balanced_trending_media(genre_key, config):
                     
     return trending_movies + trending_shows
 
-def get_media_artworks(media_id, media_type):
+def get_media_backdrops(media_id, media_type):
+    """Récupère exclusivement les backdrops textless validés par votes communautaires."""
     endpoint = "movie" if media_type == "movie" else "tv"
+    # include_image_language=null isole les images taguées comme strictes sans texte par la communauté
     url = f"https://api.themoviedb.org/3/{endpoint}/{media_id}/images?api_key={TMDB_API_KEY}&include_image_language=null"
     try:
         res = requests.get(url, timeout=5).json()
     except Exception:
         return []
+    
     backdrops = res.get("backdrops", [])
-    posters = res.get("posters", [])
-    for b in backdrops: b['artwork_type'] = 'backdrop'
-    for p in posters: p['artwork_type'] = 'poster'
-    return posters + backdrops
+    # Tri d'élite : d'abord le volume de votes, puis la note moyenne
+    backdrops.sort(key=lambda x: (x.get("vote_count", 0), x.get("vote_average", 0)), reverse=True)
+    return backdrops
 
 def analyze_image_layout(img):
-    """Analyse fine de la répartition lumineuse et des vides (Détection Teaser et Centre Vide)."""
+    """Analyse la répartition lumineuse pour écarter les fonds noirs vides (teasers)."""
     gray = img.convert("L")
     gray_np = np.array(gray)
     h, w = gray_np.shape
     
-    # 1. Sécurité anti-teaser noir (Mortal Kombat)
-    # Si plus de 55% des pixels de l'affiche complète sont très sombres (< 25)
-    dark_pixels = np.sum(gray_np < 25)
-    if (dark_pixels / (h * w)) > 0.55:
-        return "teaser"
-
-    # 2. Sécurité anti-centre vide en couronne (Vice-Versa 2)
-    bh, bw = h // 3, w // 3
-    blocks_variance = []
-    for i in range(3):
-        for j in range(3):
-            block = gray_np[i*bh:(i+1)*bh, j*bw:(j+1)*bw]
-            blocks_variance.append(block.var())
-            
-    center_var = blocks_variance[4] # Bloc du milieu
-    avg_outer_var = np.mean([blocks_variance[i] for i in [0,1,2,3,5,6,7,8]])
-    
-    # Si le centre est super lisse/vide alors que les bords débordent d'éléments
-    if center_var < 15.0 and avg_outer_var > 45.0:
-        return "center_empty"
-        
-    # Test classique de la grille vide générale
-    empty_blocks = sum(1 for v in blocks_variance if v < 12.0)
-    if empty_blocks >= 6:
+    dark_pixels = np.sum(gray_np < 20)
+    if (dark_pixels / (h * w)) > 0.60:
         return "teaser"
         
     return "ok"
 
-def calculate_candidate_score(artwork_type, variance, num_faces, genre_name, layout_status):
+def calculate_candidate_score(variance, num_faces, genre_name, layout_status):
     if layout_status == "teaser": return 5
     
-    score = 0
-    if artwork_type == 'poster': score += 35
+    score = 50  # Base solide pour les backdrops textless de haute qualité
+    score += min(20, int(variance / 8))
     
-    score += min(25, int(variance / 7))
-    
-    # Pénalité si la composition isole le centre (évite le texte sur les visages extérieurs)
-    if layout_status == "center_empty":
-        score -= 40
-
     if genre_name in ["action", "science-fiction", "thriller", "romance", "aventure"]:
-        if num_faces in [1, 2]: score += 40
+        if num_faces in [1, 2]: score += 30
         elif num_faces == 0: score += 10
-        else: score += 5
     else:
-        if num_faces <= 1: score += 40
-        else: score += 15
+        if num_faces <= 1: score += 30
+        else: score += 10
         
     return max(0, score)
 
@@ -182,10 +206,8 @@ def find_best_crop_x(img, target_w, faces):
         main_face = max(faces, key=lambda f: f[2] * f[3])
         fx, _, fw, fh = main_face
         
-        # SÉCURITÉ ANTI-GROS PLAN ZOOMÉ (Crime / The Batman)
-        # Si le visage prend plus de 30% de la hauteur de l'image originale, on refuse le cadrage dessus
-        if fh / H > 0.30:
-            print("   [Cadrage] Visage trop grand (gros plan détecté), repli sur l'analyse par détails.")
+        if fh / H > 0.35:
+            pass  # Visage trop massif (gros plan extrême), repli sur l'analyse de texture
         else:
             best_x_start = (fx + (fw // 2)) - (target_w // 2)
             return max(0, min(best_x_start, W - target_w))
@@ -197,11 +219,11 @@ def find_best_crop_x(img, target_w, faces):
 
     best_x_start = (W - target_w) // 2
     max_detail_score = 0
-    step = max(1, (W - target_w) // 8)
+    step = max(1, (W - target_w) // 10)
     
     for x_start in range(0, W - target_w + 1, step):
         window_lap = lap_np[:, x_start:x_start + target_w]
-        detail_score = np.sum(window_lap > 50)
+        detail_score = np.sum(window_lap > 45)
         if detail_score > max_detail_score:
             max_detail_score = detail_score
             best_x_start = x_start
@@ -218,9 +240,8 @@ def apply_duotone(img, target_color):
         duotone[..., i] = base_dark[i] + (gray_np / 255.0) * (target_light[i] - base_dark[i])
     return Image.fromarray(duotone)
 
-def process_candidate(artwork, genre_name):
-    img_url = f"https://image.tmdb.org/t/p/original{artwork['file_path']}"
-    artwork_type = artwork['artwork_type']
+def process_candidate(backdrop, genre_name):
+    img_url = f"https://image.tmdb.org/t/p/original{backdrop['file_path']}"
     
     try:
         img_res = requests.get(img_url, stream=True, timeout=5)
@@ -231,7 +252,7 @@ def process_candidate(artwork, genre_name):
         
     img = ImageOps.exif_transpose(raw_img)
     W, H = img.size
-    if W < 800 or H < 600: return None
+    if W < 1000 or H < 600: return None
     
     layout_status = analyze_image_layout(img)
     
@@ -240,39 +261,29 @@ def process_candidate(artwork, genre_name):
     laplacian_img = gray.filter(ImageFilter.Kernel((3, 3), kernel.flatten(), scale=1, offset=0))
     variance = np.array(laplacian_img, dtype=np.float32).var()
     
-    if variance < 45: return None
+    if variance < 35: return None
     
     img_np = np.array(img)
     gray_np = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
     try:
-        faces = face_cascade.detectMultiScale(gray_np, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
+        faces = face_cascade.detectMultiScale(gray_np, scaleFactor=1.1, minNeighbors=5, minSize=(35, 35))
     except Exception:
         faces = []
         
     num_faces = len(faces)
-    if artwork_type == 'poster' and num_faces > 4: return None
-    if artwork_type == 'backdrop' and num_faces > 2: return None
+    if num_faces > 3: return None
     
-    if artwork_type == 'backdrop':
-        target_w = int(H * (2/3))
-        if target_w > W: return None
-        best_x_start = find_best_crop_x(img, target_w, faces)
-        if best_x_start is None: return None
-        cropped = img.crop((best_x_start, 0, best_x_start + target_w, H))
-    else:
-        current_ratio = W / H
-        if abs(current_ratio - (2/3)) > 0.02:
-            target_w = int(H * (2/3))
-            if target_w <= W:
-                start_x = (W - target_w) // 2
-                cropped = img.crop((start_x, 0, start_x + target_w, H))
-            else: cropped = img
-        else: cropped = img
+    target_w = int(H * (2/3))
+    if target_w > W: return None
+    
+    best_x_start = find_best_crop_x(img, target_w, faces)
+    if best_x_start is None: return None
+    cropped = img.crop((best_x_start, 0, best_x_start + target_w, H))
 
     final_img = cropped.resize((800, 1200), Image.Resampling.LANCZOS)
-    score = calculate_candidate_score(artwork_type, variance, num_faces, genre_name, layout_status)
+    score = calculate_candidate_score(variance, num_faces, genre_name, layout_status)
     
-    return final_img, score, artwork['file_path']
+    return final_img, score, backdrop['file_path']
 
 def finalize_poster(img, label, target_color):
     img = ImageEnhance.Contrast(img).enhance(1.15)
@@ -316,7 +327,7 @@ def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
     for genre_name, config in GENRES_CONFIG.items():
-        print(f"\n--- [TOURNOI] Traitement du genre : {config['label']} ---")
+        print(f"\n--- [TOURNOI PREMIUM] Traitement du genre : {config['label']} ---")
         balanced_pool = get_balanced_trending_media(genre_name, config)
         
         pool_candidates = []
@@ -327,11 +338,12 @@ def main():
             composite_key = f"{media_type}_{media_id}"
             if composite_key in PROCESSED_MEDIA_IDS: continue
             
-            artworks = get_media_artworks(media_id, media_type)
-            if not artworks: continue
+            # Récupère exclusivement les versions paysages textless de TMDB
+            backdrops = get_media_backdrops(media_id, media_type)
+            if not backdrops: continue
             
-            for art in artworks[:4]:
-                result = process_candidate(art, genre_name)
+            for bg in backdrops[:3]:
+                result = process_candidate(bg, genre_name)
                 if result:
                     processed_img, score, file_path = result
                     pool_candidates.append({
@@ -347,7 +359,7 @@ def main():
             pool_candidates.sort(key=lambda x: x["score"], reverse=True)
             winner = pool_candidates[0]
             
-            print(f" ==> GAGNANT : {winner['type'].upper()} '{winner['title']}' (Score: {winner['score']}/100)")
+            print(f" ==> VAINQUEUR SANS TEXTE : {winner['type'].upper()} '{winner['title']}' (Score: {winner['score']}/100)")
             
             final_poster = finalize_poster(winner["image"], config["label"], config["color"])
             final_poster.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
@@ -355,7 +367,7 @@ def main():
             
             PROCESSED_MEDIA_IDS.add(winner["key"])
         else:
-            print(f" /!\\ CONSERVATION : Aucun asset validé pour {genre_name}.")
+            print(f" /!\\ CONSERVATION : Aucun asset textless validé pour {genre_name}.")
 
 if __name__ == "__main__":
     main()
