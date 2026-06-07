@@ -2,6 +2,7 @@ import os
 import random
 import sys
 import requests
+from datetime import datetime, timedelta
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter, ImageOps
 from mtcnn import MTCNN
@@ -13,71 +14,95 @@ if not TMDB_API_KEY:
     print("Erreur : La variable TMDB_API_KEY n'est pas définie.")
     sys.exit(1)
 
+# Configuration des 17 genres avec alignement des IDs Films et Séries
 GENRES_CONFIG = {
-    "action": {"id": 28, "label": "ACTION", "color": (255, 90, 0)},
-    "animation-japonaise": {"id": 16, "label": "ANIMATION JAPONAISE", "color": (255, 0, 128)}, 
-    "animation": {"id": 16, "label": "ANIMATION", "color": (0, 200, 255)}, 
-    "aventure": {"id": 12, "label": "AVENTURE", "color": (245, 158, 11)},
-    "comedie": {"id": 35, "label": "COMÉDIE", "color": (250, 204, 21)},
-    "crime": {"id": 80, "label": "CRIME", "color": (107, 114, 128)},
-    "documentaire": {"id": 99, "label": "DOCUMENTAIRE", "color": (34, 197, 94)},
-    "drame": {"id": 18, "label": "DRAME", "color": (14, 165, 233)},
-    "famille": {"id": 10751, "label": "FAMILLE", "color": (217, 70, 239)},
-    "fantastique": {"id": 14, "label": "FANTASTIQUE", "color": (168, 85, 247)},
-    "guerre": {"id": 10752, "label": "GUERRE", "color": (120, 113, 108)},
-    "histoire": {"id": 36, "label": "HISTOIRE", "color": (180, 83, 9)},
-    "horreur": {"id": 27, "label": "HORREUR", "color": (239, 68, 68)},
-    "romance": {"id": 10749, "label": "ROMANCE", "color": (244, 63, 94)},
-    "science-fiction": {"id": 878, "label": "SCIENCE-FICTION", "color": (6, 182, 212)},
-    "thriller": {"id": 53, "label": "THRILLER", "color": (29, 78, 216)},
-    "western": {"id": 37, "label": "WESTERN", "color": (214, 100, 42)}
+    "action": {"id": 28, "tv_id": 10759, "label": "ACTION", "color": (255, 90, 0)},
+    "animation-japonaise": {"id": 16, "tv_id": 16, "label": "ANIMATION JAPONAISE", "color": (255, 0, 128)}, 
+    "animation": {"id": 16, "tv_id": 16, "label": "ANIMATION", "color": (0, 200, 255)}, 
+    "aventure": {"id": 12, "tv_id": 10759, "label": "AVENTURE", "color": (245, 158, 11)},
+    "comedie": {"id": 35, "tv_id": 35, "label": "COMÉDIE", "color": (250, 204, 21)},
+    "crime": {"id": 80, "tv_id": 80, "label": "CRIME", "color": (107, 114, 128)},
+    "documentaire": {"id": 99, "tv_id": 99, "label": "DOCUMENTAIRE", "color": (34, 197, 94)},
+    "drame": {"id": 18, "tv_id": 18, "label": "DRAME", "color": (14, 165, 233)},
+    "famille": {"id": 10751, "tv_id": 10751, "label": "FAMILLE", "color": (217, 70, 239)},
+    "fantastique": {"id": 14, "tv_id": 10765, "label": "FANTASTIQUE", "color": (168, 85, 247)},
+    "guerre": {"id": 10752, "tv_id": 10768, "label": "GUERRE", "color": (120, 113, 108)},
+    "histoire": {"id": 36, "tv_id": 10768, "label": "HISTOIRE", "color": (180, 83, 9)},
+    "horreur": {"id": 27, "tv_id": 27, "label": "HORREUR", "color": (239, 68, 68)},
+    "romance": {"id": 10749, "tv_id": 10749, "label": "ROMANCE", "color": (244, 63, 94)},
+    "science-fiction": {"id": 878, "tv_id": 10765, "label": "SCIENCE-FICTION", "color": (6, 182, 212)},
+    "thriller": {"id": 53, "tv_id": 80, "label": "THRILLER", "color": (29, 78, 216)},
+    "western": {"id": 37, "tv_id": 37, "label": "WESTERN", "color": (214, 100, 42)}
 }
 
 OUTPUT_DIR = "Ressources/Collections Covers/Genres/Static Covers"
 detector = MTCNN()
-PROCESSED_MOVIE_IDS = set()
+PROCESSED_MEDIA_IDS = set()
 
-def get_popular_movies_by_genre(genre_key, config):
-    """Découverte des films avec requêtes normalisées et nettoyées pour TMDB."""
-    movies = []
-    genre_id = config["id"]
+def is_mature_release(date_str):
+    """Vérifie si le média est sorti depuis au moins 14 jours (évite les coquilles vides)."""
+    if not date_str:
+        return False
+    try:
+        release_date = datetime.strptime(date_str, "%Y-%m-%d")
+        # Seuil de sécurité : au moins 2 semaines d'existence
+        safety_threshold = datetime.now() - timedelta(days=14)
+        return release_date <= safety_threshold
+    except ValueError:
+        return False
+
+def get_balanced_trending_media(genre_key, config):
+    """Récolte équitablement 5 films et 5 séries tendances de la semaine pour le genre."""
+    trending_movies = []
+    trending_shows = []
     
-    global_genres = ["action", "aventure", "comedie", "crime", "drame", "famille", "fantastique", "horreur", "romance", "science-fiction", "thriller"]
-    geo_filter = "&with_origin_country=US|FR|GB|CA|ES|DE|IT" if genre_key in global_genres else ""
-
-    for page in [1, 2, 3]:
-        url = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_genres={genre_id}&sort_by=popularity.desc&page={page}&language=fr-FR{geo_filter}"
-        
-        if genre_key == "animation-japonaise":
-            url += "&with_original_language=ja&vote_count.gte=100"
-        elif genre_key == "animation":
-            url += "&without_original_language=ja|ko|zh&vote_count.gte=100"
-        elif genre_key == "aventure":
-            url += "&without_genres=16&vote_count.gte=100"
-        elif genre_key == "drame":
-            url += "&primary_release_date.gte=2000-01-01&vote_count.gte=500"
-        elif genre_key == "documentaire":
-            # FIX DOCUMENTAIRE : Syntaxe simplifiée et robuste pour éviter le crash de l'URL
-            url = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_genres=99&with_keywords=209386&sort_by=vote_average.desc&vote_count.gte=20&page={page}"
-        else:
-            url += "&vote_count.gte=100"
+    # On scanne un peu plus de pages des tendances de la semaine pour remplir nos quotas équitablement
+    for page in [1, 2, 3, 4, 5]:
+        if len(trending_movies) >= 5 and len(trending_shows) >= 5:
+            break
             
+        url = f"https://api.themoviedb.org/3/trending/all/week?api_key={TMDB_API_KEY}&page={page}&language=fr-FR"
         try:
             res = requests.get(url, timeout=10).json()
-            if "results" in res and res["results"]:
-                movies.extend(res["results"])
+            results = res.get("results", [])
         except Exception:
             continue
             
-    return movies
+        for item in results:
+            media_type = item.get("media_type")
+            genre_ids = item.get("genre_ids", [])
+            org_lang = item.get("original_language", "")
+            
+            # Récupération et filtrage par date selon le type de média
+            date_str = item.get("release_date") if media_type == "movie" else item.get("first_air_date")
+            if not is_mature_release(date_str):
+                continue
+                
+            target_genre_id = config["id"] if media_type == "movie" else config.get("tv_id", config["id"])
+            
+            if target_genre_id in genre_ids:
+                # Séparation Animation Japonaise / Animation internationale
+                if genre_key == "animation-japonaise" and (16 not in genre_ids or org_lang != "ja"):
+                    continue
+                if genre_key == "animation" and (16 not in genre_ids or org_lang == "ja"):
+                    continue
+                
+                if media_type == "movie" and len(trending_movies) < 5 and item not in trending_movies:
+                    trending_movies.append(item)
+                elif media_type == "tv" and len(trending_shows) < 5 and item not in trending_shows:
+                    trending_shows.append(item)
+                    
+    return trending_movies + trending_shows
 
-def get_movie_artworks(movie_id):
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}/images?api_key={TMDB_API_KEY}&include_image_language=null"
+def get_media_artworks(media_id, media_type):
+    endpoint = "movie" if media_type == "movie" else "tv"
+    url = f"https://api.themoviedb.org/3/{endpoint}/{media_id}/images?api_key={TMDB_API_KEY}&include_image_language=null"
+    
     try:
         res = requests.get(url, timeout=5).json()
     except Exception:
         return []
-    
+        
     backdrops = res.get("backdrops", [])
     posters = res.get("posters", [])
     
@@ -87,52 +112,36 @@ def get_movie_artworks(movie_id):
     return posters + backdrops
 
 def analyze_grid_emptiness(img):
-    """Analyse si l'image est un immense aplat vide (Teaser / Logo)."""
     gray = img.convert("L")
     gray_np = np.array(gray)
     h, w = gray_np.shape
-    
-    # Découpage en une grille de 3x3 blocs
     bh, bw = h // 3, w // 3
     empty_blocks = 0
     
     for i in range(3):
         for j in range(3):
             block = gray_np[i*bh:(i+1)*bh, j*bw:(j+1)*bw]
-            if block.var() < 12.0:  # Bloc très uniforme / plat
+            if block.var() < 12.0:
                 empty_blocks += 1
                 
-    return empty_blocks >= 6  # Vrai si les 2/3 de l'image sont totalement vides
+    return empty_blocks >= 6
 
 def calculate_candidate_score(artwork_type, variance, faces, genre_name, is_teaser):
-    """Système de scoring prédictif pour élire la meilleure mise en page."""
     score = 0
+    if is_teaser: return 5
+    if artwork_type == 'poster': score += 35
     
-    if is_teaser:
-        return 5  # Pénalité quasi-éliminatoire pour les fonds noirs ou logos uniques
-        
-    if artwork_type == 'poster':
-        score += 35
-        
-    # Évaluation de la netteté globale
     score += min(25, int(variance / 7))
-    
     num_faces = len(faces)
-    # Règle d'incarnation par genre
+    
     if genre_name in ["action", "science-fiction", "thriller", "romance", "aventure"]:
-        if num_faces in [1, 2]:
-            score += 40  # Parfait pour l'identification du film
-        elif num_faces == 0:
-            score += 10  # Sanction si paysage trop anonyme pour de l'action
-        else:
-            score += 5
+        if num_faces in [1, 2]: score += 40
+        elif num_faces == 0: score += 10
+        else: score += 5
     else:
-        # Pour le documentaire, l'histoire ou l'animation, les paysages ou structures sont bienvenus
-        if num_faces <= 1:
-            score += 40
-        else:
-            score += 15
-            
+        if num_faces <= 1: score += 40
+        else: score += 15
+        
     return score
 
 def find_best_crop_x(img, target_w, faces):
@@ -188,7 +197,6 @@ def process_candidate(artwork, genre_name):
     W, H = img.size
     if W < 800 or H < 600: return None
     
-    # Détection des arrières-plans vides ou teaser posters
     is_teaser = analyze_grid_emptiness(img)
     
     gray = img.convert("L")
@@ -198,7 +206,6 @@ def process_candidate(artwork, genre_name):
     
     if variance < 45: return None
     
-    # Analyse MTCNN des sujets principaux
     img_np = np.array(img)
     try:
         faces = detector.detect_faces(img_np)
@@ -271,17 +278,18 @@ def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
     for genre_name, config in GENRES_CONFIG.items():
-        print(f"\n--- [TOURNOI FILTRÉ] Sélection intelligente pour : {config['label']} ---")
-        movies = get_popular_movies_by_genre(genre_name, config)
+        print(f"\n--- [TOURNOI PARITAIRE TENDANCES] Collecte équitable pour : {config['label']} ---")
+        balanced_pool = get_balanced_trending_media(genre_name, config)
         
-        candidate_movies = movies[:8]
         pool_candidates = []
-        
-        for movie in candidate_movies:
-            movie_id = movie["id"]
-            if movie_id in PROCESSED_MOVIE_IDS: continue
+        for item in balanced_pool:
+            media_id = item["id"]
+            media_type = item.get("media_type")
             
-            artworks = get_movie_artworks(movie_id)
+            composite_key = f"{media_type}_{media_id}"
+            if composite_key in PROCESSED_MEDIA_IDS: continue
+            
+            artworks = get_media_artworks(media_id, media_type)
             if not artworks: continue
             
             for art in artworks[:4]:
@@ -291,25 +299,27 @@ def main():
                     pool_candidates.append({
                         "image": processed_img,
                         "score": score,
-                        "movie_title": movie.get("title"),
-                        "movie_id": movie_id,
-                        "path": file_path
+                        "title": item.get("title") or item.get("name"),
+                        "key": composite_key,
+                        "path": file_path,
+                        "type": media_type
                     })
         
         if pool_candidates:
             pool_candidates.sort(key=lambda x: x["score"], reverse=True)
             winner = pool_candidates[0]
             
-            print(f" -> {len(pool_candidates)} candidats analysés avec la grille de contraste.")
-            print(f" ==> ÉLU : '{winner['movie_title']}' avec un score de {winner['score']}/100. (Asset: {winner['path']})")
+            print(f" -> Tournoi validé : {len(pool_candidates)} images filtrées et notées.")
+            print(f" ==> VAINQUEUR : {winner['type'].upper()} '{winner['title']}' (Score: {winner['score']}/100) - Asset: {winner['path']}")
             
             final_poster = finalize_poster(winner["image"], config["label"], config["color"])
             final_poster.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
             final_poster.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
             
-            PROCESSED_MOVIE_IDS.add(winner["movie_id"])
+            PROCESSED_MEDIA_IDS.add(winner["key"])
         else:
-            print(f" /!\\ CONSERVATION : Aucun candidat idéal validé pour {genre_name}.")
+            print(f" /!\\ CONSERVATION : Aucun asset mature et qualitatif trouvé pour {genre_name}.")
 
 if __name__ == "__main__":
     main()
+                
