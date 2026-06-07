@@ -17,12 +17,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-          cache: 'pip'
+          # Cache retiré pour éviter le crash en l'absence de requirements.txt
 
       - name: Installation des dépendances (Traitement Image + IA)
         run: |
           python -m pip install --upgrade pip
-          # Installation des bibliothèques nécessaires pour Pillow et le détecteur MTCNN
           pip install requests pillow numpy mtcnn tensorflow-cpu
 
       - name: Exécution du générateur de posters
@@ -35,13 +34,12 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           
-          # Ajout uniquement des fichiers générés dans ton répertoire cible
           git add "Ressources/Collections Covers/Genres/Static Covers/"
           
-          # Vérification si des changements ont eu lieu avant de commit
           if ! git diff --staged --quiet; then
             git commit -m "UI: Mise à jour automatique des posters de genre"
             git push
           else
             echo "Aucun changement détecté, pas de commit."
           fi
+          
