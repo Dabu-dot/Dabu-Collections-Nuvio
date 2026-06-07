@@ -2,7 +2,7 @@ name: Daily Genres Posters Generator
 
 on:
   schedule:
-    - cron: "0 5 * * *"  # Tous les jours à 5h00 UTC
+    - cron: "0 5 * * *"  # S'exécute automatiquement tous les jours à 5h00 UTC
   workflow_dispatch:      # Permet un déclenchement manuel depuis l'interface GitHub
 
 permissions:
@@ -42,13 +42,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # Indexation des bannières générées et de l'historique de rotation
+          # Indexation ciblée des posters et de l'historique trié
           git add "Ressources/Collections Covers/Genres/Static Covers/"
           git add ".github/scripts/posters_history.json"
           
+          # Vérification intelligente : On commit et push uniquement si des fichiers ont bougé ou changé
           if ! git diff --cached --exit-code; then
-            git commit -m "Changement quotidien automatique des posters de genres"
+            git commit -m "Mise à jour automatique des couvertures de genre [Skip CI]"
             git push origin main
           else
-            echo "Aucun changement détecté, skip push."
+            echo "Aucun changement détecté (tous les posters existants ont été préservés ou reconduits)."
           fi
