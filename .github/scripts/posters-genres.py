@@ -20,11 +20,10 @@ if not TMDB_API_KEY:
 OUTPUT_DIR = "Ressources/Collections Covers/Genres/Static Covers"
 HISTORY_FILE = ".github/scripts/posters_history.json"
 
-# Langues occidentales populaires autorisées (Coréen et Japonais isolés à leurs genres dédiés)
+# Langues occidentales populaires autorisées (Filtre de base)
 ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it"}
 
-# Configuration chirurgicale des genres (Filtres Live-Action stricts, mots-clés et exclusions d'anime)
-# ID Mots-clés TMDB utilisés : Anime (210024), Animation 3D (156157), Stylisé (296180)
+# Configuration chirurgicale des genres (Prête à recevoir ta future vague de tags fins)
 GENRES_CONFIG = {
     "action": {"label": "Action", "color": (255, 90, 0), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16&with_keywords=9715|9717|1556"},
     "animation-japonaise": {"label": "Animation Japonaise", "color": (255, 0, 128), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True, "override_lang": True},
@@ -33,9 +32,8 @@ GENRES_CONFIG = {
         "color": (0, 200, 255), 
         "movie_genre": 16, 
         "tv_genre": 16, 
-        # Exclusion totale des mots-clés liés aux productions/styles animés asiatiques et des langues d'Asie
         "extra": "&without_genres=99&without_original_language=ja|ko|zh&without_keywords=210024|287513",
-        "min_popularity": 80 # Seuil haut pour chasser les petits projets indépendants ou d'importation
+        "min_popularity": 80
     },
     "aventure": {"label": "Aventure", "color": (245, 158, 11), "movie_genre": 12, "tv_genre": 10759, "extra": "&without_genres=16&with_keywords=4814|1563"},
     "comedie": {"label": "Comédie", "color": (250, 204, 21), "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16"},
@@ -53,7 +51,7 @@ GENRES_CONFIG = {
     "guerre": {"label": "Guerre", "color": (120, 113, 108), "movie_genre": 10752, "tv_genre": 10768, "extra": "&without_genres=16"},
     "histoire": {"label": "Histoire", "color": (180, 83, 9), "movie_genre": 36, "tv_genre": 10768, "extra": "&without_genres=16"},
     "horreur": {"label": "Horreur", "color": (239, 68, 68), "movie_genre": 27, "tv_genre": 27, "extra": "&without_genres=16&with_keywords=3358|9748|6152"},
-    "romance": {"label": "Romance", "color": (244, 63, 94), "movie_genre": 10749, "tv_genre": 10749, "extra": "&without_genres=16&without_original_language=ko|ja|zh"}, # Adieu la pollution de shows TV asiatiques non-textless
+    "romance": {"label": "Romance", "color": (244, 63, 94), "movie_genre": 10749, "tv_genre": 10749, "extra": "&without_genres=16&without_original_language=ko|ja|zh"},
     "science-fiction": {"label": "Science-Fiction", "color": (6, 182, 212), "movie_genre": 878, "tv_genre": 10765, "extra": "&without_genres=16&with_keywords=4565|9882"},
     "thriller": {"label": "Thriller", "color": (29, 78, 216), "movie_genre": 53, "tv_genre": 80, "extra": "&without_genres=16&with_keywords=9826|10123"},
     "western": {"label": "Western", "color": (214, 100, 42), "movie_genre": 37, "tv_genre": 37, "extra": "&without_genres=16"}
@@ -62,7 +60,6 @@ GENRES_CONFIG = {
 RUN_PROCESSED_IDS = set()
 
 def tmdb_api_call(endpoint, params=None):
-    """Effectue un appel GET vers TMDB sécurisé avec politique de retries"""
     if params is None:
         params = {}
     params["api_key"] = TMDB_API_KEY
@@ -77,7 +74,6 @@ def tmdb_api_call(endpoint, params=None):
             time.sleep(1.5 + attempt)
 
 def load_and_clean_history():
-    """Charge le JSON et nettoie les entrées plus vieilles que 14 jours"""
     if not os.path.exists(HISTORY_FILE):
         return {}
     try:
@@ -100,11 +96,9 @@ def load_and_clean_history():
     return cleaned_history
 
 def get_trending_media_for_genre(config, excluded_keys):
-    """Récupère et filtre drastiquement le pool de candidats cinéma/série d'un genre"""
     movie_pool = []
     tv_pool = []
     
-    # 1. Collecte de Films
     movie_url = f"/discover/movie?sort_by=popularity.desc&with_genres={config['movie_genre']}{config.get('extra', '')}"
     try:
         movie_data = tmdb_api_call(movie_url)
@@ -115,7 +109,6 @@ def get_trending_media_for_genre(config, excluded_keys):
     except Exception as e:
         print(f"      Alerte discover movie: {e}")
 
-    # 2. Collecte de Séries (TV)
     tv_url = f"/discover/tv?sort_by=popularity.desc&with_genres={config['tv_genre']}{config.get('extra', '')}"
     try:
         tv_data = tmdb_api_call(tv_url)
@@ -126,11 +119,9 @@ def get_trending_media_for_genre(config, excluded_keys):
     except Exception as e:
         print(f"      Alerte discover tv: {e}")
 
-    # Structuration du pool selon les préférences graphiques (ex: séries pour anime)
     combined_pool = tv_pool + movie_pool if config.get("prefer_tv", False) else movie_pool + tv_pool
-
     filtered_pool = []
-    min_pop_threshold = config.get("min_popularity", 25) # Par défaut popularité min de 25
+    min_pop_threshold = config.get("min_popularity", 25)
 
     for item in combined_pool:
         lang = item.get("original_language", "")
@@ -150,38 +141,33 @@ def get_trending_media_for_genre(config, excluded_keys):
     return filtered_pool[:20]
 
 def get_best_textless_backdrops(media_type, media_id, fallback_path):
-    """Interroge la section d'images TMDB. Filtre par vote_count pour éjecter les captures TV polluées de texte"""
     try:
         data = tmdb_api_call(f"/{media_type}/{media_id}/images", {"include_image_language": "null"})
         backdrops = data.get("backdrops", [])
         if not backdrops:
             return [{"file_path": fallback_path, "width": 1920, "vote_count": 5, "vote_average": 5.0}]
             
-        # Tri : On exige d'abord un volume de votes pour garantir la validation communautaire (Vrai Textless)
         backdrops.sort(key=lambda x: (x.get("vote_count", 0), x.get("vote_average", 0)), reverse=True)
         return backdrops[:5]
     except Exception:
         return [{"file_path": fallback_path, "width": 1920, "vote_count": 5, "vote_average": 5.0}]
 
 def analyze_and_score_backdrop(bg, item):
-    """Calcule le score de qualité globale en favorisant la modernité et en pénalisant les images douteuses"""
     score = 40
     width = bg.get("width", 0)
     popularity = item.get("popularity", 0)
     vote_count = bg.get("vote_count", 0)
     
-    # Élimination des fonds pollués (Captures d'écrans amateurs sans aucun vote communautaire)
     if vote_count == 0:
         score -= 30
 
-    # Valorisation de la modernité (Élimine le rendu vieillot / daté)
     release_date_str = item.get("release_date") or item.get("first_air_date") or ""
     if release_date_str:
         try:
             year = datetime.strptime(release_date_str, "%Y-%m-%d").year
-            if year >= 2022: score += 35      # Ultra récent / Blockbuster moderne
-            elif year >= 2015: score += 15    # Propre
-            elif year < 2005: score -= 20     # Malus rétro pour forcer le renouvellement moderne
+            if year >= 2022: score += 35
+            elif year >= 2015: score += 15
+            elif year < 2005: score -= 20
         except ValueError:
             pass
 
@@ -193,11 +179,10 @@ def analyze_and_score_backdrop(bg, item):
     return score
 
 def apply_apple_tv_duotone(img, target_color):
-    """Génère un filtre Duotone cinéma calqué sur le style Apple TV"""
     gray = img.convert("L")
     gray_np = np.array(gray)
     
-    base_dark = np.array([10, 14, 22])  # Fond sombre d'interface épurée
+    base_dark = np.array([10, 14, 22])
     target_light = np.array(target_color)
     
     duotone = np.zeros((gray_np.shape[0], gray_np.shape[1], 3), dtype=np.uint8)
@@ -207,40 +192,38 @@ def apply_apple_tv_duotone(img, target_color):
     return Image.fromarray(duotone)
 
 def finalize_landscape_banner(img, label, target_color):
-    """Redimensionne en 16:9, applique le Duotone, le dégradé bas, l'ombre diffuse et le texte XXL espacé"""
-    # Recadrage intelligent et forçage du format 16:9 paysage
+    """Calcule et applique le texte Ultra-XXL (165px) avec un wrapping dynamique haut de gamme"""
     img = ImageOps.fit(img, (1920, 1080), method=Image.Resampling.LANCZOS)
     img = ImageEnhance.Contrast(img).enhance(1.18)
     img = apply_apple_tv_duotone(img, target_color)
     
-    # Création d'un dégradé de noir cinématique sur la moitié inférieure
+    # Dégradé de noir cinématique sur le bas pour asseoir le gros texte
     gradient = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
     g_draw = ImageDraw.Draw(gradient)
-    for y in range(450, 1080):
-        alpha = int(((y - 450) / 630) ** 2.0 * 250)
+    for y in range(400, 1080):
+        alpha = int(((y - 400) / 680) ** 1.8 * 252)
         g_draw.line([(0, y), (1920, y)], fill=(0, 0, 0, alpha))
     img = Image.alpha_composite(img.convert("RGBA"), gradient)
 
-    # Calques de dessin
     text_layer = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
     shadow_layer = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
     
     t_draw = ImageDraw.Draw(text_layer)
     s_draw = ImageDraw.Draw(shadow_layer)
     
-    # Augmentation de la taille de police pour lisibilité TV/Mobile lointaine (135px)
-    font_size = 135
+    # TYPOGRAPHIE PRODUCTION ULTRA-XXL (165px pour visibilité TV lointaine)
+    font_size = 165
     try:
         font = ImageFont.truetype(".github/assets/fonts/SF-Pro-Display-Bold.otf", font_size)
     except IOError:
         font = ImageFont.load_default()
 
-    # Padding de sécurité pour décoller le texte des bordures physiques de l'image
+    # Padding ergonomique stable
     padding_left = 130
     padding_bottom = 140
-    max_text_width = 1920 - (padding_left * 2) # Largeur max utile restante
+    max_text_width = 1920 - (padding_left * 2)
 
-    # Wrapping intelligent multi-lignes
+    # Wrapping intelligent
     words = label.split(" ")
     lines = []
     current_line = ""
@@ -253,27 +236,26 @@ def finalize_landscape_banner(img, label, target_color):
             current_line = word
     if current_line: lines.append(current_line)
 
-    # Agencement des blocs de lignes et gestion de la hauteur totale
-    line_spacing = 18
-    line_height = font_size - 15
+    # Ajustement des interlignes pour les gros caractères
+    line_spacing = 20
+    line_height = font_size - 22
     total_text_height = (len(lines) * line_height) + ((len(lines) - 1) * line_spacing)
     
-    # Calcul de la coordonnée de départ y (Le texte remonte proprement si multi-lignes)
+    # Calcul dynamique de y : Remonte parfaitement si double ligne détectée
     base_y = (1080 - padding_bottom - line_height) - (total_text_height - line_height)
 
-    # Écriture sur les calques distincts
+    # Rendu des calques
     current_y = base_y
     for line in lines:
-        # Ombre portée douce (Léger décalage d'arrière-plan)
-        s_draw.text((padding_left + 5, current_y + 8), line, fill=(0, 0, 0, 240), font=font)
-        # Texte frontal blanc pur
+        # Ombre portée cinéma diffuse
+        s_draw.text((padding_left + 6, current_y + 10), line, fill=(0, 0, 0, 245), font=font)
+        # Texte de face blanc pur
         t_draw.text((padding_left, current_y), line, fill=(255, 255, 255, 255), font=font)
         current_y += line_height + line_spacing
 
-    # Floutage gaussien de l'ombre pour créer un halo d'ombrage ergonomique et premium de loin
-    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(10))
+    # Flou gaussien pour une ombre diffuse haut de gamme (aucun effet de contour dur)
+    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(12))
     
-    # Fusion finale
     final_img = Image.alpha_composite(img, shadow_layer)
     final_img = Image.alpha_composite(final_img, text_layer)
     
@@ -282,7 +264,6 @@ def finalize_landscape_banner(img, label, target_color):
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
-    # Purge complète du dossier cible avant écriture
     for file in os.listdir(OUTPUT_DIR):
         file_path = os.path.join(OUTPUT_DIR, file)
         if os.path.isfile(file_path):
@@ -301,7 +282,6 @@ def main():
             print(f" /!\\ Aucun candidat éligible trouvé pour le genre {config['label']}")
             continue
             
-        # Tirage parmi le top qualitatif
         selected_media = random.choice(candidates_pool)
         media_id = selected_media["id"]
         media_type = selected_media["media_type"]
@@ -333,7 +313,6 @@ def main():
             
             final_banner = finalize_landscape_banner(winner_bg["image"], config["label"], config["color"])
             
-            # Export des fichiers maîtres
             final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
             final_banner.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
             
@@ -346,11 +325,10 @@ def main():
         else:
             print(f" /!\\ Échec : Aucun visuel n'a pu être extrait pour {media_title}")
 
-    # Enregistrement du fichier de persistance JSON
     os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(history, f, ensure_ascii=False, indent=4)
-    print("\n[SUCCESS] Déploiement terminé. Règles de padding de sécurité et filtres d'ambiances appliqués.")
+    print("\n[SUCCESS] Déploiement terminé. Prise en charge de la police ultra-XXL active.")
 
 if __name__ == "__main__":
     main()
