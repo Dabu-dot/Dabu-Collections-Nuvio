@@ -3,7 +3,7 @@ name: Daily Genres Posters Generator
 on:
   schedule:
     - cron: "0 5 * * *"  # Tous les jours à 5h00 UTC
-  workflow_dispatch:      # Permet de lancer le script manuellement si besoin
+  workflow_dispatch:      # Permet un déclenchement manuel depuis l'interface GitHub
 
 permissions:
   contents: write
@@ -35,14 +35,14 @@ jobs:
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
           PYTHONDONTWRITEBYTECODE: "1"
-        run: python3 .github/scripts/generate_posters.py
+        run: python3 .github/scripts/posters-genres.py
 
       - name: Commit and Push Changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # Indexation des images et du fichier d'historique
+          # Indexation des images générées et du fichier JSON d'historique glissant
           git add "Ressources/Collections Covers/Genres/Static Covers/"
           git add ".github/scripts/posters_history.json"
           
@@ -50,5 +50,5 @@ jobs:
             git commit -m "Changement quotidien automatique des posters de genres"
             git push origin main
           else
-            print("Aucun changement détecté.")
+            echo "Aucun changement détecté, skip push."
           fi
