@@ -7,14 +7,12 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter, ImageOps
 import cv2
 
-# Récupération de la clé API via les secrets GitHub
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 
 if not TMDB_API_KEY:
     print("Erreur : La variable TMDB_API_KEY n'est pas définie.")
     sys.exit(1)
 
-# Configuration des 17 genres avec alignement des IDs Films et Séries
 GENRES_CONFIG = {
     "action": {"id": 28, "tv_id": 10759, "label": "ACTION", "color": (255, 90, 0)},
     "animation-japonaise": {"id": 16, "tv_id": 16, "label": "ANIMATION JAPONAISE", "color": (255, 0, 128)}, 
@@ -38,14 +36,11 @@ GENRES_CONFIG = {
 OUTPUT_DIR = "Ressources/Collections Covers/Genres/Static Covers"
 PROCESSED_MEDIA_IDS = set()
 
-# Chargement du classificateur de visages OpenCV (fourni nativement avec cv2)
 face_cascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
 face_cascade = cv2.CascadeClassifier(face_cascade_path)
 
 def is_mature_release(date_str):
-    """Vérifie si le média est sorti depuis au moins 14 jours (évite les coquilles vides)."""
-    if not date_str:
-        return False
+    if not date_str: return False
     try:
         release_date = datetime.strptime(date_str, "%Y-%m-%d")
         safety_threshold = datetime.now() - timedelta(days=14)
@@ -53,14 +48,36 @@ def is_mature_release(date_str):
     except ValueError:
         return False
 
+def get_pure_documentaries():
+    """Endpoint spécifique pour éviter l'infiltration de blockbusters de fiction dans Documentaire."""
+    docs = []
+    # 1. Récupération des films documentaires populaires (sans SF, Fantastique ni Action)
+    url_movies = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_genres=99&without_genres=28,14,878&sort_by=popularity.desc&language=fr-FR&page=1"
+    # 2. Récupération des séries documentaires populaires
+    url_tv = f"https://api.themoviedb.org/3/discover/tv?api_key={TMDB_API_KEY}&with_genres=99&sort_by=popularity.desc&language=fr-FR&page=1"
+    
+    try:
+        res_m = requests.get(url_movies, timeout=10).json().get("results", [])
+        for item in res_m: 
+            item["media_type"] = "movie"
+            docs.append(item)
+        res_t = requests.get(url_tv, timeout=10).json().get("results", [])
+        for item in res_t: 
+            item["media_type"] = "tv"
+            docs.append(item)
+    except Exception:
+        pass
+    return docs[:10]
+
 def get_balanced_trending_media(genre_key, config):
-    """Récolte équitablement 5 films et 5 séries tendances de la semaine pour le genre."""
+    if genre_key == "documentaire":
+        return get_pure_documentaries()
+        
     trending_movies = []
     trending_shows = []
     
     for page in [1, 2, 3, 4, 5]:
-        if len(trending_movies) >= 5 and len(trending_shows) >= 5:
-            break
+        if len(trending_movies) >= 5 and len(trending_shows) >= 5: break
             
         url = f"https://api.themoviedb.org/3/trending/all/week?api_key={TMDB_API_KEY}&page={page}&language=fr-FR"
         try:
@@ -75,16 +92,13 @@ def get_balanced_trending_media(genre_key, config):
             org_lang = item.get("original_language", "")
             
             date_str = item.get("release_date") if media_type == "movie" else item.get("first_air_date")
-            if not is_mature_release(date_str):
-                continue
+            if not is_mature_release(date_str): continue
                 
             target_genre_id = config["id"] if media_type == "movie" else config.get("tv_id", config["id"])
             
             if target_genre_id in genre_ids:
-                if genre_key == "animation-japonaise" and (16 not in genre_ids or org_lang != "ja"):
-                    continue
-                if genre_key == "animation" and (16 not in genre_ids or org_lang == "ja"):
-                    continue
+                if genre_key == "animation-japonaise" and (16 not in genre_ids or org_lang != "ja"): continue
+                if genre_key == "animation" and (16 not in genre_ids or org_lang == "ja"): continue
                 
                 if media_type == "movie" and len(trending_movies) < 5 and item not in trending_movies:
                     trending_movies.append(item)
@@ -96,42 +110,62 @@ def get_balanced_trending_media(genre_key, config):
 def get_media_artworks(media_id, media_type):
     endpoint = "movie" if media_type == "movie" else "tv"
     url = f"https://api.themoviedb.org/3/{endpoint}/{media_id}/images?api_key={TMDB_API_KEY}&include_image_language=null"
-    
     try:
         res = requests.get(url, timeout=5).json()
     except Exception:
         return []
-        
     backdrops = res.get("backdrops", [])
     posters = res.get("posters", [])
-    
     for b in backdrops: b['artwork_type'] = 'backdrop'
     for p in posters: p['artwork_type'] = 'poster'
-    
     return posters + backdrops
 
-def analyze_grid_emptiness(img):
+def analyze_image_layout(img):
+    """Analyse fine de la répartition lumineuse et des vides (Détection Teaser et Centre Vide)."""
     gray = img.convert("L")
     gray_np = np.array(gray)
     h, w = gray_np.shape
-    bh, bw = h // 3, w // 3
-    empty_blocks = 0
     
+    # 1. Sécurité anti-teaser noir (Mortal Kombat)
+    # Si plus de 55% des pixels de l'affiche complète sont très sombres (< 25)
+    dark_pixels = np.sum(gray_np < 25)
+    if (dark_pixels / (h * w)) > 0.55:
+        return "teaser"
+
+    # 2. Sécurité anti-centre vide en couronne (Vice-Versa 2)
+    bh, bw = h // 3, w // 3
+    blocks_variance = []
     for i in range(3):
         for j in range(3):
             block = gray_np[i*bh:(i+1)*bh, j*bw:(j+1)*bw]
-            if block.var() < 12.0:
-                empty_blocks += 1
-                
-    return empty_blocks >= 6
+            blocks_variance.append(block.var())
+            
+    center_var = blocks_variance[4] # Bloc du milieu
+    avg_outer_var = np.mean([blocks_variance[i] for i in [0,1,2,3,5,6,7,8]])
+    
+    # Si le centre est super lisse/vide alors que les bords débordent d'éléments
+    if center_var < 15.0 and avg_outer_var > 45.0:
+        return "center_empty"
+        
+    # Test classique de la grille vide générale
+    empty_blocks = sum(1 for v in blocks_variance if v < 12.0)
+    if empty_blocks >= 6:
+        return "teaser"
+        
+    return "ok"
 
-def calculate_candidate_score(artwork_type, variance, num_faces, genre_name, is_teaser):
+def calculate_candidate_score(artwork_type, variance, num_faces, genre_name, layout_status):
+    if layout_status == "teaser": return 5
+    
     score = 0
-    if is_teaser: return 5
     if artwork_type == 'poster': score += 35
     
     score += min(25, int(variance / 7))
     
+    # Pénalité si la composition isole le centre (évite le texte sur les visages extérieurs)
+    if layout_status == "center_empty":
+        score -= 40
+
     if genre_name in ["action", "science-fiction", "thriller", "romance", "aventure"]:
         if num_faces in [1, 2]: score += 40
         elif num_faces == 0: score += 10
@@ -140,16 +174,21 @@ def calculate_candidate_score(artwork_type, variance, num_faces, genre_name, is_
         if num_faces <= 1: score += 40
         else: score += 15
         
-    return score
+    return max(0, score)
 
 def find_best_crop_x(img, target_w, faces):
     W, H = img.size
     if len(faces) > 0:
-        # Trouver le plus grand visage détecté par OpenCV (w * h)
         main_face = max(faces, key=lambda f: f[2] * f[3])
-        fx, _, fw, _ = main_face
-        best_x_start = (fx + (fw // 2)) - (target_w // 2)
-        return max(0, min(best_x_start, W - target_w))
+        fx, _, fw, fh = main_face
+        
+        # SÉCURITÉ ANTI-GROS PLAN ZOOMÉ (Crime / The Batman)
+        # Si le visage prend plus de 30% de la hauteur de l'image originale, on refuse le cadrage dessus
+        if fh / H > 0.30:
+            print("   [Cadrage] Visage trop grand (gros plan détecté), repli sur l'analyse par détails.")
+        else:
+            best_x_start = (fx + (fw // 2)) - (target_w // 2)
+            return max(0, min(best_x_start, W - target_w))
 
     gray = img.convert("L")
     kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]], dtype=np.float32)
@@ -174,11 +213,9 @@ def apply_duotone(img, target_color):
     gray_np = np.array(gray)
     base_dark = np.array([12, 16, 26])
     target_light = np.array(target_color)
-    
     duotone = np.zeros((gray_np.shape[0], gray_np.shape[1], 3), dtype=np.uint8)
     for i in range(3):
         duotone[..., i] = base_dark[i] + (gray_np / 255.0) * (target_light[i] - base_dark[i])
-        
     return Image.fromarray(duotone)
 
 def process_candidate(artwork, genre_name):
@@ -196,7 +233,7 @@ def process_candidate(artwork, genre_name):
     W, H = img.size
     if W < 800 or H < 600: return None
     
-    is_teaser = analyze_grid_emptiness(img)
+    layout_status = analyze_image_layout(img)
     
     gray = img.convert("L")
     kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]], dtype=np.float32)
@@ -205,12 +242,9 @@ def process_candidate(artwork, genre_name):
     
     if variance < 45: return None
     
-    # Détection de visages ultra-rapide avec OpenCV
     img_np = np.array(img)
     gray_np = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
-    
     try:
-        # scaleFactor=1.1, minNeighbors=5 balancent bien précision/vitesse
         faces = face_cascade.detectMultiScale(gray_np, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
     except Exception:
         faces = []
@@ -236,7 +270,7 @@ def process_candidate(artwork, genre_name):
         else: cropped = img
 
     final_img = cropped.resize((800, 1200), Image.Resampling.LANCZOS)
-    score = calculate_candidate_score(artwork_type, variance, num_faces, genre_name, is_teaser)
+    score = calculate_candidate_score(artwork_type, variance, num_faces, genre_name, layout_status)
     
     return final_img, score, artwork['file_path']
 
@@ -282,7 +316,7 @@ def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
     for genre_name, config in GENRES_CONFIG.items():
-        print(f"\n--- [TOURNOI PARITAIRE TENDANCES] Collecte équitable pour : {config['label']} ---")
+        print(f"\n--- [TOURNOI] Traitement du genre : {config['label']} ---")
         balanced_pool = get_balanced_trending_media(genre_name, config)
         
         pool_candidates = []
@@ -313,8 +347,7 @@ def main():
             pool_candidates.sort(key=lambda x: x["score"], reverse=True)
             winner = pool_candidates[0]
             
-            print(f" -> Tournoi validé : {len(pool_candidates)} images filtrées et notées.")
-            print(f" ==> VAINQUEUR : {winner['type'].upper()} '{winner['title']}' (Score: {winner['score']}/100) - Asset: {winner['path']}")
+            print(f" ==> GAGNANT : {winner['type'].upper()} '{winner['title']}' (Score: {winner['score']}/100)")
             
             final_poster = finalize_poster(winner["image"], config["label"], config["color"])
             final_poster.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
@@ -322,7 +355,7 @@ def main():
             
             PROCESSED_MEDIA_IDS.add(winner["key"])
         else:
-            print(f" /!\\ CONSERVATION : Aucun asset mature et qualitatif trouvé pour {genre_name}.")
+            print(f" /!\\ CONSERVATION : Aucun asset validé pour {genre_name}.")
 
 if __name__ == "__main__":
     main()
