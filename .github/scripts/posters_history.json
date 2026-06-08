@@ -1,4 +1,89 @@
 {
+    "movie_460465": {
+        "title": "Mortal Kombat",
+        "genre": "action",
+        "date": "2026-06-08"
+    },
+    "tv_46260": {
+        "title": "Naruto",
+        "genre": "animation-japonaise",
+        "date": "2026-06-08"
+    },
+    "tv_456": {
+        "title": "The Simpsons",
+        "genre": "animation",
+        "date": "2026-06-08"
+    },
+    "movie_121": {
+        "title": "The Lord of the Rings: The Two Towers",
+        "genre": "aventure",
+        "date": "2026-06-08"
+    },
+    "movie_4258": {
+        "title": "Scary Movie 5",
+        "genre": "comedie",
+        "date": "2026-06-08"
+    },
+    "tv_1431": {
+        "title": "CSI: Crime Scene Investigation",
+        "genre": "crime",
+        "date": "2026-06-08"
+    },
+    "movie_1522126": {
+        "title": "1000 Men and Me: The Bonnie Blue Story",
+        "genre": "documentaire",
+        "date": "2026-06-08"
+    },
+    "tv_2734": {
+        "title": "Law & Order: Special Victims Unit",
+        "genre": "drame",
+        "date": "2026-06-08"
+    },
+    "tv_106": {
+        "title": "The Andy Griffith Show",
+        "genre": "famille",
+        "date": "2026-06-08"
+    },
+    "tv_60735": {
+        "title": "The Flash",
+        "genre": "fantastique",
+        "date": "2026-06-08"
+    },
+    "tv_918": {
+        "title": "M*A*S*H",
+        "genre": "guerre",
+        "date": "2026-06-08"
+    },
+    "movie_1530510": {
+        "title": "Mexico 86",
+        "genre": "histoire",
+        "date": "2026-06-08"
+    },
+    "movie_680493": {
+        "title": "Return to Silent Hill",
+        "genre": "horreur",
+        "date": "2026-06-08"
+    },
+    "movie_1157008": {
+        "title": "Dime lo que quieres (de verdad)",
+        "genre": "romance",
+        "date": "2026-06-08"
+    },
+    "tv_69478": {
+        "title": "The Handmaid's Tale",
+        "genre": "science-fiction",
+        "date": "2026-06-08"
+    },
+    "tv_1405": {
+        "title": "Dexter",
+        "genre": "thriller",
+        "date": "2026-06-08"
+    },
+    "tv_953": {
+        "title": "Maverick",
+        "genre": "western",
+        "date": "2026-06-08"
+    },
     "movie_1122573": {
         "title": "In the Grey",
         "genre": "action",
