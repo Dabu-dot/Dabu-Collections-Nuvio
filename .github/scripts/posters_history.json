@@ -1,4 +1,84 @@
 {
+    "tv_655": {
+        "title": "Star Trek: The Next Generation",
+        "genre": "action",
+        "date": "2026-06-09"
+    },
+    "tv_37854": {
+        "title": "One Piece",
+        "genre": "animation-japonaise",
+        "date": "2026-06-09"
+    },
+    "tv_95557": {
+        "title": "INVINCIBLE",
+        "genre": "animation",
+        "date": "2026-06-09"
+    },
+    "tv_94997": {
+        "title": "House of the Dragon",
+        "genre": "aventure",
+        "date": "2026-06-09"
+    },
+    "movie_4247": {
+        "title": "Scary Movie",
+        "genre": "comedie",
+        "date": "2026-06-09"
+    },
+    "tv_80748": {
+        "title": "FBI",
+        "genre": "crime",
+        "date": "2026-06-09"
+    },
+    "tv_3562": {
+        "title": "NOVA",
+        "genre": "documentaire",
+        "date": "2026-06-09"
+    },
+    "tv_85552": {
+        "title": "Euphoria",
+        "genre": "drame",
+        "date": "2026-06-09"
+    },
+    "tv_1950": {
+        "title": "Everwood",
+        "genre": "famille",
+        "date": "2026-06-09"
+    },
+    "movie_931285": {
+        "title": "Mortal Kombat II",
+        "genre": "fantastique",
+        "date": "2026-06-09"
+    },
+    "tv_4068": {
+        "title": "Hogan's Heroes",
+        "genre": "guerre",
+        "date": "2026-06-09"
+    },
+    "movie_1207162": {
+        "title": "Rise of the Conqueror",
+        "genre": "histoire",
+        "date": "2026-06-09"
+    },
+    "movie_744275": {
+        "title": "After We Fell",
+        "genre": "romance",
+        "date": "2026-06-09"
+    },
+    "tv_48866": {
+        "title": "The 100",
+        "genre": "science-fiction",
+        "date": "2026-06-09"
+    },
+    "tv_60059": {
+        "title": "Better Call Saul",
+        "genre": "thriller",
+        "date": "2026-06-09"
+    },
+    "tv_13859": {
+        "title": "The Rifleman",
+        "genre": "western",
+        "date": "2026-06-09"
+    },
     "movie_460465": {
         "title": "Mortal Kombat",
         "genre": "action",
