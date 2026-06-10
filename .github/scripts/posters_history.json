@@ -253,5 +253,90 @@
         "title": "Bonanza",
         "genre": "western",
         "date": "2026-06-10"
+    },
+    "tv_4616": {
+        "title": "Xena: Warrior Princess",
+        "genre": "action",
+        "date": "2026-06-10"
+    },
+    "tv_46298": {
+        "title": "Hunter x Hunter",
+        "genre": "animation-japonaise",
+        "date": "2026-06-10"
+    },
+    "movie_1327819": {
+        "title": "Hoppers",
+        "genre": "animation",
+        "date": "2026-06-10"
+    },
+    "tv_1399": {
+        "title": "Game of Thrones",
+        "genre": "aventure",
+        "date": "2026-06-10"
+    },
+    "tv_61818": {
+        "title": "Late Night with Seth Meyers",
+        "genre": "comedie",
+        "date": "2026-06-10"
+    },
+    "tv_790": {
+        "title": "Agatha Christie's Poirot",
+        "genre": "crime",
+        "date": "2026-06-10"
+    },
+    "movie_1522126": {
+        "title": "1000 Men and Me: The Bonnie Blue Story",
+        "genre": "documentaire",
+        "date": "2026-06-10"
+    },
+    "movie_936075": {
+        "title": "Michael",
+        "genre": "drame",
+        "date": "2026-06-10"
+    },
+    "tv_3452": {
+        "title": "Frasier",
+        "genre": "famille",
+        "date": "2026-06-10"
+    },
+    "tv_1622": {
+        "title": "Supernatural",
+        "genre": "fantastique",
+        "date": "2026-06-10"
+    },
+    "tv_252107": {
+        "title": "Star City",
+        "genre": "guerre",
+        "date": "2026-06-10"
+    },
+    "tv_63333": {
+        "title": "The Last Kingdom",
+        "genre": "histoire",
+        "date": "2026-06-10"
+    },
+    "movie_1038392": {
+        "title": "The Conjuring: Last Rites",
+        "genre": "horreur",
+        "date": "2026-06-10"
+    },
+    "movie_744275": {
+        "title": "After We Fell",
+        "genre": "romance",
+        "date": "2026-06-10"
+    },
+    "movie_157336": {
+        "title": "Interstellar",
+        "genre": "science-fiction",
+        "date": "2026-06-10"
+    },
+    "tv_764": {
+        "title": "Midsomer Murders",
+        "genre": "thriller",
+        "date": "2026-06-10"
+    },
+    "tv_63247": {
+        "title": "Westworld",
+        "genre": "western",
+        "date": "2026-06-10"
     }
 }
