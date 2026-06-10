@@ -23,6 +23,9 @@ HISTORY_FILE = ".github/scripts/posters_history.json"
 # Langues occidentales populaires autorisées (Filtre de base)
 ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it"}
 
+# Variable globale pour suivre les médias traités pendant l'exécution
+RUN_PROCESSED_IDS = set()
+
 # Configuration chirurgicale des genres - Palette Apple TV Premium optimisée
 GENRES_CONFIG = {
     "action": {"label": "Action", "color": (210, 40, 45), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [3930, 6054, 12993, 9951, 8440, 188955, 226499, 83, 312, 779, 4565, 14955, 853, 9665, 10044]},
@@ -51,8 +54,6 @@ GENRES_CONFIG = {
     "thriller": {"label": "Thriller", "color": (30, 120, 80), "movie_genre": 53, "tv_genre": 80, "extra": "&without_genres=16&with_keywords=9826|10123", "scoring_keywords": []},
     "western": {"label": "Western", "color": (214, 100, 42), "movie_genre": 37, "tv_genre": 37, "extra": "&without_genres=16", "scoring_keywords": []}
 }
-
-RUN_PROCESSED_IDS = set()
 
 def tmdb_api_call(endpoint, params=None):
     if params is None:
@@ -217,26 +218,20 @@ def analyze_and_score_backdrop(bg, item):
 
 def apply_apple_tv_duotone(img, target_color):
     """Applique un traitement d'image adaptatif et non linéaire (Style Apple TV Premium)"""
-    # 1. Conversion en niveaux de gris et extraction de la matrice float32
     gray = img.convert("L")
     gray_np = np.array(gray, dtype=np.float32)
     
-    # 2. Normalisation Min-Max adaptative (Étirement de l'histogramme pour révéler les textures)
     f_min, f_max = gray_np.min(), gray_np.max()
     if f_max > f_min:
         gray_np = (gray_np - f_min) * (255.0 / (f_max - f_min))
     
-    # 3. Courbe en S Sigmoïde dynamique pour booster le contraste local sans boucher les noirs
-    # Centre autour du gris moyen (127.5), facteur d'accentuation chirurgical à 0.022
     gray_np = 255.0 / (1.0 + np.exp(-0.022 * (gray_np - 127.5)))
     
-    # 4. Cartographie du Duotone avec le noir bleuté emblématique d'Apple
-    base_dark = np.array([12, 16, 26])  # Fond sombre profond cinéma
+    base_dark = np.array([12, 16, 26])  
     target_light = np.array(target_color)
     
     duotone = np.zeros((gray_np.shape[0], gray_np.shape[1], 3), dtype=np.uint8)
     for i in range(3):
-        # Interpolation linéaire basée sur l'histogramme boosté en numpy
         duotone[..., i] = base_dark[i] + (gray_np / 255.0) * (target_light[i] - base_dark[i])
         
     return Image.fromarray(duotone)
@@ -407,5 +402,23 @@ def main():
             final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
             final_banner.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
             
-            RUN
+            RUN_PROCESSED_IDS.add(composite_key)
+            history[composite_key] = {
+                "title": media_title,
+                "genre": genre_name,
+                "date": datetime.now().strftime("%Y-%m-%d")
+            }
+        else:
+            print(f" [CONSERVATION] Échec d'extraction visuelle pour {media_title}. L'ancien poster de {config['label']} reste en place.")
+            sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=240,title=Visuel Manquant ({config['label']})::Impossible d'extraire un fond pour '{media_title}'. L'ancien poster est conservé.\n")
+
+    sorted_history = dict(sorted(history.items(), key=lambda item: item[1]['date'], reverse=True))
+
+    os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
+    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(sorted_history, f, ensure_ascii=False, indent=4)
         
+    print("\n[SUCCESS] Déploiement terminé. Protection contre les bannières vides active.")
+
+if __name__ == "__main__":
+    main()
