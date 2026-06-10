@@ -23,10 +23,10 @@ HISTORY_FILE = ".github/scripts/posters_history.json"
 # Langues occidentales populaires autorisées (Filtre de base)
 ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it"}
 
-# Configuration chirurgicale des genres (Prête pour le scoring et tes futurs tags fins)
+# Configuration chirurgicale des genres - Palette Apple TV Premium optimisée
 GENRES_CONFIG = {
-    "action": {"label": "Action", "color": (255, 90, 0), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [3930, 6054, 12993, 9951, 8440, 188955, 226499, 83, 312, 779, 4565, 14955, 853, 9665, 10044]},
-    "animation-japonaise": {"label": "Animation Japonaise", "color": (255, 0, 128), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True, "override_lang": True, "scoring_keywords": [210024, 13141, 207826]},
+    "action": {"label": "Action", "color": (210, 40, 45), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [3930, 6054, 12993, 9951, 8440, 188955, 226499, 83, 312, 779, 4565, 14955, 853, 9665, 10044]},
+    "animation-japonaise": {"label": "Animation Japonaise", "color": (120, 60, 200), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True, "override_lang": True, "scoring_keywords": [210024, 13141, 207826]},
     "animation": {
         "label": "Animation", 
         "color": (0, 200, 255), 
@@ -36,33 +36,19 @@ GENRES_CONFIG = {
         "min_popularity": 80,
         "scoring_keywords": [272909, 7376, 278823, 234183, 179411, 234662, 290589, 297442, 339048, 366485]
     },
-    "aventure": {
-        "label": "Aventure", 
-        "color": (245, 158, 11), 
-        "movie_genre": 12, 
-        "tv_genre": 10759, 
-        "extra": "&without_genres=16",
-        "scoring_keywords": [195114, 161176, 818, 4152, 170362, 210246, 10364, 41586, 6956, 269233]
-    },
-    "comedie": {"label": "Comédie", "color": (250, 204, 21), "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16", "scoring_keywords": [8201, 9755, 9964, 375047, 6241, 9253]},
+    "aventure": {"label": "Aventure", "color": (20, 140, 90), "movie_genre": 12, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [195114, 161176, 818, 4152, 170362, 210246, 10364, 41586, 6956, 269233]},
+    "comedie": {"label": "Comédie", "color": (220, 170, 30), "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16", "scoring_keywords": [8201, 9755, 9964, 375047, 6241, 9253]},
     "crime": {"label": "Crime", "color": (107, 114, 128), "movie_genre": 80, "tv_genre": 80, "extra": "&without_genres=16", "scoring_keywords": [2095, 9748, 181644, 157241, 206958, 268067, 703, 5340, 6149, 9826, 155790, 207046]},
-    "documentaire": {
-        "label": "Documentaire", 
-        "color": (34, 197, 94), 
-        "movie_genre": 99, 
-        "tv_genre": 99,
-        "extra": "&without_genres=16",
-        "scoring_keywords": [221355, 305903, 343303, 284176]
-    },
+    "documentaire": {"label": "Documentaire", "color": (34, 197, 94), "movie_genre": 99, "tv_genre": 99, "extra": "&without_genres=16", "scoring_keywords": [221355, 305903, 343303, 284176]},
     "drame": {"label": "Drame", "color": (14, 165, 233), "movie_genre": 18, "tv_genre": 18, "extra": "&without_genres=16", "scoring_keywords": []},
     "famille": {"label": "Famille", "color": (217, 70, 239), "movie_genre": 10751, "tv_genre": 10751, "extra": "&without_genres=16", "scoring_keywords": []},
     "fantastique": {"label": "Fantastique", "color": (168, 85, 247), "movie_genre": 14, "tv_genre": 10765, "extra": "&without_genres=16", "scoring_keywords": []},
     "guerre": {"label": "Guerre", "color": (120, 113, 108), "movie_genre": 10752, "tv_genre": 10768, "extra": "&without_genres=16", "scoring_keywords": []},
-    "histoire": {"label": "Histoire", "color": (180, 83, 9), "movie_genre": 36, "tv_genre": 10768, "extra": "&without_genres=16", "scoring_keywords": []},
+    "histoire": {"label": "Histoire", "color": (139, 90, 60), "movie_genre": 36, "tv_genre": 10768, "extra": "&without_genres=16", "scoring_keywords": []},
     "horreur": {"label": "Horreur", "color": (239, 68, 68), "movie_genre": 27, "tv_genre": 27, "extra": "&without_genres=16&with_keywords=3358|9748|6152", "scoring_keywords": []},
-    "romance": {"label": "Romance", "color": (244, 63, 94), "movie_genre": 10749, "tv_genre": 10749, "extra": "&without_genres=16&without_original_language=ko|ja|zh", "scoring_keywords": []},
+    "romance": {"label": "Romance", "color": (230, 90, 140), "movie_genre": 10749, "tv_genre": 10749, "extra": "&without_genres=16&without_original_language=ko|ja|zh", "scoring_keywords": []},
     "science-fiction": {"label": "Science-Fiction", "color": (6, 182, 212), "movie_genre": 878, "tv_genre": 10765, "extra": "&without_genres=16&with_keywords=4565|9882", "scoring_keywords": []},
-    "thriller": {"label": "Thriller", "color": (29, 78, 216), "movie_genre": 53, "tv_genre": 80, "extra": "&without_genres=16&with_keywords=9826|10123", "scoring_keywords": []},
+    "thriller": {"label": "Thriller", "color": (30, 120, 80), "movie_genre": 53, "tv_genre": 80, "extra": "&without_genres=16&with_keywords=9826|10123", "scoring_keywords": []},
     "western": {"label": "Western", "color": (214, 100, 42), "movie_genre": 37, "tv_genre": 37, "extra": "&without_genres=16", "scoring_keywords": []}
 }
 
@@ -108,7 +94,6 @@ def get_trending_media_for_genre(config, excluded_keys):
     movie_pool = []
     tv_pool = []
     
-    # Récupération de 3 pages de tendances pour avoir un grand pool de candidats
     for page in range(1, 4):
         movie_url = f"/discover/movie?sort_by=popularity.desc&with_genres={config['movie_genre']}{config.get('extra', '')}&page={page}&include_adult=false"
         try:
@@ -148,7 +133,6 @@ def get_trending_media_for_genre(config, excluded_keys):
         composite_key = f"{item['media_type']}_{item['id']}"
         popularity = item.get("popularity", 0)
         
-        # Filtrage éliminatoire : Exclure la pornographie (adult content)
         if item.get("adult") is True:
             continue
         if popularity < min_pop_threshold:
@@ -162,7 +146,6 @@ def get_trending_media_for_genre(config, excluded_keys):
         
     print(f"   Pool éligible après filtrage : {len(filtered_pool)} œuvres (Films & Séries).")
     
-    # Sélection aléatoire de 50 candidats parmi les œuvres éligibles
     if len(filtered_pool) > 50:
         selected_pool = random.sample(filtered_pool, 50)
         print(f"   Sélection aléatoire de 50 candidats parmi les {len(filtered_pool)} œuvres.")
@@ -188,7 +171,6 @@ def get_media_keywords(media_type, media_id):
         data = tmdb_api_call(endpoint)
         if not data:
             return set()
-        # TMDB renvoie "keywords" pour les films et "results" pour les séries
         keyword_list = data.get("keywords") or data.get("results") or []
         return {kw["id"] for kw in keyword_list if "id" in kw}
     except Exception as e:
@@ -234,22 +216,34 @@ def analyze_and_score_backdrop(bg, item):
     return score
 
 def apply_apple_tv_duotone(img, target_color):
+    """Applique un traitement d'image adaptatif et non linéaire (Style Apple TV Premium)"""
+    # 1. Conversion en niveaux de gris et extraction de la matrice float32
     gray = img.convert("L")
-    gray_np = np.array(gray)
+    gray_np = np.array(gray, dtype=np.float32)
     
-    base_dark = np.array([10, 14, 22])
+    # 2. Normalisation Min-Max adaptative (Étirement de l'histogramme pour révéler les textures)
+    f_min, f_max = gray_np.min(), gray_np.max()
+    if f_max > f_min:
+        gray_np = (gray_np - f_min) * (255.0 / (f_max - f_min))
+    
+    # 3. Courbe en S Sigmoïde dynamique pour booster le contraste local sans boucher les noirs
+    # Centre autour du gris moyen (127.5), facteur d'accentuation chirurgical à 0.022
+    gray_np = 255.0 / (1.0 + np.exp(-0.022 * (gray_np - 127.5)))
+    
+    # 4. Cartographie du Duotone avec le noir bleuté emblématique d'Apple
+    base_dark = np.array([12, 16, 26])  # Fond sombre profond cinéma
     target_light = np.array(target_color)
     
     duotone = np.zeros((gray_np.shape[0], gray_np.shape[1], 3), dtype=np.uint8)
     for i in range(3):
+        # Interpolation linéaire basée sur l'histogramme boosté en numpy
         duotone[..., i] = base_dark[i] + (gray_np / 255.0) * (target_light[i] - base_dark[i])
         
     return Image.fromarray(duotone)
 
 def finalize_landscape_banner(img, label, target_color):
-    """Calcule et applique le texte Ultra-XXL (165px) avec wrapping dynamique haut de gamme"""
     img = ImageOps.fit(img, (1920, 1080), method=Image.Resampling.LANCZOS)
-    img = ImageEnhance.Contrast(img).enhance(1.18)
+    img = ImageEnhance.Contrast(img).enhance(1.05) # Réduit légèrement l'apport PIL linéaire devenu inutile
     img = apply_apple_tv_duotone(img, target_color)
     
     # Dégradé cinématique
@@ -310,11 +304,8 @@ def finalize_landscape_banner(img, label, target_color):
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
-    # NOTE: On ne purge plus agressivement tout le dossier de sortie ici pour garder les anciens posters en cas d'échec
-    
-    # Résolution des mots-clés à exclure globalement (tags éliminatoires)
     EXCLUDED_KEYWORD_IDS = set()
-    raw_excludes = []  # On pourra ajouter des mots-clés ici à l'avenir pour les exclure du scoring
+    raw_excludes = []
     for name_or_id in raw_excludes:
         if isinstance(name_or_id, int):
             EXCLUDED_KEYWORD_IDS.add(name_or_id)
@@ -323,8 +314,6 @@ def main():
             if kw_id:
                 EXCLUDED_KEYWORD_IDS.add(kw_id)
                 print(f"Mot-clé à exclure résolu : '{name_or_id}' -> ID {kw_id}")
-            else:
-                print(f"Alerte : Impossible de résoudre le mot-clé à exclure '{name_or_id}' (Il sera résolu si l'API est accessible)")
     
     history = load_and_clean_history()
     excluded_keys = set(history.keys())
@@ -336,9 +325,8 @@ def main():
         
         candidates_pool = get_trending_media_for_genre(config, excluded_keys)
         if not candidates_pool:
-            # SYSTÈME DE SECOURS 1 : Pas de candidats renvoyés par l'API
             print(f" [CONSERVATION] Aucun candidat éligible trouvé pour le genre {config['label']}. Ancien poster préservé.")
-            sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=200,title=Génération Sautée ({config['label']})::Aucun média valide trouvé dans l'API. L'ancien poster est conservé pour éviter un écran noir.\n")
+            sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=200,title=Génération Sautée ({config['label']})::Aucun média valide trouvé dans l'API. L'ancien poster est conservé.\n")
             continue
             
         scoring_keywords = set(config.get("scoring_keywords", []))
@@ -350,16 +338,13 @@ def main():
             media_id = item["id"]
             media_title = item.get("title") or item.get("name")
             
-            # Récupération des mots-clés de l'œuvre
             keywords = get_media_keywords(media_type, media_id)
             
-            # Filtrage par tags éliminatoires
             bad_tags = keywords.intersection(EXCLUDED_KEYWORD_IDS)
             if bad_tags:
                 print(f"      [{idx+1}/{len(candidates_pool)}] {media_title} ({media_type.upper()}) - ÉLIMINÉ (contient un tag exclu : {list(bad_tags)})")
                 continue
             
-            # Calcul du score : 10 points par mot-clé correspondant
             matching_keywords = keywords.intersection(scoring_keywords)
             tag_score = len(matching_keywords) * 10
             
@@ -372,15 +357,13 @@ def main():
             if tag_score > 0:
                 print(f"      [{idx+1}/{len(candidates_pool)}] {media_title} ({media_type.upper()}) - Score: {tag_score} (Tags: {list(matching_keywords)})")
                 
-            time.sleep(0.05)  # Pause légère pour respecter les limites TMDB
+            time.sleep(0.05)
             
         if not scored_candidates:
-            # SYSTÈME DE SECOURS 3 : Tous les candidats ont été éliminés par le filtrage
             print(f" [CONSERVATION] Aucun candidat éligible restant après filtrage par tags éliminatoires pour {config['label']}. Ancien poster préservé.")
             sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=320,title=Tous Éliminés ({config['label']})::Tous les candidats ont été éliminés par les tags exclus. L'ancien poster est conservé.\n")
             continue
             
-        # Tri : Score de tags décroissant, puis popularité décroissante en bris d'égalité
         scored_candidates.sort(key=lambda x: (x["score"], x["item"].get("popularity", 0)), reverse=True)
         
         winner_data = scored_candidates[0]
@@ -393,10 +376,6 @@ def main():
         media_title = selected_media.get("title") or selected_media.get("name")
         
         print(f" -> Vainqueur sélectionné : {media_title} ({media_type.upper()} - ID: {media_id})")
-        if scoring_keywords:
-            print(f"    Score final : {winner_score} points (Mots-clés associés: {winner_data['keywords_found']})")
-        else:
-            print(f"    Sélection par popularité par défaut (Pas de mots-clés configurés pour ce genre)")
         
         backdrops_list = get_best_textless_backdrops(media_type, media_id, selected_media["backdrop_path"])
         time.sleep(0.2)
@@ -421,7 +400,6 @@ def main():
             
             final_banner = finalize_landscape_banner(winner_bg["image"], config["label"], config["color"])
             
-            # Écriture/Écrasement sécurisé du fichier propre à ce genre
             final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
             final_banner.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
             
@@ -432,11 +410,9 @@ def main():
                 "date": datetime.now().strftime("%Y-%m-%d")
             }
         else:
-            # SYSTÈME DE SECOURS 2 : Les candidats n'avaient pas de visuels téléchargeables
             print(f" [CONSERVATION] Échec d'extraction visuelle pour {media_title}. L'ancien poster de {config['label']} reste en place.")
             sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=240,title=Visuel Manquant ({config['label']})::Impossible d'extraire un fond pour '{media_title}'. L'ancien poster est conservé.\n")
 
-    # Tri de l'historique par date descendante pour le confort de lecture de l'humain (Table de hachage ordonnée)
     sorted_history = dict(sorted(history.items(), key=lambda item: item[1]['date'], reverse=True))
 
     os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
