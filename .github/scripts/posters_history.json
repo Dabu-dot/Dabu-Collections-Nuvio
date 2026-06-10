@@ -83,5 +83,90 @@
         "title": "Yellowstone",
         "genre": "western",
         "date": "2026-06-10"
+    },
+    "movie_931285": {
+        "title": "Mortal Kombat II",
+        "genre": "action",
+        "date": "2026-06-10"
+    },
+    "movie_1311031": {
+        "title": "Demon Slayer: Kimetsu no Yaiba Infinity Castle",
+        "genre": "animation-japonaise",
+        "date": "2026-06-10"
+    },
+    "movie_1226863": {
+        "title": "The Super Mario Galaxy Movie",
+        "genre": "animation",
+        "date": "2026-06-10"
+    },
+    "movie_121": {
+        "title": "The Lord of the Rings: The Two Towers",
+        "genre": "aventure",
+        "date": "2026-06-10"
+    },
+    "movie_1273221": {
+        "title": "Scary Movie",
+        "genre": "comedie",
+        "date": "2026-06-10"
+    },
+    "tv_41956": {
+        "title": "Death in Paradise",
+        "genre": "crime",
+        "date": "2026-06-10"
+    },
+    "tv_21145": {
+        "title": "Natural World",
+        "genre": "documentaire",
+        "date": "2026-06-10"
+    },
+    "tv_273240": {
+        "title": "Off Campus",
+        "genre": "drame",
+        "date": "2026-06-10"
+    },
+    "tv_71728": {
+        "title": "Young Sheldon",
+        "genre": "famille",
+        "date": "2026-06-10"
+    },
+    "tv_76479": {
+        "title": "The Boys",
+        "genre": "fantastique",
+        "date": "2026-06-10"
+    },
+    "tv_87917": {
+        "title": "For All Mankind",
+        "genre": "guerre",
+        "date": "2026-06-10"
+    },
+    "movie_1530510": {
+        "title": "Mexico 86",
+        "genre": "histoire",
+        "date": "2026-06-10"
+    },
+    "movie_1304313": {
+        "title": "Lee Cronin's The Mummy",
+        "genre": "horreur",
+        "date": "2026-06-10"
+    },
+    "movie_11012": {
+        "title": "Damage",
+        "genre": "romance",
+        "date": "2026-06-10"
+    },
+    "tv_4629": {
+        "title": "Stargate SG-1",
+        "genre": "science-fiction",
+        "date": "2026-06-10"
+    },
+    "tv_1396": {
+        "title": "Breaking Bad",
+        "genre": "thriller",
+        "date": "2026-06-10"
+    },
+    "tv_299167": {
+        "title": "Dutton Ranch",
+        "genre": "western",
+        "date": "2026-06-10"
     }
 }
