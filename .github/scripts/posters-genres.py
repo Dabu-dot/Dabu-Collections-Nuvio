@@ -243,8 +243,10 @@ def apply_apple_tv_duotone(img, target_color):
 
 def finalize_landscape_banner(img, label, target_color):
     img = ImageOps.fit(img, (1920, 1080), method=Image.Resampling.LANCZOS)
-    img = ImageEnhance.Contrast(img).enhance(1.05) # Réduit légèrement l'apport PIL linéaire devenu inutile
     img = apply_apple_tv_duotone(img, target_color)
+    
+    # 1. Conversion explicite en RGBA pour préparer la superposition stable
+    img_rgba = img.convert("RGBA")
     
     # Dégradé cinématique
     gradient = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
@@ -252,7 +254,9 @@ def finalize_landscape_banner(img, label, target_color):
     for y in range(400, 1080):
         alpha = int(((y - 400) / 680) ** 1.8 * 252)
         g_draw.line([(0, y), (1920, y)], fill=(0, 0, 0, alpha))
-    img = Image.alpha_composite(img.convert("RGBA"), gradient)
+        
+    # Fusion sécurisée des deux calques RGBA
+    img_with_gradient = Image.alpha_composite(img_rgba, gradient)
 
     text_layer = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
     shadow_layer = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
@@ -296,7 +300,7 @@ def finalize_landscape_banner(img, label, target_color):
 
     shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(12))
     
-    final_img = Image.alpha_composite(img, shadow_layer)
+    final_img = Image.alpha_composite(img_with_gradient, shadow_layer)
     final_img = Image.alpha_composite(final_img, text_layer)
     
     return final_img.convert("RGB")
@@ -403,23 +407,5 @@ def main():
             final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
             final_banner.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
             
-            RUN_PROCESSED_IDS.add(composite_key)
-            history[composite_key] = {
-                "title": media_title,
-                "genre": genre_name,
-                "date": datetime.now().strftime("%Y-%m-%d")
-            }
-        else:
-            print(f" [CONSERVATION] Échec d'extraction visuelle pour {media_title}. L'ancien poster de {config['label']} reste en place.")
-            sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=240,title=Visuel Manquant ({config['label']})::Impossible d'extraire un fond pour '{media_title}'. L'ancien poster est conservé.\n")
-
-    sorted_history = dict(sorted(history.items(), key=lambda item: item[1]['date'], reverse=True))
-
-    os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
-    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
-        json.dump(sorted_history, f, ensure_ascii=False, indent=4)
+            RUN
         
-    print("\n[SUCCESS] Déploiement terminé. Protection contre les bannières vides active.")
-
-if __name__ == "__main__":
-    main()
