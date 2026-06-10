@@ -190,7 +190,7 @@ def get_best_textless_backdrops(media_type, media_id, fallback_path):
     except Exception:
         return [{"file_path": fallback_path, "width": 1920, "vote_count": 5, "vote_average": 5.0}]
 
-def analyze_and_score_backdrop(bg, item):
+def analyze_and_score_backdrop(bg, item, downloaded_image=None):
     score = 40
     width = bg.get("width", 0)
     popularity = item.get("popularity", 0)
@@ -203,43 +203,58 @@ def analyze_and_score_backdrop(bg, item):
     if release_date_str:
         try:
             year = datetime.strptime(release_date_str, "%Y-%m-%d").year
-            if year >= 2022: score += 35
-            elif year >= 2015: score += 15
+            if year >= 2022: score += 25
+            elif year >= 2015: score += 10
             elif year < 2005: score -= 20
         except ValueError:
             pass
 
+    # Bonus de résolution brute
     if width >= 3840: score += 15
     elif width >= 1920: score += 10
         
-    if popularity > 150: score += 15
+    if popularity > 150: score += 10
         
+    # Analyse de la netteté réelle (Anti-Upscale artificiel)
+    if downloaded_image:
+        try:
+            # Conversion rapide en niveaux de gris et tableau numpy pour analyse de fréquence
+            gray_img = downloaded_image.convert("L").resize((480, 270), Image.Resampling.BILINEAR)
+            arr = np.array(gray_img, dtype=np.float32)
+            
+            # Calcul des gradients directionnels (variations d'intensité locales)
+            grad_x = np.diff(arr, axis=1)
+            grad_y = np.diff(arr, axis=0)
+            edge_variance = np.var(grad_x) + np.var(grad_y)
+            
+            # Bonus si les textures et contours sont réels et marqués (Vraie UHD / HD nette)
+            if edge_variance > 140:
+                score += 25
+            # Malus si l'image est anormalement floue ou lissée artificiellement (Upscale étiré)
+            elif edge_variance < 55:
+                score -= 20
+        except Exception:
+            pass
+            
     return score
 
 def apply_apple_tv_duotone(img, target_color):
     """Applique un traitement adaptatif et non linéaire avec netteté accrue (Style Apple TV Premium)"""
-    # 1. Étape d'accentuation matérielle de la netteté des textures (Pillow)
     sharper = ImageEnhance.Sharpness(img)
-    img = sharper.enhance(2.2)  # Augmente la clarté des micro-contrastes (visages, décors)
+    img = sharper.enhance(2.2)  
     
-    # 2. Conversion et extraction numpy
     gray = img.convert("L")
     gray_np = np.array(gray, dtype=np.float32)
     
-    # 3. Normalisation Min-Max
     f_min, f_max = gray_np.min(), gray_np.max()
     if f_max > f_min:
         gray_np = (gray_np - f_min) * (255.0 / (f_max - f_min))
     
-    # 4. Correction de contraste adaptative selon l'homogénéité de l'image d'origine
     std_dev = np.std(gray_np)
-    # Si l'image est très plate (écart-type faible), on pousse le coefficient de contraste
     contrast_factor = 0.028 if std_dev < 55.0 else 0.022
     
-    # Courbe sigmoïde dynamique
     gray_np = 255.0 / (1.0 + np.exp(-contrast_factor * (gray_np - 127.5)))
     
-    # 5. Cartographie Duotone Apple (Fond noir bleuté profond cinéma)
     base_dark = np.array([12, 16, 26])  
     target_light = np.array(target_color)
     
@@ -253,10 +268,8 @@ def finalize_landscape_banner(img, label, target_color):
     img = ImageOps.fit(img, (1920, 1080), method=Image.Resampling.LANCZOS)
     img = apply_apple_tv_duotone(img, target_color)
     
-    # Conversion explicite en RGBA pour la superposition stable
     img_rgba = img.convert("RGBA")
     
-    # Dégradé cinématique
     gradient = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
     g_draw = ImageDraw.Draw(gradient)
     for y in range(400, 1080):
@@ -398,7 +411,8 @@ def main():
                 res = requests.get(img_url, stream=True, timeout=10)
                 if res.status_code == 200:
                     raw_img = Image.open(res.raw).convert("RGB")
-                    score = analyze_and_score_backdrop(bg, selected_media)
+                    # Analyse intelligente de l'image physique en mémoire avec numpy
+                    score = analyze_and_score_backdrop(bg, selected_media, downloaded_image=raw_img)
                     scored_backdrops.append({"image": raw_img, "score": score, "path": bg["file_path"]})
             except Exception:
                 continue
@@ -407,7 +421,7 @@ def main():
             scored_backdrops.sort(key=lambda x: x["score"], reverse=True)
             winner_bg = scored_backdrops[0]
             
-            print(f"   ==> Backdrop élu (Score: {winner_bg['score']}/100) | Image: {winner_bg['path']}")
+            print(f"   ==> Backdrop élu (Score final: {winner_bg['score']}/140) | Image: {winner_bg['path']}")
             
             final_banner = finalize_landscape_banner(winner_bg["image"], config["label"], config["color"])
             
@@ -422,15 +436,4 @@ def main():
             }
         else:
             print(f" [CONSERVATION] Échec d'extraction visuelle pour {media_title}. L'ancien poster de {config['label']} reste en place.")
-            sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=240,title=Visuel Manquant ({config['label']})::Impossible d'extraire un fond pour '{media_title}'. L'ancien poster est conservé.\n")
-
-    sorted_history = dict(sorted(history.items(), key=lambda item: item[1]['date'], reverse=True))
-
-    os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
-    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
-        json.dump(sorted_history, f, ensure_ascii=False, indent=4)
-        
-    print("\n[SUCCESS] Déploiement terminé. Protection contre les bannières vides active.")
-
-if __name__ == "__main__":
-    main()
+            sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=240,title=Visuel Manquant ({config['label']})::Impossible d'extraire un fond pour '{media_title}'. L'ancien poster est conse
