@@ -434,6 +434,17 @@ def main():
                 "genre": genre_name,
                 "date": datetime.now().strftime("%Y-%m-%d")
             }
-            else:
+        else:
             print(f" [CONSERVATION] Échec d'extraction visuelle pour {media_title}. L'ancien poster de {config['label']} reste en place.")
             sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=240,title=Visuel Manquant ({config['label']})::Impossible d'extraire un fond pour '{media_title}'. L'ancien poster est conservé.\n")
+
+    sorted_history = dict(sorted(history.items(), key=lambda item: item[1]['date'], reverse=True))
+
+    os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
+    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(sorted_history, f, ensure_ascii=False, indent=4)
+        
+    print("\n[SUCCESS] Déploiement terminé. Système anti-upscale actif.")
+
+if __name__ == "__main__":
+    main()
