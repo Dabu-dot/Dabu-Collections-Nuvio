@@ -168,5 +168,90 @@
         "title": "Dutton Ranch",
         "genre": "western",
         "date": "2026-06-10"
+    },
+    "movie_460465": {
+        "title": "Mortal Kombat",
+        "genre": "action",
+        "date": "2026-06-10"
+    },
+    "tv_30984": {
+        "title": "Bleach",
+        "genre": "animation-japonaise",
+        "date": "2026-06-10"
+    },
+    "movie_1007757": {
+        "title": "Swapped",
+        "genre": "animation",
+        "date": "2026-06-10"
+    },
+    "tv_94997": {
+        "title": "House of the Dragon",
+        "genre": "aventure",
+        "date": "2026-06-10"
+    },
+    "movie_4257": {
+        "title": "Scary Movie 4",
+        "genre": "comedie",
+        "date": "2026-06-10"
+    },
+    "tv_80748": {
+        "title": "FBI",
+        "genre": "crime",
+        "date": "2026-06-10"
+    },
+    "tv_13805": {
+        "title": "A Girl's Guide to 21st Century Sex",
+        "genre": "documentaire",
+        "date": "2026-06-10"
+    },
+    "tv_2734": {
+        "title": "Law & Order: Special Victims Unit",
+        "genre": "drame",
+        "date": "2026-06-10"
+    },
+    "tv_1950": {
+        "title": "Everwood",
+        "genre": "famille",
+        "date": "2026-06-10"
+    },
+    "movie_454639": {
+        "title": "Masters of the Universe",
+        "genre": "fantastique",
+        "date": "2026-06-10"
+    },
+    "tv_71789": {
+        "title": "SEAL Team",
+        "genre": "guerre",
+        "date": "2026-06-10"
+    },
+    "movie_1579": {
+        "title": "Apocalypto",
+        "genre": "histoire",
+        "date": "2026-06-10"
+    },
+    "movie_1340110": {
+        "title": "Redux Redux",
+        "genre": "horreur",
+        "date": "2026-06-10"
+    },
+    "movie_462183": {
+        "title": "Wild Awakening",
+        "genre": "romance",
+        "date": "2026-06-10"
+    },
+    "movie_1116201": {
+        "title": "Iron Lung",
+        "genre": "science-fiction",
+        "date": "2026-06-10"
+    },
+    "movie_976912": {
+        "title": "Graphic Desires",
+        "genre": "thriller",
+        "date": "2026-06-10"
+    },
+    "tv_1018": {
+        "title": "Bonanza",
+        "genre": "western",
+        "date": "2026-06-10"
     }
 }
