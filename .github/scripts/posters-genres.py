@@ -217,16 +217,29 @@ def analyze_and_score_backdrop(bg, item):
     return score
 
 def apply_apple_tv_duotone(img, target_color):
-    """Applique un traitement d'image adaptatif et non linéaire (Style Apple TV Premium)"""
+    """Applique un traitement adaptatif et non linéaire avec netteté accrue (Style Apple TV Premium)"""
+    # 1. Étape d'accentuation matérielle de la netteté des textures (Pillow)
+    sharper = ImageEnhance.Sharpness(img)
+    img = sharper.enhance(2.2)  # Augmente la clarté des micro-contrastes (visages, décors)
+    
+    # 2. Conversion et extraction numpy
     gray = img.convert("L")
     gray_np = np.array(gray, dtype=np.float32)
     
+    # 3. Normalisation Min-Max
     f_min, f_max = gray_np.min(), gray_np.max()
     if f_max > f_min:
         gray_np = (gray_np - f_min) * (255.0 / (f_max - f_min))
     
-    gray_np = 255.0 / (1.0 + np.exp(-0.022 * (gray_np - 127.5)))
+    # 4. Correction de contraste adaptative selon l'homogénéité de l'image d'origine
+    std_dev = np.std(gray_np)
+    # Si l'image est très plate (écart-type faible), on pousse le coefficient de contraste
+    contrast_factor = 0.028 if std_dev < 55.0 else 0.022
     
+    # Courbe sigmoïde dynamique
+    gray_np = 255.0 / (1.0 + np.exp(-contrast_factor * (gray_np - 127.5)))
+    
+    # 5. Cartographie Duotone Apple (Fond noir bleuté profond cinéma)
     base_dark = np.array([12, 16, 26])  
     target_light = np.array(target_color)
     
@@ -240,7 +253,7 @@ def finalize_landscape_banner(img, label, target_color):
     img = ImageOps.fit(img, (1920, 1080), method=Image.Resampling.LANCZOS)
     img = apply_apple_tv_duotone(img, target_color)
     
-    # 1. Conversion explicite en RGBA pour préparer la superposition stable
+    # Conversion explicite en RGBA pour la superposition stable
     img_rgba = img.convert("RGBA")
     
     # Dégradé cinématique
@@ -250,7 +263,6 @@ def finalize_landscape_banner(img, label, target_color):
         alpha = int(((y - 400) / 680) ** 1.8 * 252)
         g_draw.line([(0, y), (1920, y)], fill=(0, 0, 0, alpha))
         
-    # Fusion sécurisée des deux calques RGBA
     img_with_gradient = Image.alpha_composite(img_rgba, gradient)
 
     text_layer = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
