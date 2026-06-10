@@ -1,1 +1,87 @@
-
+{
+    "movie_603": {
+        "title": "The Matrix",
+        "genre": "action",
+        "date": "2026-06-10"
+    },
+    "tv_95479": {
+        "title": "JUJUTSU KAISEN",
+        "genre": "animation-japonaise",
+        "date": "2026-06-10"
+    },
+    "tv_65334": {
+        "title": "Miraculous: Tales of Ladybug & Cat Noir",
+        "genre": "animation",
+        "date": "2026-06-10"
+    },
+    "movie_122": {
+        "title": "The Lord of the Rings: The Return of the King",
+        "genre": "aventure",
+        "date": "2026-06-10"
+    },
+    "movie_4247": {
+        "title": "Scary Movie",
+        "genre": "comedie",
+        "date": "2026-06-10"
+    },
+    "tv_1431": {
+        "title": "CSI: Crime Scene Investigation",
+        "genre": "crime",
+        "date": "2026-06-10"
+    },
+    "tv_14951": {
+        "title": "Nature",
+        "genre": "documentaire",
+        "date": "2026-06-10"
+    },
+    "tv_79744": {
+        "title": "The Rookie",
+        "genre": "drame",
+        "date": "2026-06-10"
+    },
+    "tv_49009": {
+        "title": "The Goldbergs",
+        "genre": "famille",
+        "date": "2026-06-10"
+    },
+    "tv_124364": {
+        "title": "FROM",
+        "genre": "fantastique",
+        "date": "2026-06-10"
+    },
+    "tv_44217": {
+        "title": "Vikings",
+        "genre": "guerre",
+        "date": "2026-06-10"
+    },
+    "tv_1407": {
+        "title": "Homeland",
+        "genre": "histoire",
+        "date": "2026-06-10"
+    },
+    "movie_1339713": {
+        "title": "Obsession",
+        "genre": "horreur",
+        "date": "2026-06-10"
+    },
+    "movie_1358005": {
+        "title": "Office Romance",
+        "genre": "romance",
+        "date": "2026-06-10"
+    },
+    "movie_687163": {
+        "title": "Project Hail Mary",
+        "genre": "science-fiction",
+        "date": "2026-06-10"
+    },
+    "movie_28322": {
+        "title": "Madness",
+        "genre": "thriller",
+        "date": "2026-06-10"
+    },
+    "tv_73586": {
+        "title": "Yellowstone",
+        "genre": "western",
+        "date": "2026-06-10"
+    }
+}
