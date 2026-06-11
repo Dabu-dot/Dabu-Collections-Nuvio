@@ -1,4 +1,84 @@
 {
+    "movie_155": {
+        "title": "The Dark Knight",
+        "genre": "action",
+        "date": "2026-06-11"
+    },
+    "tv_46260": {
+        "title": "Naruto",
+        "genre": "animation-japonaise",
+        "date": "2026-06-11"
+    },
+    "movie_1084242": {
+        "title": "Zootopia 2",
+        "genre": "animation",
+        "date": "2026-06-11"
+    },
+    "movie_120": {
+        "title": "The Lord of the Rings: The Fellowship of the Ring",
+        "genre": "aventure",
+        "date": "2026-06-11"
+    },
+    "tv_111803": {
+        "title": "The White Lotus",
+        "genre": "comedie",
+        "date": "2026-06-11"
+    },
+    "movie_1439930": {
+        "title": "The Punisher: One Last Kill",
+        "genre": "crime",
+        "date": "2026-06-11"
+    },
+    "tv_90": {
+        "title": "Mayday",
+        "genre": "documentaire",
+        "date": "2026-06-11"
+    },
+    "tv_1416": {
+        "title": "Grey's Anatomy",
+        "genre": "drame",
+        "date": "2026-06-11"
+    },
+    "tv_40": {
+        "title": "Dallas",
+        "genre": "famille",
+        "date": "2026-06-11"
+    },
+    "movie_83533": {
+        "title": "Avatar: Fire and Ash",
+        "genre": "fantastique",
+        "date": "2026-06-11"
+    },
+    "tv_918": {
+        "title": "M*A*S*H",
+        "genre": "guerre",
+        "date": "2026-06-11"
+    },
+    "tv_113962": {
+        "title": "Lioness",
+        "genre": "histoire",
+        "date": "2026-06-11"
+    },
+    "movie_259872": {
+        "title": "Skin. Like. Sun.",
+        "genre": "romance",
+        "date": "2026-06-11"
+    },
+    "tv_63639": {
+        "title": "The Expanse",
+        "genre": "science-fiction",
+        "date": "2026-06-11"
+    },
+    "tv_60574": {
+        "title": "Peaky Blinders",
+        "genre": "thriller",
+        "date": "2026-06-11"
+    },
+    "tv_1781": {
+        "title": "Little House on the Prairie",
+        "genre": "western",
+        "date": "2026-06-11"
+    },
     "movie_603": {
         "title": "The Matrix",
         "genre": "action",
