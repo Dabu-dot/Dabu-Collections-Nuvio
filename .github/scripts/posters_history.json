@@ -1,4 +1,84 @@
 {
+    "tv_67198": {
+        "title": "Star Trek: Discovery",
+        "genre": "action",
+        "date": "2026-06-13"
+    },
+    "tv_120089": {
+        "title": "SPY x FAMILY",
+        "genre": "animation-japonaise",
+        "date": "2026-06-13"
+    },
+    "tv_456": {
+        "title": "The Simpsons",
+        "genre": "animation",
+        "date": "2026-06-13"
+    },
+    "movie_1228710": {
+        "title": "The Mandalorian and Grogu",
+        "genre": "aventure",
+        "date": "2026-06-13"
+    },
+    "tv_2710": {
+        "title": "It's Always Sunny in Philadelphia",
+        "genre": "comedie",
+        "date": "2026-06-13"
+    },
+    "tv_39185": {
+        "title": "Vera",
+        "genre": "crime",
+        "date": "2026-06-13"
+    },
+    "tv_4384": {
+        "title": "Frontline",
+        "genre": "documentaire",
+        "date": "2026-06-13"
+    },
+    "tv_4057": {
+        "title": "Criminal Minds",
+        "genre": "drame",
+        "date": "2026-06-13"
+    },
+    "tv_14929": {
+        "title": "Heartland",
+        "genre": "famille",
+        "date": "2026-06-13"
+    },
+    "tv_60735": {
+        "title": "The Flash",
+        "genre": "fantastique",
+        "date": "2026-06-13"
+    },
+    "tv_732": {
+        "title": "L.A. Law",
+        "genre": "guerre",
+        "date": "2026-06-13"
+    },
+    "movie_6312": {
+        "title": "Brotherhood of the Wolf",
+        "genre": "histoire",
+        "date": "2026-06-13"
+    },
+    "movie_1157008": {
+        "title": "Dime lo que quieres (de verdad)",
+        "genre": "romance",
+        "date": "2026-06-13"
+    },
+    "tv_48866": {
+        "title": "The 100",
+        "genre": "science-fiction",
+        "date": "2026-06-13"
+    },
+    "tv_60059": {
+        "title": "Better Call Saul",
+        "genre": "thriller",
+        "date": "2026-06-13"
+    },
+    "tv_4324": {
+        "title": "Dr. Quinn, Medicine Woman",
+        "genre": "western",
+        "date": "2026-06-13"
+    },
     "movie_1275779": {
         "title": "Disclosure Day",
         "genre": "action",
