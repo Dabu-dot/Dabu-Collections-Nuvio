@@ -1,4 +1,89 @@
 {
+    "tv_4604": {
+        "title": "Smallville",
+        "genre": "action",
+        "date": "2026-06-14"
+    },
+    "tv_45790": {
+        "title": "JoJo's Bizarre Adventure",
+        "genre": "animation-japonaise",
+        "date": "2026-06-14"
+    },
+    "tv_60625": {
+        "title": "Rick and Morty",
+        "genre": "animation",
+        "date": "2026-06-14"
+    },
+    "tv_1855": {
+        "title": "Star Trek: Voyager",
+        "genre": "aventure",
+        "date": "2026-06-14"
+    },
+    "movie_4248": {
+        "title": "Scary Movie 2",
+        "genre": "comedie",
+        "date": "2026-06-14"
+    },
+    "tv_4614": {
+        "title": "NCIS",
+        "genre": "crime",
+        "date": "2026-06-14"
+    },
+    "tv_1181": {
+        "title": "American Experience",
+        "genre": "documentaire",
+        "date": "2026-06-14"
+    },
+    "tv_549": {
+        "title": "Law & Order",
+        "genre": "drame",
+        "date": "2026-06-14"
+    },
+    "tv_85077": {
+        "title": "The Chosen",
+        "genre": "famille",
+        "date": "2026-06-14"
+    },
+    "tv_1402": {
+        "title": "The Walking Dead",
+        "genre": "fantastique",
+        "date": "2026-06-14"
+    },
+    "movie_1207162": {
+        "title": "Rise of the Conqueror",
+        "genre": "guerre",
+        "date": "2026-06-14"
+    },
+    "tv_61378": {
+        "title": "Madam Secretary",
+        "genre": "histoire",
+        "date": "2026-06-14"
+    },
+    "movie_1363387": {
+        "title": "Saccharine",
+        "genre": "horreur",
+        "date": "2026-06-14"
+    },
+    "movie_1010581": {
+        "title": "My Fault",
+        "genre": "romance",
+        "date": "2026-06-14"
+    },
+    "movie_299536": {
+        "title": "Avengers: Infinity War",
+        "genre": "science-fiction",
+        "date": "2026-06-14"
+    },
+    "tv_873": {
+        "title": "Columbo",
+        "genre": "thriller",
+        "date": "2026-06-14"
+    },
+    "tv_157744": {
+        "title": "1923",
+        "genre": "western",
+        "date": "2026-06-14"
+    },
     "tv_67198": {
         "title": "Star Trek: Discovery",
         "genre": "action",
