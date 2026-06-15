@@ -1,1 +1,87 @@
-
+{
+    "movie_603": {
+        "title": "The Matrix",
+        "genre": "action",
+        "date": "2026-06-15"
+    },
+    "tv_95479": {
+        "title": "JUJUTSU KAISEN",
+        "genre": "animation-japonaise",
+        "date": "2026-06-15"
+    },
+    "tv_65334": {
+        "title": "Miraculous: Tales of Ladybug & Cat Noir",
+        "genre": "animation",
+        "date": "2026-06-15"
+    },
+    "movie_121": {
+        "title": "The Lord of the Rings: The Two Towers",
+        "genre": "aventure",
+        "date": "2026-06-15"
+    },
+    "movie_4247": {
+        "title": "Scary Movie",
+        "genre": "comedie",
+        "date": "2026-06-15"
+    },
+    "tv_41956": {
+        "title": "Death in Paradise",
+        "genre": "crime",
+        "date": "2026-06-15"
+    },
+    "tv_13805": {
+        "title": "A Girl's Guide to 21st Century Sex",
+        "genre": "documentaire",
+        "date": "2026-06-15"
+    },
+    "tv_124364": {
+        "title": "FROM",
+        "genre": "drame",
+        "date": "2026-06-15"
+    },
+    "tv_71728": {
+        "title": "Young Sheldon",
+        "genre": "famille",
+        "date": "2026-06-15"
+    },
+    "movie_931285": {
+        "title": "Mortal Kombat II",
+        "genre": "fantastique",
+        "date": "2026-06-15"
+    },
+    "tv_44217": {
+        "title": "Vikings",
+        "genre": "guerre",
+        "date": "2026-06-15"
+    },
+    "tv_1407": {
+        "title": "Homeland",
+        "genre": "histoire",
+        "date": "2026-06-15"
+    },
+    "movie_1339713": {
+        "title": "Obsession",
+        "genre": "horreur",
+        "date": "2026-06-15"
+    },
+    "movie_11012": {
+        "title": "Damage",
+        "genre": "romance",
+        "date": "2026-06-15"
+    },
+    "movie_687163": {
+        "title": "Project Hail Mary",
+        "genre": "science-fiction",
+        "date": "2026-06-15"
+    },
+    "movie_28322": {
+        "title": "Madness",
+        "genre": "thriller",
+        "date": "2026-06-15"
+    },
+    "tv_299167": {
+        "title": "Dutton Ranch",
+        "genre": "western",
+        "date": "2026-06-15"
+    }
+}
