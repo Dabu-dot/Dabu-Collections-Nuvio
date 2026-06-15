@@ -154,6 +154,76 @@
         "genre": "western",
         "date": "2026-06-15"
     },
+    "tv_121": {
+        "title": "Doctor Who",
+        "genre": "action",
+        "date": "2026-06-15"
+    },
+    "tv_31910": {
+        "title": "Naruto Shippūden",
+        "genre": "animation-japonaise",
+        "date": "2026-06-15"
+    },
+    "tv_57532": {
+        "title": "PAW Patrol",
+        "genre": "animation",
+        "date": "2026-06-15"
+    },
+    "tv_82856": {
+        "title": "The Mandalorian",
+        "genre": "aventure",
+        "date": "2026-06-15"
+    },
+    "tv_34307": {
+        "title": "Shameless",
+        "genre": "comedie",
+        "date": "2026-06-15"
+    },
+    "tv_1620": {
+        "title": "CSI: Miami",
+        "genre": "crime",
+        "date": "2026-06-15"
+    },
+    "movie_1202285": {
+        "title": "Porn",
+        "genre": "documentaire",
+        "date": "2026-06-15"
+    },
+    "tv_85552": {
+        "title": "Euphoria",
+        "genre": "drame",
+        "date": "2026-06-15"
+    },
+    "tv_2625": {
+        "title": "Diagnosis: Murder",
+        "genre": "famille",
+        "date": "2026-06-15"
+    },
+    "tv_56570": {
+        "title": "Outlander",
+        "genre": "fantastique",
+        "date": "2026-06-15"
+    },
+    "movie_48650": {
+        "title": "Room in Rome",
+        "genre": "romance",
+        "date": "2026-06-15"
+    },
+    "tv_42009": {
+        "title": "Black Mirror",
+        "genre": "science-fiction",
+        "date": "2026-06-15"
+    },
+    "tv_76669": {
+        "title": "Elite",
+        "genre": "thriller",
+        "date": "2026-06-15"
+    },
+    "tv_6081": {
+        "title": "Wagon Train",
+        "genre": "western",
+        "date": "2026-06-15"
+    },
     "tv_4604": {
         "title": "Smallville",
         "genre": "action",
