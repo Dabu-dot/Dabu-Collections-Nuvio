@@ -143,17 +143,6 @@ def get_trending_media_for_genre(config, excluded_keys):
         return random.sample(filtered_pool, 50)
     return filtered_pool
 
-def get_keyword_id_by_name(name):
-    try:
-        data = tmdb_api_call("/search/keyword", {"query": name})
-        if data and "results" in data:
-            for kw in data["results"]:
-                if kw.get("name", "").lower() == name.lower():
-                    return kw["id"]
-    except Exception:
-        pass
-    return None
-
 def get_media_keywords(media_type, media_id):
     try:
         endpoint = f"/{media_type}/{media_id}/keywords"
@@ -207,7 +196,7 @@ def analyze_and_score_backdrop(bg, item, downloaded_image=None):
         
     if downloaded_image:
         try:
-            # 1. Analyse de la texture et du piqué
+            # 1. Analyse du piqué (Variance des gradients)
             gray_img = downloaded_image.convert("L").resize((480, 270), Image.Resampling.BILINEAR)
             arr = np.array(gray_img, dtype=np.float32)
             grad_x = np.diff(arr, axis=1)
@@ -217,29 +206,28 @@ def analyze_and_score_backdrop(bg, item, downloaded_image=None):
             if edge_variance > 140: score += 20
             elif edge_variance < 55: score -= 25
             
-            # 2. PROCESSUS DE VALIDATION DE LA LUMINOSITÉ (Anti-Cramage / Anti-Sombre)
-            # Calcul de l'histogramme des 256 niveaux de gris
+            # 2. VALIDATION STRICTE PAR HISTOGRAMME (Anti-Cramage / Anti-Sombre)
             hist = gray_img.histogram()
             total_pixels = sum(hist)
             
-            # Pixels très sombres (0 à 35) et pixels très clairs (220 à 255)
+            # Isolement des extrêmes (0-35 pour le noir enterré, 220-255 pour le blanc brûlé)
             very_dark_pixels = sum(hist[0:36])
             very_light_pixels = sum(hist[220:256])
             
             pct_dark = (very_dark_pixels / total_pixels) * 100
             pct_light = (very_light_pixels / total_pixels) * 100
             
-            # SEUIL DOUBLE : Élimination directe si l'image est inexploitable
-            if pct_light > 15.0:  # Plus de 15% de l'image est complètement blanche/brûlée
-                print(f"      [REJET] Image trop lumineuse / cramée ({pct_light:.1f}% de blancs).")
+            # Filtrage de sécurité : Élimination immédiate
+            if pct_light > 15.0:
+                print(f"      [REJET HISTOGRAMME] Image cramée par la lumière ({pct_light:.1f}% de blancs extrêmes).")
                 return -100
                 
-            if pct_dark > 70.0:   # Plus de 70% de l'image est noire (sous-exposée)
-                print(f"      [REJET] Image trop sombre / sous-exposée ({pct_dark:.1f}% de noirs).")
+            if pct_dark > 70.0:
+                print(f"      [REJET HISTOGRAMME] Image trop sombre / sous-exposée ({pct_dark:.1f}% de noirs profonds).")
                 return -100
                 
-            # Bonus pour les images parfaitement équilibrées (Style cinéma)
-            if 15.0 <= pct_dark <= 45.0 and pct_light <= 5.0:
+            # Bonus de stabilité pour les images "cinéma" parfaitement balancées
+            if 15.0 <= pct_dark <= 45.0 and pct_light <= 4.0:
                 score += 25
 
         except Exception:
@@ -248,14 +236,42 @@ def analyze_and_score_backdrop(bg, item, downloaded_image=None):
     return score
 
 def apply_premium_duotone(img, base_color):
-    """Applique le traitement Duotone sur une image validée et pré-équilibrée"""
-    brightened = ImageEnhance.Brightness(img).enhance(1.15)
-    gray = brightened.convert("L")
+    """
+    Applique le mode de fusion "Luminosité/Soft Light" haut de gamme.
+    Préserve l'intégralité des visages et des détails fins du film.
+    """
+    # Lissage préventif de la dynamique d'origine
+    img_soft = ImageEnhance.Contrast(img).enhance(0.85)
+    img_soft = ImageEnhance.Brightness(img_soft).enhance(1.05)
     
-    dark_color = tuple(max(0, int(c * 0.20)) for c in base_color)
-    light_color = tuple(min(255, int(c * 0.80 + 50)) for c in base_color)
+    # Passage en luminance pure
+    gray = img_soft.convert("L")
+    gray_np = np.array(gray, dtype=np.float32) / 255.0
     
-    return ImageOps.colorize(gray, dark_color, light_color)
+    width, height = img.size
+    
+    # Définition des cibles chromatiques
+    dark_target = np.array([c * 0.15 for c in base_color], dtype=np.float32) / 255.0
+    light_target = np.array([min(255, c * 1.1 + 20) for c in base_color], dtype=np.float32) / 255.0
+    
+    # Algorithme mathématique Soft Light (Lumière Douce) non destructif
+    output = np.zeros((height, width, 3), dtype=np.float32)
+    for i in range(3):
+        bg_channel = dark_target[i] + gray_np * (light_target[i] - dark_target[i])
+        
+        res = np.where(
+            gray_np < 0.5,
+            2 * gray_np * bg_channel + (bg_channel ** 2) * (1 - 2 * gray_np),
+            2 * gray_np * (1 - bg_channel) + (2 * gray_np - 1) * np.sqrt(bg_channel)
+        )
+        output[..., i] = res
+
+    # Reconversion en espace 8-bit standard
+    output = np.clip(output * 255.0, 0, 255).astype(np.uint8)
+    result_img = Image.fromarray(output, "RGB")
+    
+    # Effet "cristallin" Apple TV
+    return result_img.filter(ImageFilter.SHARPEN)
 
 def finalize_landscape_banner(img, label, color):
     img = ImageOps.fit(img, (1920, 1080), method=Image.Resampling.LANCZOS)
@@ -263,6 +279,7 @@ def finalize_landscape_banner(img, label, color):
     
     img_rgba = img.convert("RGBA")
     
+    # Dégradé cinématique vers le noir sur la partie inférieure
     gradient = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
     g_draw = ImageDraw.Draw(gradient)
     for y in range(400, 1080):
@@ -334,80 +351,3 @@ def main():
             continue
             
         scoring_keywords = set(config.get("scoring_keywords", []))
-        scored_candidates = []
-        
-        for idx, item in enumerate(candidates_pool):
-            media_type = item["media_type"]
-            media_id = item["id"]
-            keywords = get_media_keywords(media_type, media_id)
-            matching_keywords = keywords.intersection(scoring_keywords)
-            tag_score = len(matching_keywords) * 10
-            
-            scored_candidates.append({
-                "item": item,
-                "score": tag_score
-            })
-            
-        if not scored_candidates:
-            continue
-            
-        scored_candidates.sort(key=lambda x: (x["score"], x["item"].get("popularity", 0)), reverse=True)
-        
-        # Parcourir les candidats triés jusqu'à en trouver un avec un backdrop valide
-        success = False
-        for candidate in scored_candidates:
-            selected_media = candidate["item"]
-            media_id = selected_media["id"]
-            media_type = selected_media["media_type"]
-            composite_key = f"{media_type}_{media_id}"
-            media_title = selected_media.get("title") or selected_media.get("name")
-            
-            backdrops_list = get_best_textless_backdrops(media_type, media_id, selected_media["backdrop_path"])
-            
-            scored_backdrops = []
-            for bg in backdrops_list:
-                img_url = f"https://image.tmdb.org/t/p/original{bg['file_path']}"
-                try:
-                    res = requests.get(img_url, stream=True, timeout=10)
-                    if res.status_code == 200:
-                        raw_img = Image.open(res.raw).convert("RGB")
-                        score = analyze_and_score_backdrop(bg, selected_media, downloaded_image=raw_img)
-                        # On ne garde que les backdrops qui ont passé la validation (> 0)
-                        if score > 0:
-                            scored_backdrops.append({"image": raw_img, "score": score, "path": bg["file_path"]})
-                except Exception:
-                    continue
-                    
-            if scored_backdrops:
-                scored_backdrops.sort(key=lambda x: x["score"], reverse=True)
-                winner_bg = scored_backdrops[0]
-                
-                print(f" -> Vainqueur Validé : {media_title} (Score: {winner_bg['score']})")
-                final_banner = finalize_landscape_banner(winner_bg["image"], config["label"], config["color"])
-                
-                final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
-                final_banner.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
-                
-                RUN_PROCESSED_IDS.add(composite_key)
-                history[composite_key] = {
-                    "title": media_title,
-                    "genre": genre_name,
-                    "date": datetime.now().strftime("%Y-%m-%d")
-                }
-                success = True
-                break # On passe au genre suivant dès qu'on a un vainqueur valide
-            else:
-                print(f"   x Média '{media_title}' rejeté (Tous ses backdrops sont hors-limites de luminosité).")
-        
-        if not success:
-            print(f" [CONSERVATION] Aucun film du pool n'a de visuel équilibré pour {config['label']}. Sauvegarde de l'ancien poster.")
-
-    sorted_history = dict(sorted(history.items(), key=lambda item: item[1]['date'], reverse=True))
-    os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
-    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
-        json.dump(sorted_history, f, ensure_ascii=False, indent=4)
-        
-    print("\n[SUCCESS] Déploiement terminé. Système de validation par histogramme actif.")
-
-if __name__ == "__main__":
-    main()
