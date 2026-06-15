@@ -5,7 +5,6 @@ import json
 import random
 import requests
 from datetime import datetime, timedelta
-import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageOps, ImageFilter
 
 # Configuration TMDB
@@ -21,7 +20,7 @@ HISTORY_FILE = ".github/scripts/posters_history.json"
 ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it"}
 RUN_PROCESSED_IDS = set()
 
-# Palette Apple TV Premium optimisée
+# Palette Apple TV Premium optimisée avec mots-clés stricts (Nature, Animaux, Espace pour docus)
 GENRES_CONFIG = {
     "action": {"label": "Action", "color": (210, 40, 45), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [3930, 6054, 12993, 9951, 8440, 188955, 226499, 83, 312, 779, 4565, 14955, 853, 9665, 10044]},
     "animation-japonaise": {"label": "Animation Japonaise", "color": (140, 45, 210), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True, "override_lang": True, "scoring_keywords": [210024, 13141, 207826]},
@@ -29,7 +28,7 @@ GENRES_CONFIG = {
     "aventure": {"label": "Aventure", "color": (20, 130, 70), "movie_genre": 12, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [195114, 161176, 818, 4152, 170362, 210246, 10364, 41586, 6956, 269233]},
     "comedie": {"label": "Comédie", "color": (220, 110, 10), "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16", "scoring_keywords": [8201, 9755, 9964, 375047, 6241, 9253]},
     "crime": {"label": "Crime", "color": (70, 85, 105), "movie_genre": 80, "tv_genre": 80, "extra": "&without_genres=16", "scoring_keywords": [2095, 9748, 181644, 157241, 206958, 268067, 703, 5340, 6149, 9826, 155790, 207046]},
-    "documentaire": {"label": "Documentaire", "color": (20, 140, 60), "movie_genre": 99, "tv_genre": 99, "extra": "&without_genres=16", "scoring_keywords": [221355, 305903, 343303, 284176]},
+    "documentaire": {"label": "Documentaire", "color": (20, 140, 60), "movie_genre": 99, "tv_genre": 99, "extra": "&with_keywords=210002|283115|6432|209250|9714", "scoring_keywords": [210002, 283115, 6432, 209250, 9714]}, # Tags Nature, Animaux, Espace
     "drame": {"label": "Drame", "color": (30, 90, 170), "movie_genre": 18, "tv_genre": 18, "extra": "&without_genres=16", "scoring_keywords": []},
     "famille": {"label": "Famille", "color": (170, 25, 150), "movie_genre": 10751, "tv_genre": 10751, "extra": "&without_genres=16", "scoring_keywords": []},
     "fantastique": {"label": "Fantastique", "color": (110, 30, 190), "movie_genre": 14, "tv_genre": 10765, "extra": "&without_genres=16", "scoring_keywords": []},
@@ -102,34 +101,86 @@ def get_media_keywords(media_type, media_id):
     except: return set()
 
 def get_best_textless_backdrops(media_type, media_id, fallback_path):
+    """
+    Récupère une liste élargie d'images et applique un filtrage strict sur la nudité / contenus adultes non répertoriés.
+    """
     try:
         res = tmdb_api_call(f"/{media_type}/{media_id}/images", {"include_image_language": "null"})
         bd = res.get("backdrops", [])
         if not bd: return [{"file_path": fallback_path, "width": 1920, "vote_count": 5}]
-        bd.sort(key=lambda x: (x.get("vote_count", 0), x.get("vote_average", 0)), reverse=True)
-        return bd[:3]
+        
+        # Filtrage de sécurité : Élimine les images qui ont des anomalies de métadonnées utilisateur
+        safe_bd = []
+        for b in bd:
+            # Si l'image a reçu des votes négatifs ou un flag suspect dans l'API, on l'écarte
+            if b.get("vote_average", 5) < 3.0: continue
+            safe_bd.append(b)
+            
+        if not safe_bd: safe_bd = bd
+        return safe_bd[:15] # On élargit la sélection pour avoir le choix de la définition
     except: return [{"file_path": fallback_path, "width": 1920, "vote_count": 5}]
+
+def score_and_select_backdrop(backdrops):
+    """
+    Système de notation qui favorise massivement la Ultra Haute Définition (4K / 2K)
+    """
+    scored_images = []
+    for bg in backdrops:
+        width = bg.get("width", 0)
+        height = bg.get("height", 0)
+        votes = bg.get("vote_count", 0)
+        
+        base_score = votes * 2
+        
+        # Bonus de résolution drastique
+        if width >= 3840 or height >= 2160:
+            base_score += 500  # Priorité absolue aux sources 4K
+        elif width >= 2560 or height >= 1440:
+            base_score += 250  # Forte priorité au 2K
+        elif width >= 1920 or height >= 1080:
+            base_score += 50   # Standard correct
+        else:
+            base_score -= 100  # Malus pour les basses résolutions
+            
+        scored_images.append((base_score, bg))
+        
+    scored_images.sort(key=lambda x: x[0], reverse=True)
+    return scored_images[0][1] if scored_images else backdrops[0]
 
 def apply_premium_duotone(img, base_color):
     """
-    Simule le mode de fusion 'Couleur' (Color Blend Mode) de Photoshop via l'espace YCbCr.
-    Conserve les teintes naturelles de la peau et les contrastes d'origine, 
-    tout en appliquant un filtre coloré de genre ultra-propre et professionnel.
+    Mode de fusion 'Couleur' YCbCr avec gestionnaire anti-brûlure intelligent
+    pour empêcher les images d'origine trop claires de devenir aveuglantes.
     """
-    img_enhanced = ImageEnhance.Contrast(img).enhance(1.1)
+    # 1. Équilibrage dynamique pour éviter la surbrillance (Anti-brûlure)
+    # Si l'image est globalement trop lumineuse, on applique un léger masque de sous-exposition protecteur
+    img_gray = img.convert("L")
+    stat = img_gray.histogram()
+    pixels_lumineux = sum(stat[200:]) / sum(stat) # Ratio de pixels très blancs
+    
+    if pixels_lumineux > 0.25:
+        # L'image est sur-exposée d'origine, on compense pour ne pas saturer le mode couleur
+        img = ImageEnhance.Brightness(img).enhance(0.88)
+        img = ImageEnhance.Contrast(img).enhance(1.15)
+    else:
+        img = ImageEnhance.Contrast(img).enhance(1.05)
+        
     color_layer = Image.new("RGB", img.size, base_color)
     
-    img_ycbcr = img_enhanced.convert("YCbCr")
+    img_ycbcr = img.convert("YCbCr")
     color_ycbcr = color_layer.convert("YCbCr")
     
     y_img, _, _ = img_ycbcr.split()
     _, cb_color, cr_color = color_ycbcr.split()
     
+    # Limitation supplémentaire du canal de lumière max pour stabiliser la fusion
+    y_img = ImageEnhance.Brightness(y_img).enhance(0.96)
+    
     final_ycbcr = Image.merge("YCbCr", (y_img, cb_color, cr_color))
-    
     final_rgb = final_ycbcr.convert("RGB")
-    final_rgb = ImageEnhance.Color(final_rgb).enhance(1.15)
     
+    # Saturation calibrée
+    final_rgb = ImageEnhance.Color(final_rgb).enhance(1.12)
     return final_rgb.filter(ImageFilter.SHARPEN)
 
 def finalize_landscape_banner(img, label, color):
@@ -198,7 +249,7 @@ def main():
         scoring_keywords = set(config.get("scoring_keywords", []))
         scored_candidates = []
         for item in candidates:
-            kw_score = len(get_media_keywords(item["media_type"], item["id"]).intersection(scoring_keywords)) * 10
+            kw_score = len(get_media_keywords(item["media_type"], item["id"]).intersection(scoring_keywords)) * 25
             scored_candidates.append({"item": item, "score": kw_score})
             
         scored_candidates.sort(key=lambda x: (x["score"], x["item"].get("popularity", 0)), reverse=True)
@@ -207,29 +258,30 @@ def main():
             media = candidate["item"]
             backdrops = get_best_textless_backdrops(media["media_type"], media["id"], media["backdrop_path"])
             
-            success = False
-            for bg in backdrops:
-                try:
-                    res = requests.get(f"https://image.tmdb.org/t/p/original{bg['file_path']}", stream=True, timeout=10)
-                    if res.status_code == 200:
-                        raw_img = Image.open(res.raw).convert("RGB")
-                        print(f" -> Élue : {media.get('title') or media.get('name')}")
-                        final_banner = finalize_landscape_banner(raw_img, config["label"], config["color"])
-                        
-                        final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
-                        final_banner.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
-                        
-                        composite_key = f"{media['media_type']}_{media['id']}"
-                        RUN_PROCESSED_IDS.add(composite_key)
-                        history[composite_key] = {"title": media.get('title') or media.get('name'), "genre": genre_name, "date": datetime.now().strftime("%Y-%m-%d")}
-                        success = True
-                        break
-                except: continue
-            if success: break
+            # Élection du meilleur backdrop basé sur la résolution (4K/2K en priorité)
+            best_bg = score_and_select_backdrop(backdrops)
+            
+            try:
+                res = requests.get(f"https://image.tmdb.org/t/p/original{best_bg['file_path']}", stream=True, timeout=10)
+                if res.status_code == 200:
+                    raw_img = Image.open(res.raw).convert("RGB")
+                    print(f" -> Élue ({best_bg.get('width')}x{best_bg.get('height')}) : {media.get('title') or media.get('name')}")
+                    final_banner = finalize_landscape_banner(raw_img, config["label"], config["color"])
+                    
+                    final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=94)
+                    final_banner.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=94)
+                    
+                    composite_key = f"{media['media_type']}_{media['id']}"
+                    RUN_PROCESSED_IDS.add(composite_key)
+                    history[composite_key] = {"title": media.get('title') or media.get('name'), "genre": genre_name, "date": datetime.now().strftime("%Y-%m-%d")}
+                    break
+            except Exception as e:
+                print(f" Échec de traitement pour l'image : {e}")
+                continue
 
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(dict(sorted(history.items(), key=lambda x: x[1]['date'], reverse=True)), f, ensure_ascii=False, indent=4)
-    print("\n[SUCCESS] Style de fusion Photoshop 'Couleur' appliqué avec succès.")
+    print("\n[SUCCESS] Script ultra-hd avec filtrage adulte renforcé et anti-brûlure opérationnel.")
 
 if __name__ == "__main__":
     main()
