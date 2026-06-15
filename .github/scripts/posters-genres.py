@@ -167,7 +167,7 @@ def get_best_textless_backdrops(media_type, media_id, fallback_path):
         return [{"file_path": fallback_path, "width": 1920, "vote_count": 5, "vote_average": 5.0}]
 
 def analyze_and_score_backdrop(bg, item, downloaded_image=None):
-    score = 40
+    score = 50  # Base stable
     width = bg.get("width", 0)
     popularity = item.get("popularity", 0)
     vote_count = bg.get("vote_count", 0)
@@ -178,7 +178,7 @@ def analyze_and_score_backdrop(bg, item, downloaded_image=None):
         if vote_count >= 10: score += 15
         elif vote_count >= 5: score += 10
     else:
-        score -= 20
+        score -= 10
 
     release_date_str = item.get("release_date") or item.get("first_air_date") or ""
     if release_date_str:
@@ -186,7 +186,7 @@ def analyze_and_score_backdrop(bg, item, downloaded_image=None):
             year = datetime.strptime(release_date_str, "%Y-%m-%d").year
             if year >= 2022: score += 15
             elif year >= 2015: score += 5
-            elif year < 2005: score -= 15
+            elif year < 2005: score -= 10
         except ValueError:
             pass
 
@@ -196,39 +196,40 @@ def analyze_and_score_backdrop(bg, item, downloaded_image=None):
         
     if downloaded_image:
         try:
-            # 1. Analyse du piqué (Variance des gradients)
+            # 1. Analyse des textures (Détails de l'image)
             gray_img = downloaded_image.convert("L").resize((480, 270), Image.Resampling.BILINEAR)
             arr = np.array(gray_img, dtype=np.float32)
             grad_x = np.diff(arr, axis=1)
             grad_y = np.diff(arr, axis=0)
             edge_variance = np.var(grad_x) + np.var(grad_y)
             
-            if edge_variance > 140: score += 20
-            elif edge_variance < 55: score -= 25
+            if edge_variance > 140: score += 15
+            elif edge_variance < 55: score -= 15
             
-            # 2. VALIDATION STRICTE PAR HISTOGRAMME (Anti-Cramage / Anti-Sombre)
+            # 2. ANALYSE ET PÉNALISATION DE LA LUMINOSITÉ (Souple et non-bloquante)
             hist = gray_img.histogram()
             total_pixels = sum(hist)
             
-            # Isolement des extrêmes (0-35 pour le noir enterré, 220-255 pour le blanc brûlé)
-            very_dark_pixels = sum(hist[0:36])
-            very_light_pixels = sum(hist[220:256])
+            very_dark_pixels = sum(hist[0:36])   # Tons très sombres
+            very_light_pixels = sum(hist[220:256]) # Tons très clairs
             
             pct_dark = (very_dark_pixels / total_pixels) * 100
             pct_light = (very_light_pixels / total_pixels) * 100
             
-            # Filtrage de sécurité : Élimination immédiate
-            if pct_light > 15.0:
-                print(f"      [REJET HISTOGRAMME] Image cramée par la lumière ({pct_light:.1f}% de blancs extrêmes).")
-                return -100
+            # Au lieu d'un rejet sec, on applique une pénalité progressive sur la note
+            if pct_light > 25.0:
+                score -= 30  # Image très blanche, moins prioritaire
+            elif pct_light > 15.0:
+                score -= 15
                 
-            if pct_dark > 70.0:
-                print(f"      [REJET HISTOGRAMME] Image trop sombre / sous-exposée ({pct_dark:.1f}% de noirs profonds).")
-                return -100
+            if pct_dark > 80.0:
+                score -= 30  # Image presque entièrement noire, moins prioritaire
+            elif pct_dark > 65.0:
+                score -= 15
                 
-            # Bonus de stabilité pour les images "cinéma" parfaitement balancées
-            if 15.0 <= pct_dark <= 45.0 and pct_light <= 4.0:
-                score += 25
+            # Bonus de stabilité pour les images "cinéma" idéalement équilibrées
+            if 15.0 <= pct_dark <= 45.0 and pct_light <= 5.0:
+                score += 20
 
         except Exception:
             pass
@@ -240,21 +241,20 @@ def apply_premium_duotone(img, base_color):
     Applique le mode de fusion "Luminosité/Soft Light" haut de gamme.
     Préserve l'intégralité des visages et des détails fins du film.
     """
-    # Lissage préventif de la dynamique d'origine
+    # Lissage de la dynamique d'origine pour adoucir la fusion
     img_soft = ImageEnhance.Contrast(img).enhance(0.85)
     img_soft = ImageEnhance.Brightness(img_soft).enhance(1.05)
     
-    # Passage en luminance pure
     gray = img_soft.convert("L")
     gray_np = np.array(gray, dtype=np.float32) / 255.0
     
     width, height = img.size
     
-    # Définition des cibles chromatiques
+    # Définition des couleurs cibles (Sombre et Vibrante)
     dark_target = np.array([c * 0.15 for c in base_color], dtype=np.float32) / 255.0
     light_target = np.array([min(255, c * 1.1 + 20) for c in base_color], dtype=np.float32) / 255.0
     
-    # Algorithme mathématique Soft Light (Lumière Douce) non destructif
+    # Fusion Mathématique Soft Light (Lumière Douce)
     output = np.zeros((height, width, 3), dtype=np.float32)
     for i in range(3):
         bg_channel = dark_target[i] + gray_np * (light_target[i] - dark_target[i])
@@ -266,11 +266,10 @@ def apply_premium_duotone(img, base_color):
         )
         output[..., i] = res
 
-    # Reconversion en espace 8-bit standard
+    # Reconversion en 8-bit standard
     output = np.clip(output * 255.0, 0, 255).astype(np.uint8)
     result_img = Image.fromarray(output, "RGB")
     
-    # Effet "cristallin" Apple TV
     return result_img.filter(ImageFilter.SHARPEN)
 
 def finalize_landscape_banner(img, label, color):
@@ -279,7 +278,7 @@ def finalize_landscape_banner(img, label, color):
     
     img_rgba = img.convert("RGBA")
     
-    # Dégradé cinématique vers le noir sur la partie inférieure
+    # Dégradé de bas de page pour le texte
     gradient = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
     g_draw = ImageDraw.Draw(gradient)
     for y in range(400, 1080):
@@ -351,3 +350,78 @@ def main():
             continue
             
         scoring_keywords = set(config.get("scoring_keywords", []))
+        scored_candidates = []
+        
+        for idx, item in enumerate(candidates_pool):
+            media_type = item["media_type"]
+            media_id = item["id"]
+            keywords = get_media_keywords(media_type, media_id)
+            matching_keywords = keywords.intersection(scoring_keywords)
+            tag_score = len(matching_keywords) * 10
+            
+            scored_candidates.append({
+                "item": item,
+                "score": tag_score
+            })
+            
+        if not scored_candidates:
+            continue
+            
+        scored_candidates.sort(key=lambda x: (x["score"], x["item"].get("popularity", 0)), reverse=True)
+        
+        success = False
+        # Parcourir les films populaires
+        for candidate in scored_candidates:
+            selected_media = candidate["item"]
+            media_id = selected_media["id"]
+            media_type = selected_media["media_type"]
+            composite_key = f"{media_type}_{media_id}"
+            media_title = selected_media.get("title") or selected_media.get("name")
+            
+            backdrops_list = get_best_textless_backdrops(media_type, media_id, selected_media["backdrop_path"])
+            
+            scored_backdrops = []
+            for bg in backdrops_list:
+                img_url = f"https://image.tmdb.org/t/p/original{bg['file_path']}"
+                try:
+                    res = requests.get(img_url, stream=True, timeout=10)
+                    if res.status_code == 200:
+                        raw_img = Image.open(res.raw).convert("RGB")
+                        score = analyze_and_score_backdrop(bg, selected_media, downloaded_image=raw_img)
+                        # Toutes les images sont acceptées, on stocke la note
+                        scored_backdrops.append({"image": raw_img, "score": score, "path": bg["file_path"]})
+                except Exception:
+                    continue
+                    
+            if scored_backdrops:
+                # On classe par la meilleure note (les images équilibrées passent devant, les extrêmes descendent)
+                scored_backdrops.sort(key=lambda x: x["score"], reverse=True)
+                winner_bg = scored_backdrops[0]
+                
+                print(f" -> Vainqueur Sélectionné : {media_title} (Score visuel: {winner_bg['score']})")
+                final_banner = finalize_landscape_banner(winner_bg["image"], config["label"], config["color"])
+                
+                final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
+                final_banner.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
+                
+                RUN_PROCESSED_IDS.add(composite_key)
+                history[composite_key] = {
+                    "title": media_title,
+                    "genre": genre_name,
+                    "date": datetime.now().strftime("%Y-%m-%d")
+                }
+                success = True
+                break
+        
+        if not success:
+            print(f" [CONSERVATION] Échec critique pour {config['label']}.")
+
+    sorted_history = dict(sorted(history.items(), key=lambda item: item[1]['date'], reverse=True))
+    os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
+    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(sorted_history, f, ensure_ascii=False, indent=4)
+        
+    print("\n[SUCCESS] Déploiement terminé. Pondération de la lumière assouplie.")
+
+if __name__ == "__main__":
+    main()
