@@ -1,4 +1,89 @@
 {
+    "movie_1280738": {
+        "title": "The Furious",
+        "genre": "action",
+        "date": "2026-06-15"
+    },
+    "tv_12971": {
+        "title": "Dragon Ball Z",
+        "genre": "animation-japonaise",
+        "date": "2026-06-15"
+    },
+    "tv_1433": {
+        "title": "American Dad!",
+        "genre": "animation",
+        "date": "2026-06-15"
+    },
+    "tv_71912": {
+        "title": "The Witcher",
+        "genre": "aventure",
+        "date": "2026-06-15"
+    },
+    "movie_4256": {
+        "title": "Scary Movie 3",
+        "genre": "comedie",
+        "date": "2026-06-15"
+    },
+    "tv_1419": {
+        "title": "Castle",
+        "genre": "crime",
+        "date": "2026-06-15"
+    },
+    "tv_10029": {
+        "title": "Great Performances",
+        "genre": "documentaire",
+        "date": "2026-06-15"
+    },
+    "tv_5920": {
+        "title": "The Mentalist",
+        "genre": "drame",
+        "date": "2026-06-15"
+    },
+    "tv_2912": {
+        "title": "Jeopardy!",
+        "genre": "famille",
+        "date": "2026-06-15"
+    },
+    "tv_63174": {
+        "title": "Lucifer",
+        "genre": "fantastique",
+        "date": "2026-06-15"
+    },
+    "tv_2947": {
+        "title": "Veep",
+        "genre": "guerre",
+        "date": "2026-06-15"
+    },
+    "movie_872585": {
+        "title": "Oppenheimer",
+        "genre": "histoire",
+        "date": "2026-06-15"
+    },
+    "movie_680493": {
+        "title": "Return to Silent Hill",
+        "genre": "horreur",
+        "date": "2026-06-15"
+    },
+    "movie_204407": {
+        "title": "Bosco d'amore",
+        "genre": "romance",
+        "date": "2026-06-15"
+    },
+    "tv_2985": {
+        "title": "Andromeda",
+        "genre": "science-fiction",
+        "date": "2026-06-15"
+    },
+    "tv_60622": {
+        "title": "Fargo",
+        "genre": "thriller",
+        "date": "2026-06-15"
+    },
+    "tv_10180": {
+        "title": "The Virginian",
+        "genre": "western",
+        "date": "2026-06-15"
+    },
     "tv_4604": {
         "title": "Smallville",
         "genre": "action",
