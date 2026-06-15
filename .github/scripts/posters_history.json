@@ -294,6 +294,76 @@
         "genre": "western",
         "date": "2026-06-15"
     },
+    "tv_580": {
+        "title": "Star Trek: Deep Space Nine",
+        "genre": "action",
+        "date": "2026-06-15"
+    },
+    "tv_73833": {
+        "title": "The Ancient Magus' Bride",
+        "genre": "animation-japonaise",
+        "date": "2026-06-15"
+    },
+    "movie_1297842": {
+        "title": "GOAT",
+        "genre": "animation",
+        "date": "2026-06-15"
+    },
+    "tv_129552": {
+        "title": "The Night Agent",
+        "genre": "aventure",
+        "date": "2026-06-15"
+    },
+    "tv_59941": {
+        "title": "The Tonight Show Starring Jimmy Fallon",
+        "genre": "comedie",
+        "date": "2026-06-15"
+    },
+    "tv_32692": {
+        "title": "Blue Bloods",
+        "genre": "crime",
+        "date": "2026-06-15"
+    },
+    "tv_11105": {
+        "title": "Forensic Files",
+        "genre": "documentaire",
+        "date": "2026-06-15"
+    },
+    "tv_1408": {
+        "title": "House",
+        "genre": "drame",
+        "date": "2026-06-15"
+    },
+    "tv_5371": {
+        "title": "iCarly",
+        "genre": "famille",
+        "date": "2026-06-15"
+    },
+    "tv_1413": {
+        "title": "American Horror Story",
+        "genre": "fantastique",
+        "date": "2026-06-15"
+    },
+    "movie_27": {
+        "title": "9 Songs",
+        "genre": "romance",
+        "date": "2026-06-15"
+    },
+    "tv_253": {
+        "title": "Star Trek",
+        "genre": "science-fiction",
+        "date": "2026-06-15"
+    },
+    "tv_1424": {
+        "title": "Orange Is the New Black",
+        "genre": "thriller",
+        "date": "2026-06-15"
+    },
+    "tv_10929": {
+        "title": "The Wild Wild West",
+        "genre": "western",
+        "date": "2026-06-15"
+    },
     "tv_4604": {
         "title": "Smallville",
         "genre": "action",
