@@ -224,6 +224,76 @@
         "genre": "western",
         "date": "2026-06-15"
     },
+    "movie_1613798": {
+        "title": "Vengeance",
+        "genre": "action",
+        "date": "2026-06-15"
+    },
+    "tv_37854": {
+        "title": "One Piece",
+        "genre": "animation-japonaise",
+        "date": "2026-06-15"
+    },
+    "tv_276191": {
+        "title": "Super Simple Songs",
+        "genre": "animation",
+        "date": "2026-06-15"
+    },
+    "movie_674": {
+        "title": "Harry Potter and the Goblet of Fire",
+        "genre": "aventure",
+        "date": "2026-06-15"
+    },
+    "tv_284725": {
+        "title": "Not Suitable for Work",
+        "genre": "comedie",
+        "date": "2026-06-15"
+    },
+    "tv_3034": {
+        "title": "Scene of the Crime",
+        "genre": "crime",
+        "date": "2026-06-15"
+    },
+    "tv_1966": {
+        "title": "Horizon",
+        "genre": "documentaire",
+        "date": "2026-06-15"
+    },
+    "tv_1911": {
+        "title": "Bones",
+        "genre": "drame",
+        "date": "2026-06-15"
+    },
+    "tv_2352": {
+        "title": "The Nanny",
+        "genre": "famille",
+        "date": "2026-06-15"
+    },
+    "tv_1411": {
+        "title": "Person of Interest",
+        "genre": "fantastique",
+        "date": "2026-06-15"
+    },
+    "movie_337167": {
+        "title": "Fifty Shades Freed",
+        "genre": "romance",
+        "date": "2026-06-15"
+    },
+    "tv_125988": {
+        "title": "Silo",
+        "genre": "science-fiction",
+        "date": "2026-06-15"
+    },
+    "tv_125282": {
+        "title": "The Cleaning Lady",
+        "genre": "thriller",
+        "date": "2026-06-15"
+    },
+    "tv_43901": {
+        "title": "Longmire",
+        "genre": "western",
+        "date": "2026-06-15"
+    },
     "tv_4604": {
         "title": "Smallville",
         "genre": "action",
