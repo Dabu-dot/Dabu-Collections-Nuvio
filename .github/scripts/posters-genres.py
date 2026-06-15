@@ -207,6 +207,7 @@ def analyze_and_score_backdrop(bg, item, downloaded_image=None):
         
     if downloaded_image:
         try:
+            # 1. Analyse de la texture et du piqué
             gray_img = downloaded_image.convert("L").resize((480, 270), Image.Resampling.BILINEAR)
             arr = np.array(gray_img, dtype=np.float32)
             grad_x = np.diff(arr, axis=1)
@@ -215,28 +216,49 @@ def analyze_and_score_backdrop(bg, item, downloaded_image=None):
             
             if edge_variance > 140: score += 20
             elif edge_variance < 55: score -= 25
+            
+            # 2. PROCESSUS DE VALIDATION DE LA LUMINOSITÉ (Anti-Cramage / Anti-Sombre)
+            # Calcul de l'histogramme des 256 niveaux de gris
+            hist = gray_img.histogram()
+            total_pixels = sum(hist)
+            
+            # Pixels très sombres (0 à 35) et pixels très clairs (220 à 255)
+            very_dark_pixels = sum(hist[0:36])
+            very_light_pixels = sum(hist[220:256])
+            
+            pct_dark = (very_dark_pixels / total_pixels) * 100
+            pct_light = (very_light_pixels / total_pixels) * 100
+            
+            # SEUIL DOUBLE : Élimination directe si l'image est inexploitable
+            if pct_light > 15.0:  # Plus de 15% de l'image est complètement blanche/brûlée
+                print(f"      [REJET] Image trop lumineuse / cramée ({pct_light:.1f}% de blancs).")
+                return -100
+                
+            if pct_dark > 70.0:   # Plus de 70% de l'image est noire (sous-exposée)
+                print(f"      [REJET] Image trop sombre / sous-exposée ({pct_dark:.1f}% de noirs).")
+                return -100
+                
+            # Bonus pour les images parfaitement équilibrées (Style cinéma)
+            if 15.0 <= pct_dark <= 45.0 and pct_light <= 5.0:
+                score += 25
+
         except Exception:
             pass
             
     return score
 
 def apply_premium_duotone(img, base_color):
-    """Débouche les zones sombres et applique un effet Duotone élégant et visible"""
-    # 1. Éclaircissement non destructif des arrières-plans trop sombres (+30%)
-    brightened = ImageEnhance.Brightness(img).enhance(1.3)
+    """Applique le traitement Duotone sur une image validée et pré-équilibrée"""
+    brightened = ImageEnhance.Brightness(img).enhance(1.15)
     gray = brightened.convert("L")
     
-    # 2. Génération automatique d'une nuance sombre et d'une nuance claire à partir de la couleur du genre
-    dark_color = tuple(max(0, int(c * 0.25)) for c in base_color)
-    light_color = tuple(min(255, int(c * 0.75 + 60)) for c in base_color)
+    dark_color = tuple(max(0, int(c * 0.20)) for c in base_color)
+    light_color = tuple(min(255, int(c * 0.80 + 50)) for c in base_color)
     
-    # 3. Application du Duotone adouci
     return ImageOps.colorize(gray, dark_color, light_color)
 
 def finalize_landscape_banner(img, label, color):
     img = ImageOps.fit(img, (1920, 1080), method=Image.Resampling.LANCZOS)
-    
-    # Application de l'effet Duotone Premium corrigé
     img = apply_premium_duotone(img, color)
     
     img_rgba = img.convert("RGBA")
@@ -330,52 +352,62 @@ def main():
             continue
             
         scored_candidates.sort(key=lambda x: (x["score"], x["item"].get("popularity", 0)), reverse=True)
-        winner_data = scored_candidates[0]
-        selected_media = winner_data["item"]
         
-        media_id = selected_media["id"]
-        media_type = selected_media["media_type"]
-        composite_key = f"{media_type}_{media_id}"
-        media_title = selected_media.get("title") or selected_media.get("name")
-        
-        print(f" -> Vainqueur sélectionné : {media_title}")
-        
-        backdrops_list = get_best_textless_backdrops(media_type, media_id, selected_media["backdrop_path"])
-        
-        scored_backdrops = []
-        for bg in backdrops_list:
-            img_url = f"https://image.tmdb.org/t/p/original{bg['file_path']}"
-            try:
-                res = requests.get(img_url, stream=True, timeout=10)
-                if res.status_code == 200:
-                    raw_img = Image.open(res.raw).convert("RGB")
-                    score = analyze_and_score_backdrop(bg, selected_media, downloaded_image=raw_img)
-                    scored_backdrops.append({"image": raw_img, "score": score, "path": bg["file_path"]})
-            except Exception:
-                continue
+        # Parcourir les candidats triés jusqu'à en trouver un avec un backdrop valide
+        success = False
+        for candidate in scored_candidates:
+            selected_media = candidate["item"]
+            media_id = selected_media["id"]
+            media_type = selected_media["media_type"]
+            composite_key = f"{media_type}_{media_id}"
+            media_title = selected_media.get("title") or selected_media.get("name")
+            
+            backdrops_list = get_best_textless_backdrops(media_type, media_id, selected_media["backdrop_path"])
+            
+            scored_backdrops = []
+            for bg in backdrops_list:
+                img_url = f"https://image.tmdb.org/t/p/original{bg['file_path']}"
+                try:
+                    res = requests.get(img_url, stream=True, timeout=10)
+                    if res.status_code == 200:
+                        raw_img = Image.open(res.raw).convert("RGB")
+                        score = analyze_and_score_backdrop(bg, selected_media, downloaded_image=raw_img)
+                        # On ne garde que les backdrops qui ont passé la validation (> 0)
+                        if score > 0:
+                            scored_backdrops.append({"image": raw_img, "score": score, "path": bg["file_path"]})
+                except Exception:
+                    continue
+                    
+            if scored_backdrops:
+                scored_backdrops.sort(key=lambda x: x["score"], reverse=True)
+                winner_bg = scored_backdrops[0]
                 
-        if scored_backdrops:
-            scored_backdrops.sort(key=lambda x: x["score"], reverse=True)
-            winner_bg = scored_backdrops[0]
-            
-            final_banner = finalize_landscape_banner(winner_bg["image"], config["label"], config["color"])
-            
-            final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
-            final_banner.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
-            
-            RUN_PROCESSED_IDS.add(composite_key)
-            history[composite_key] = {
-                "title": media_title,
-                "genre": genre_name,
-                "date": datetime.now().strftime("%Y-%m-%d")
-            }
+                print(f" -> Vainqueur Validé : {media_title} (Score: {winner_bg['score']})")
+                final_banner = finalize_landscape_banner(winner_bg["image"], config["label"], config["color"])
+                
+                final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
+                final_banner.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
+                
+                RUN_PROCESSED_IDS.add(composite_key)
+                history[composite_key] = {
+                    "title": media_title,
+                    "genre": genre_name,
+                    "date": datetime.now().strftime("%Y-%m-%d")
+                }
+                success = True
+                break # On passe au genre suivant dès qu'on a un vainqueur valide
+            else:
+                print(f"   x Média '{media_title}' rejeté (Tous ses backdrops sont hors-limites de luminosité).")
+        
+        if not success:
+            print(f" [CONSERVATION] Aucun film du pool n'a de visuel équilibré pour {config['label']}. Sauvegarde de l'ancien poster.")
 
     sorted_history = dict(sorted(history.items(), key=lambda item: item[1]['date'], reverse=True))
     os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(sorted_history, f, ensure_ascii=False, indent=4)
         
-    print("\n[SUCCESS] Déploiement terminé. Traitement duotone équilibré et stable.")
+    print("\n[SUCCESS] Déploiement terminé. Système de validation par histogramme actif.")
 
 if __name__ == "__main__":
     main()
