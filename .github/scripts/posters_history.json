@@ -168,5 +168,85 @@
         "title": "Yellowstone",
         "genre": "western",
         "date": "2026-06-15"
+    },
+    "tv_66732": {
+        "title": "Stranger Things",
+        "genre": "action",
+        "date": "2026-06-15"
+    },
+    "tv_30984": {
+        "title": "Bleach",
+        "genre": "animation-japonaise",
+        "date": "2026-06-15"
+    },
+    "movie_1007757": {
+        "title": "Swapped",
+        "genre": "animation",
+        "date": "2026-06-15"
+    },
+    "tv_94997": {
+        "title": "House of the Dragon",
+        "genre": "aventure",
+        "date": "2026-06-15"
+    },
+    "tv_61818": {
+        "title": "Late Night with Seth Meyers",
+        "genre": "comedie",
+        "date": "2026-06-15"
+    },
+    "tv_80748": {
+        "title": "FBI",
+        "genre": "crime",
+        "date": "2026-06-15"
+    },
+    "movie_936075": {
+        "title": "Michael",
+        "genre": "drame",
+        "date": "2026-06-15"
+    },
+    "tv_1950": {
+        "title": "Everwood",
+        "genre": "famille",
+        "date": "2026-06-15"
+    },
+    "movie_454639": {
+        "title": "Masters of the Universe",
+        "genre": "fantastique",
+        "date": "2026-06-15"
+    },
+    "tv_63333": {
+        "title": "The Last Kingdom",
+        "genre": "guerre",
+        "date": "2026-06-15"
+    },
+    "movie_1579": {
+        "title": "Apocalypto",
+        "genre": "histoire",
+        "date": "2026-06-15"
+    },
+    "movie_1363387": {
+        "title": "Saccharine",
+        "genre": "horreur",
+        "date": "2026-06-15"
+    },
+    "movie_204407": {
+        "title": "Bosco d'amore",
+        "genre": "romance",
+        "date": "2026-06-15"
+    },
+    "movie_157336": {
+        "title": "Interstellar",
+        "genre": "science-fiction",
+        "date": "2026-06-15"
+    },
+    "tv_764": {
+        "title": "Midsomer Murders",
+        "genre": "thriller",
+        "date": "2026-06-15"
+    },
+    "tv_1018": {
+        "title": "Bonanza",
+        "genre": "western",
+        "date": "2026-06-15"
     }
 }
