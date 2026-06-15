@@ -26,26 +26,26 @@ ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it"}
 # Variable globale pour suivre les médias traités pendant l'exécution
 RUN_PROCESSED_IDS = set()
 
-# Configuration chirurgicale des genres - Dégradés Premium inspirés d'Apple
+# Configuration chirurgicale des genres - Dégradés Premium et Contrastés (Style Apple Music / Xcode)
 GENRES_CONFIG = {
     "action": {
         "label": "Action", 
-        "color_dark": (140, 15, 20),      # Rouge Sombre
-        "color_light": (240, 70, 80),     # Rouge Éclatant
+        "color_dark": (160, 10, 20),      # Rouge Éclatant Sombre
+        "color_light": (255, 90, 95),     # Corail Électrique
         "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16", 
         "scoring_keywords": [3930, 6054, 12993, 9951, 8440, 188955, 226499, 83, 312, 779, 4565, 14955, 853, 9665, 10044]
     },
     "animation-japonaise": {
         "label": "Animation Japonaise", 
-        "color_dark": (70, 20, 140),     # Indigo Profond
-        "color_light": (180, 90, 250),    # Violet Néon
+        "color_dark": (90, 20, 160),     # Violet Profond
+        "color_light": (230, 100, 255),   # Magenta Néon
         "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True, "override_lang": True, 
         "scoring_keywords": [210024, 13141, 207826]
     },
     "animation": {
         "label": "Animation", 
-        "color_dark": (10, 80, 180),      # Bleu Roi
-        "color_light": (0, 220, 255),     # Cyan Lumineux
+        "color_dark": (10, 60, 200),      # Bleu Électrique
+        "color_light": (0, 235, 255),     # Cyan Pur
         "movie_genre": 16, "tv_genre": 16, 
         "extra": "&without_genres=99&without_original_language=ja|ko|zh&without_keywords=210024|287513",
         "min_popularity": 80,
@@ -53,99 +53,99 @@ GENRES_CONFIG = {
     },
     "aventure": {
         "label": "Aventure", 
-        "color_dark": (10, 90, 50),       # Vert Émeraude Profond
-        "color_light": (230, 130, 20),    # Orange Ambré Lumineux
+        "color_dark": (10, 110, 60),      # Vert Jungle Intense
+        "color_light": (255, 140, 0),     # Orange Pur Solaire
         "movie_genre": 12, "tv_genre": 10759, "extra": "&without_genres=16", 
         "scoring_keywords": [195114, 161176, 818, 4152, 170362, 210246, 10364, 41586, 6956, 269233]
     },
     "comedie": {
         "label": "Comédie", 
-        "color_dark": (170, 100, 10),     # Ocre Chaud
-        "color_light": (250, 210, 40),    # Jaune Solaire
+        "color_dark": (190, 80, 5),       # Ambre Brûlé
+        "color_light": (255, 220, 30),    # Jaune Vif
         "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16", 
         "scoring_keywords": [8201, 9755, 9964, 375047, 6241, 9253]
     },
     "crime": {
         "label": "Crime", 
-        "color_dark": (45, 55, 72),       # Ardoise Sombre
-        "color_light": (148, 163, 184),   # Gris Argenté Lumineux
+        "color_dark": (40, 50, 70),       # Bleu Pétrole Sombre
+        "color_light": (170, 190, 220),   # Bleu Givré Lumineux
         "movie_genre": 80, "tv_genre": 80, "extra": "&without_genres=16", 
         "scoring_keywords": [2095, 9748, 181644, 157241, 206958, 268067, 703, 5340, 6149, 9826, 155790, 207046]
     },
     "documentaire": {
         "label": "Documentaire", 
-        "color_dark": (15, 110, 50),      # Vert Forêt
-        "color_light": (74, 222, 128),    # Vert Menthe Éclatant
+        "color_dark": (10, 120, 40),      # Vert Malachite
+        "color_light": (110, 255, 130),   # Vert Lime Fluorescent
         "movie_genre": 99, "tv_genre": 99, "extra": "&without_genres=16", 
         "scoring_keywords": [221355, 305903, 343303, 284176]
     },
     "drame": {
         "label": "Drame", 
-        "color_dark": (10, 70, 140),      # Saphir Sombre
-        "color_light": (56, 189, 248),    # Bleu Ciel Éclatant
+        "color_dark": (20, 60, 160),      # Bleu Outremer
+        "color_light": (120, 210, 255),   # Bleu Ciel Lumineux
         "movie_genre": 18, "tv_genre": 18, "extra": "&without_genres=16", 
         "scoring_keywords": []
     },
     "famille": {
         "label": "Famille", 
-        "color_dark": (130, 20, 150),     # Violet Byzantium
-        "color_light": (247, 130, 250),   # Rose Bonbon Lumineux
+        "color_dark": (140, 10, 130),     # Pourpre Vif
+        "color_light": (255, 150, 220),   # Rose Fluo Doux
         "movie_genre": 10751, "tv_genre": 10751, "extra": "&without_genres=16", 
         "scoring_keywords": []
     },
     "fantastique": {
         "label": "Fantastique", 
-        "color_dark": (90, 20, 160),      # Améthyste Profond
-        "color_light": (192, 132, 252),   # Mauve Électrique
+        "color_dark": (100, 10, 180),     # Violet Électrique Sombre
+        "color_light": (210, 150, 255),   # Lilas Lumineux
         "movie_genre": 14, "tv_genre": 10765, "extra": "&without_genres=16", 
         "scoring_keywords": []
     },
     "guerre": {
         "label": "Guerre", 
-        "color_dark": (60, 55, 50),       # Kaki/Terre Sombre
-        "color_light": (168, 162, 158),   # Pierre Lumineuse
+        "color_dark": (70, 65, 50),       # Olive Sombre
+        "color_light": (200, 190, 170),   # Sable Clair
         "movie_genre": 10752, "tv_genre": 10768, "extra": "&without_genres=16", 
         "scoring_keywords": []
     },
     "histoire": {
         "label": "Histoire", 
-        "color_dark": (90, 50, 30),       # Bronze Sombre
-        "color_light": (197, 140, 90),    # Cuivre Doré
+        "color_dark": (110, 50, 10),      # Terracotta Profond
+        "color_light": (230, 170, 100),   # Or Chaud
         "movie_genre": 36, "tv_genre": 10768, "extra": "&without_genres=16", 
         "scoring_keywords": []
     },
     "horreur": {
         "label": "Horreur", 
-        "color_dark": (40, 10, 15),       # Sang Profond
-        "color_light": (245, 40, 40),     # Rouge Écarlate Vif
+        "color_dark": (50, 5, 5),         # Sang Brûlé
+        "color_light": (255, 30, 30),     # Rouge Néon Absolu
         "movie_genre": 27, "tv_genre": 27, "extra": "&without_genres=16&with_keywords=3358|9748|6152", 
         "scoring_keywords": []
     },
     "romance": {
         "label": "Romance", 
-        "color_dark": (150, 30, 70),      # Rubis Profond
-        "color_light": (244, 143, 177),   # Rose Pastel Lumineux
+        "color_dark": (170, 10, 60),      # Cerise Intense
+        "color_light": (255, 160, 180),   # Rose Poudré Flash
         "movie_genre": 10749, "tv_genre": 10749, "extra": "&without_genres=16&without_original_language=ko|ja|zh", 
         "scoring_keywords": []
     },
     "science-fiction": {
         "label": "Science-Fiction", 
-        "color_dark": (10, 40, 110),      # Bleu Abysse
-        "color_light": (34, 211, 238),    # Bleu Turquoise Spatial
+        "color_dark": (10, 30, 140),      # Bleu Cobalt
+        "color_light": (0, 240, 220),     # Turquoise Électrique
         "movie_genre": 878, "tv_genre": 10765, "extra": "&without_genres=16&with_keywords=4565|9882", 
         "scoring_keywords": []
     },
     "thriller": {
         "label": "Thriller", 
-        "color_dark": (10, 70, 50),       # Sarcelle Sombre
-        "color_light": (52, 211, 153),    # Menthe Électrique
+        "color_dark": (5, 80, 70),        # Cyan Sombre Aquatique
+        "color_light": (40, 240, 160),    # Vert Menthe Fluo
         "movie_genre": 53, "tv_genre": 80, "extra": "&without_genres=16&with_keywords=9826|10123", 
         "scoring_keywords": []
     },
     "western": {
         "label": "Western", 
-        "color_dark": (130, 50, 15),      # Terre de Sienne Brûlée
-        "color_light": (251, 146, 60),    # Orange Crépuscule
+        "color_dark": (140, 40, 5),       # Fauve Sombre
+        "color_light": (255, 150, 40),    # Orange Fauve Lumineux
         "movie_genre": 37, "tv_genre": 37, "extra": "&without_genres=16", 
         "scoring_keywords": []
     }
@@ -241,15 +241,11 @@ def get_trending_media_for_genre(config, excluded_keys):
             
         filtered_pool.append(item)
         
-    print(f"   Pool éligible après filtrage : {len(filtered_pool)} œuvres (Films & Séries).")
+    print(f"   Pool éligible après filtrage : {len(filtered_pool)} œuvres.")
     
     if len(filtered_pool) > 50:
-        selected_pool = random.sample(filtered_pool, 50)
-        print(f"   Sélection aléatoire de 50 candidats parmi les {len(filtered_pool)} œuvres.")
-        return selected_pool
-    else:
-        print(f"   Conservation de l'intégralité du pool ({len(filtered_pool)} candidats éligibles).")
-        return filtered_pool
+        return random.sample(filtered_pool, 50)
+    return filtered_pool
 
 def get_keyword_id_by_name(name):
     try:
@@ -258,8 +254,8 @@ def get_keyword_id_by_name(name):
             for kw in data["results"]:
                 if kw.get("name", "").lower() == name.lower():
                     return kw["id"]
-    except Exception as e:
-        print(f"      Alerte recherche de mot-clé '{name}': {e}")
+    except Exception:
+        pass
     return None
 
 def get_media_keywords(media_type, media_id):
@@ -270,8 +266,7 @@ def get_media_keywords(media_type, media_id):
             return set()
         keyword_list = data.get("keywords") or data.get("results") or []
         return {kw["id"] for kw in keyword_list if "id" in kw}
-    except Exception as e:
-        print(f"      Alerte keywords pour {media_type} {media_id}: {e}")
+    except Exception:
         return set()
 
 def get_best_textless_backdrops(media_type, media_id, fallback_path):
@@ -291,12 +286,10 @@ def analyze_and_score_backdrop(bg, item, downloaded_image=None):
     width = bg.get("width", 0)
     popularity = item.get("popularity", 0)
     vote_count = bg.get("vote_count", 0)
-    vote_average = bg.get("vote_average", 0) # On récupère la note moyenne de l'image sur TMDB
+    vote_average = bg.get("vote_average", 0)
     
-    # 1. VALORISATION DE LA NOTE COMMUNAUTAIRE (TMDB)
-    # Plus l'image est plébiscitée et bien notée, plus elle gagne de points de manière significative
     if vote_count > 0:
-        score += int(vote_average * 4)  # Ex: Une superbe image notée 8.5/10 gagne +34 points directs
+        score += int(vote_average * 4)
         if vote_count >= 10: score += 15
         elif vote_count >= 5: score += 10
     else:
@@ -312,78 +305,78 @@ def analyze_and_score_backdrop(bg, item, downloaded_image=None):
         except ValueError:
             pass
 
-    # Bonus de résolution brute
     if width >= 3840: score += 15
     elif width >= 1920: score += 10
-        
     if popularity > 150: score += 10
         
-    # Analyse de la netteté réelle (Anti-Upscale artificiel)
     if downloaded_image:
         try:
             gray_img = downloaded_image.convert("L").resize((480, 270), Image.Resampling.BILINEAR)
             arr = np.array(gray_img, dtype=np.float32)
-            
             grad_x = np.diff(arr, axis=1)
             grad_y = np.diff(arr, axis=0)
             edge_variance = np.var(grad_x) + np.var(grad_y)
             
-            if edge_variance > 140:
-                score += 20
-            elif edge_variance < 55:
-                score -= 25
+            if edge_variance > 140: score += 20
+            elif edge_variance < 55: score -= 25
         except Exception:
             pass
             
     return score
 
 def apply_gradient_duotone(img, color_dark, color_light):
-    """Applique un traitement Duotone en dégradé diagonal avec préservation avancée des détails"""
-    # Étape 1 : Récupération des détails fins
-    sharper = ImageEnhance.Sharpness(img)
-    img = sharper.enhance(1.8)  # Légèrement adouci (de 2.2 à 1.8) pour éviter le grain artificiel dans les zones sombres
+    """Applique un traitement Duotone en dégradé diagonal agressif avec rehaussement intelligent des ombres"""
     
-    # Étape 2 : Préparation de la carte des niveaux de gris
-    gray = img.convert("L")
+    # Étape 1 : ÉGALISATION ADAPTATIVE LOCALE (Anti-sombre / Effet HDR)
+    # Convertir en YCbCr pour travailler uniquement sur la luminance (Y) sans détruire les nuances
+    ycbcr = img.convert("YCbCr")
+    y, cb, cr = ycbcr.split()
+    
+    # Appliquer une égalisation d'histogramme adoucie pour déboucher localement toutes les zones sombres
+    y_eq = ImageOps.autocontrast(y, cutoff=1)
+    # Fusionner l'image d'origine et l'image éclaircie pour garder un rendu naturel mais lisible
+    y_final = Image.blend(y, y_eq, alpha=0.65) 
+    
+    # Recomposer l'image éclaircie
+    img_bright = Image.merge("YCbCr", (y_final, cb, cr)).convert("RGB")
+    
+    # Étape 2 : Accentuation des micro-contrastes (pour extraire les détails fins)
+    sharper = ImageEnhance.Sharpness(img_bright)
+    img_bright = sharper.enhance(2.0)
+    
+    # Étape 3 : Génération de la matrice des niveaux de gris
+    gray = img_bright.convert("L")
     gray_np = np.array(gray, dtype=np.float32)
     
-    # Normalisation propre des contrastes sans écraser les dynamiques extrêmes
+    # Normalisation totale de l'espace de dynamique (0.0 à 255.0)
     f_min, f_max = gray_np.min(), gray_np.max()
     if f_max > f_min:
         gray_np = (gray_np - f_min) * (255.0 / (f_max - f_min))
-    
-    # Courbe contrastée lissée (Sigmoïde adoucie pour garder de la luminosité et déboucher les ombres)
-    std_dev = np.std(gray_np)
-    contrast_factor = 0.022 if std_dev < 55.0 else 0.016  # Facteurs abaissés pour révéler les détails
-    gray_np = 255.0 / (1.0 + np.exp(-contrast_factor * (gray_np - 110.0)))  # Point d'inflexion calé à 110 au lieu de 127.5 pour éclaircir le rendu global
-    
-    # Étape 3 : Génération de la matrice du dégradé diagonal (Bas-Gauche vers Haut-Droite)
+        
+    # Étape 4 : Création du masque de dégradé diagonal parfait (Bas-Gauche vers Haut-Droite)
     h, w = gray_np.shape
     y_indices, x_indices = np.indices((h, w), dtype=np.float32)
-    
-    # Calcul de la projection diagonale (normalisée entre 0.0 et 1.0)
-    # Bas-Gauche (x=0, y=h) -> 0.0 | Haut-Droite (x=w, y=0) -> 1.0
     diagonal_mask = (x_indices / float(w) + (1.0 - y_indices / float(h))) / 2.0
     diagonal_mask = np.clip(diagonal_mask, 0.0, 1.0)
     
-    # Étape 4 : Définition des ancres de couleur
-    base_dark = np.array([12, 16, 24], dtype=np.float32) # Fond neutre très sombre pour préserver les noirs profonds
+    # Convertir les tuples de couleurs cibles en vecteurs numpy
     c_dark_np = np.array(color_dark, dtype=np.float32)
     c_light_np = np.array(color_light, dtype=np.float32)
     
-    # Interpolation de la couleur cible le long de la diagonale
-    # On mixe la teinte sombre (bas-gauche) vers la teinte claire (haut-droite)
+    # Génération de la carte de dégradé cible couleur
     target_color_matrix = np.zeros((h, w, 3), dtype=np.float32)
     for i in range(3):
         target_color_matrix[..., i] = c_dark_np[i] + diagonal_mask * (c_light_np[i] - c_dark_np[i])
         
-    # Étape 5 : Application non linéaire du duotone
+    # Étape 5 : MAPPING REFORCÉ (Plus de base noire neutre pour imposer le dégradé partout !)
     duotone = np.zeros((h, w, 3), dtype=np.uint8)
-    intensity_ratio = (gray_np / 255.0)[..., np.newaxis] # Facteur de luminance de l'image de base (0 à 1)
+    intensity_ratio = (gray_np / 255.0)[..., np.newaxis] # Facteur d'intensité (0.0 = noir d'origine, 1.0 = blanc d'origine)
     
     for i in range(3):
-        # Cartographie progressive : les tons noirs tirent vers base_dark, les tons clairs fusionnent vers la matrice colorée du dégradé
-        color_channel = base_dark[i] + intensity_ratio[..., 0] * (target_color_matrix[..., i] - base_dark[i])
+        # Les pixels noirs prennent EXACTEMENT la couleur sombre du genre.
+        # Les pixels blancs prennent EXACTEMENT la couleur claire du genre.
+        # Le dégradé diagonal se diffuse sur l'intégralité de la transition.
+        color_channel = c_dark_np[i] + intensity_ratio[..., 0] * (target_color_matrix[..., i] - c_dark_np[i])
         duotone[..., i] = np.clip(color_channel, 0, 255).astype(np.uint8)
         
     return Image.fromarray(duotone)
@@ -397,7 +390,7 @@ def finalize_landscape_banner(img, label, color_dark, color_light):
     gradient = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
     g_draw = ImageDraw.Draw(gradient)
     for y in range(400, 1080):
-        alpha = int(((y - 400) / 680) ** 1.8 * 240) # Légèrement diminué (252 -> 240) pour laisser passer plus de détails en bas
+        alpha = int(((y - 400) / 680) ** 1.8 * 220) # Baissé à 220 pour ne pas noyer le bas du dégradé sous du noir pur
         g_draw.line([(0, y), (1920, y)], fill=(0, 0, 0, alpha))
         
     img_with_gradient = Image.alpha_composite(img_rgba, gradient)
@@ -451,69 +444,38 @@ def finalize_landscape_banner(img, label, color_dark, color_light):
 
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-    
-    EXCLUDED_KEYWORD_IDS = set()
-    raw_excludes = []
-    for name_or_id in raw_excludes:
-        if isinstance(name_or_id, int):
-            EXCLUDED_KEYWORD_IDS.add(name_or_id)
-        elif isinstance(name_or_id, str):
-            kw_id = get_keyword_id_by_name(name_or_id)
-            if kw_id:
-                EXCLUDED_KEYWORD_IDS.add(kw_id)
-                print(f"Mot-clé à exclure résolu : '{name_or_id}' -> ID {kw_id}")
-    
     history = load_and_clean_history()
     excluded_keys = set(history.keys())
     
-    print(f"Chargement de l'historique : {len(excluded_keys)} œuvres verrouillées pour préservation.")
+    print(f"Chargement de l'historique : {len(excluded_keys)} œuvres verrouillées.")
 
     for genre_name, config in GENRES_CONFIG.items():
         print(f"\n--- Sélection pour le Genre : {config['label']} ---")
         
         candidates_pool = get_trending_media_for_genre(config, excluded_keys)
         if not candidates_pool:
-            print(f" [CONSERVATION] Aucun candidat éligible trouvé pour le genre {config['label']}. Ancien poster préservé.")
-            sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=200,title=Génération Sautée ({config['label']})::Aucun média valide trouvé dans l'API. L'ancien poster est conservé.\n")
+            print(f" [CONSERVATION] Aucun candidat éligible trouvé pour {config['label']}.")
             continue
             
         scoring_keywords = set(config.get("scoring_keywords", []))
         scored_candidates = []
         
-        print(f" -> Évaluation par mots-clés de {len(candidates_pool)} candidats...")
         for idx, item in enumerate(candidates_pool):
             media_type = item["media_type"]
             media_id = item["id"]
-            media_title = item.get("title") or item.get("name")
-            
             keywords = get_media_keywords(media_type, media_id)
-            
-            bad_tags = keywords.intersection(EXCLUDED_KEYWORD_IDS)
-            if bad_tags:
-                print(f"      [{idx+1}/{len(candidates_pool)}] {media_title} ({media_type.upper()}) - ÉLIMINÉ (contient un tag exclu : {list(bad_tags)})")
-                continue
-            
             matching_keywords = keywords.intersection(scoring_keywords)
             tag_score = len(matching_keywords) * 10
             
             scored_candidates.append({
                 "item": item,
-                "score": tag_score,
-                "keywords_found": list(matching_keywords)
+                "score": tag_score
             })
             
-            if tag_score > 0:
-                print(f"      [{idx+1}/{len(candidates_pool)}] {media_title} ({media_type.upper()}) - Score: {tag_score} (Tags: {list(matching_keywords)})")
-                
-            time.sleep(0.05)
-            
         if not scored_candidates:
-            print(f" [CONSERVATION] Aucun candidat éligible restant après filtrage par tags éliminatoires pour {config['label']}. Ancien poster préservé.")
-            sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=320,title=Tous Éliminés ({config['label']})::Tous les candidats ont été éliminés par les tags exclus. L'ancien poster est conservé.\n")
             continue
             
         scored_candidates.sort(key=lambda x: (x["score"], x["item"].get("popularity", 0)), reverse=True)
-        
         winner_data = scored_candidates[0]
         selected_media = winner_data["item"]
         
@@ -522,10 +484,9 @@ def main():
         composite_key = f"{media_type}_{media_id}"
         media_title = selected_media.get("title") or selected_media.get("name")
         
-        print(f" -> Vainqueur sélectionné : {media_title} ({media_type.upper()} - ID: {media_id})")
+        print(f" -> Vainqueur sélectionné : {media_title}")
         
         backdrops_list = get_best_textless_backdrops(media_type, media_id, selected_media["backdrop_path"])
-        time.sleep(0.2)
         
         scored_backdrops = []
         for bg in backdrops_list:
@@ -543,8 +504,6 @@ def main():
             scored_backdrops.sort(key=lambda x: x["score"], reverse=True)
             winner_bg = scored_backdrops[0]
             
-            print(f"   ==> Backdrop élu (Score final: {winner_bg['score']}/140) | Image: {winner_bg['path']}")
-            
             final_banner = finalize_landscape_banner(winner_bg["image"], config["label"], config["color_dark"], config["color_light"])
             
             final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
@@ -556,17 +515,13 @@ def main():
                 "genre": genre_name,
                 "date": datetime.now().strftime("%Y-%m-%d")
             }
-        else:
-            print(f" [CONSERVATION] Échec d'extraction visuelle pour {media_title}. L'ancien poster de {config['label']} reste en place.")
-            sys.stdout.write(f"::warning file=.github/scripts/posters-genres.py,line=240,title=Visuel Manquant ({config['label']})::Impossible d'extraire un fond pour '{media_title}'. L'ancien poster est conservé.\n")
 
     sorted_history = dict(sorted(history.items(), key=lambda item: item[1]['date'], reverse=True))
-
     os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(sorted_history, f, ensure_ascii=False, indent=4)
         
-    print("\n[SUCCESS] Déploiement terminé. Nouveau duotone dégradé et système anti-upscale actifs.")
+    print("\n[SUCCESS] Déploiement terminé. Nouveau duotone dégradé forcé et égalisation active.")
 
 if __name__ == "__main__":
     main()
