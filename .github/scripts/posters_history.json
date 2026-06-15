@@ -84,6 +84,76 @@
         "genre": "western",
         "date": "2026-06-15"
     },
+    "tv_57243": {
+        "title": "Doctor Who",
+        "genre": "action",
+        "date": "2026-06-15"
+    },
+    "tv_31911": {
+        "title": "Fullmetal Alchemist: Brotherhood",
+        "genre": "animation-japonaise",
+        "date": "2026-06-15"
+    },
+    "tv_95557": {
+        "title": "INVINCIBLE",
+        "genre": "animation",
+        "date": "2026-06-15"
+    },
+    "tv_108978": {
+        "title": "Reacher",
+        "genre": "aventure",
+        "date": "2026-06-15"
+    },
+    "tv_4239": {
+        "title": "Married... with Children",
+        "genre": "comedie",
+        "date": "2026-06-15"
+    },
+    "tv_1447": {
+        "title": "Psych",
+        "genre": "crime",
+        "date": "2026-06-15"
+    },
+    "tv_1749": {
+        "title": "How It's Made",
+        "genre": "documentaire",
+        "date": "2026-06-15"
+    },
+    "tv_260592": {
+        "title": "Every Year After",
+        "genre": "drame",
+        "date": "2026-06-15"
+    },
+    "tv_1508": {
+        "title": "Dancing with the Stars",
+        "genre": "famille",
+        "date": "2026-06-15"
+    },
+    "tv_18165": {
+        "title": "The Vampire Diaries",
+        "genre": "fantastique",
+        "date": "2026-06-15"
+    },
+    "movie_1246049": {
+        "title": "Dracula",
+        "genre": "romance",
+        "date": "2026-06-15"
+    },
+    "tv_655": {
+        "title": "Star Trek: The Next Generation",
+        "genre": "science-fiction",
+        "date": "2026-06-15"
+    },
+    "tv_78191": {
+        "title": "You",
+        "genre": "thriller",
+        "date": "2026-06-15"
+    },
+    "tv_13859": {
+        "title": "The Rifleman",
+        "genre": "western",
+        "date": "2026-06-15"
+    },
     "tv_4604": {
         "title": "Smallville",
         "genre": "action",
