@@ -26,33 +26,129 @@ ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it"}
 # Variable globale pour suivre les médias traités pendant l'exécution
 RUN_PROCESSED_IDS = set()
 
-# Configuration chirurgicale des genres - Palette Apple TV Premium optimisée
+# Configuration chirurgicale des genres - Dégradés Premium inspirés d'Apple
 GENRES_CONFIG = {
-    "action": {"label": "Action", "color": (210, 40, 45), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [3930, 6054, 12993, 9951, 8440, 188955, 226499, 83, 312, 779, 4565, 14955, 853, 9665, 10044]},
-    "animation-japonaise": {"label": "Animation Japonaise", "color": (120, 60, 200), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True, "override_lang": True, "scoring_keywords": [210024, 13141, 207826]},
+    "action": {
+        "label": "Action", 
+        "color_dark": (140, 15, 20),      # Rouge Sombre
+        "color_light": (240, 70, 80),     # Rouge Éclatant
+        "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16", 
+        "scoring_keywords": [3930, 6054, 12993, 9951, 8440, 188955, 226499, 83, 312, 779, 4565, 14955, 853, 9665, 10044]
+    },
+    "animation-japonaise": {
+        "label": "Animation Japonaise", 
+        "color_dark": (70, 20, 140),     # Indigo Profond
+        "color_light": (180, 90, 250),    # Violet Néon
+        "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True, "override_lang": True, 
+        "scoring_keywords": [210024, 13141, 207826]
+    },
     "animation": {
         "label": "Animation", 
-        "color": (0, 200, 255), 
-        "movie_genre": 16, 
-        "tv_genre": 16, 
+        "color_dark": (10, 80, 180),      # Bleu Roi
+        "color_light": (0, 220, 255),     # Cyan Lumineux
+        "movie_genre": 16, "tv_genre": 16, 
         "extra": "&without_genres=99&without_original_language=ja|ko|zh&without_keywords=210024|287513",
         "min_popularity": 80,
         "scoring_keywords": [272909, 7376, 278823, 234183, 179411, 234662, 290589, 297442, 339048, 366485]
     },
-    "aventure": {"label": "Aventure", "color": (20, 140, 90), "movie_genre": 12, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [195114, 161176, 818, 4152, 170362, 210246, 10364, 41586, 6956, 269233]},
-    "comedie": {"label": "Comédie", "color": (220, 170, 30), "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16", "scoring_keywords": [8201, 9755, 9964, 375047, 6241, 9253]},
-    "crime": {"label": "Crime", "color": (107, 114, 128), "movie_genre": 80, "tv_genre": 80, "extra": "&without_genres=16", "scoring_keywords": [2095, 9748, 181644, 157241, 206958, 268067, 703, 5340, 6149, 9826, 155790, 207046]},
-    "documentaire": {"label": "Documentaire", "color": (34, 197, 94), "movie_genre": 99, "tv_genre": 99, "extra": "&without_genres=16", "scoring_keywords": [221355, 305903, 343303, 284176]},
-    "drame": {"label": "Drame", "color": (14, 165, 233), "movie_genre": 18, "tv_genre": 18, "extra": "&without_genres=16", "scoring_keywords": []},
-    "famille": {"label": "Famille", "color": (217, 70, 239), "movie_genre": 10751, "tv_genre": 10751, "extra": "&without_genres=16", "scoring_keywords": []},
-    "fantastique": {"label": "Fantastique", "color": (168, 85, 247), "movie_genre": 14, "tv_genre": 10765, "extra": "&without_genres=16", "scoring_keywords": []},
-    "guerre": {"label": "Guerre", "color": (120, 113, 108), "movie_genre": 10752, "tv_genre": 10768, "extra": "&without_genres=16", "scoring_keywords": []},
-    "histoire": {"label": "Histoire", "color": (139, 90, 60), "movie_genre": 36, "tv_genre": 10768, "extra": "&without_genres=16", "scoring_keywords": []},
-    "horreur": {"label": "Horreur", "color": (239, 68, 68), "movie_genre": 27, "tv_genre": 27, "extra": "&without_genres=16&with_keywords=3358|9748|6152", "scoring_keywords": []},
-    "romance": {"label": "Romance", "color": (230, 90, 140), "movie_genre": 10749, "tv_genre": 10749, "extra": "&without_genres=16&without_original_language=ko|ja|zh", "scoring_keywords": []},
-    "science-fiction": {"label": "Science-Fiction", "color": (6, 182, 212), "movie_genre": 878, "tv_genre": 10765, "extra": "&without_genres=16&with_keywords=4565|9882", "scoring_keywords": []},
-    "thriller": {"label": "Thriller", "color": (30, 120, 80), "movie_genre": 53, "tv_genre": 80, "extra": "&without_genres=16&with_keywords=9826|10123", "scoring_keywords": []},
-    "western": {"label": "Western", "color": (214, 100, 42), "movie_genre": 37, "tv_genre": 37, "extra": "&without_genres=16", "scoring_keywords": []}
+    "aventure": {
+        "label": "Aventure", 
+        "color_dark": (10, 90, 50),       # Vert Émeraude Profond
+        "color_light": (230, 130, 20),    # Orange Ambré Lumineux
+        "movie_genre": 12, "tv_genre": 10759, "extra": "&without_genres=16", 
+        "scoring_keywords": [195114, 161176, 818, 4152, 170362, 210246, 10364, 41586, 6956, 269233]
+    },
+    "comedie": {
+        "label": "Comédie", 
+        "color_dark": (170, 100, 10),     # Ocre Chaud
+        "color_light": (250, 210, 40),    # Jaune Solaire
+        "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16", 
+        "scoring_keywords": [8201, 9755, 9964, 375047, 6241, 9253]
+    },
+    "crime": {
+        "label": "Crime", 
+        "color_dark": (45, 55, 72),       # Ardoise Sombre
+        "color_light": (148, 163, 184),   # Gris Argenté Lumineux
+        "movie_genre": 80, "tv_genre": 80, "extra": "&without_genres=16", 
+        "scoring_keywords": [2095, 9748, 181644, 157241, 206958, 268067, 703, 5340, 6149, 9826, 155790, 207046]
+    },
+    "documentaire": {
+        "label": "Documentaire", 
+        "color_dark": (15, 110, 50),      # Vert Forêt
+        "color_light": (74, 222, 128),    # Vert Menthe Éclatant
+        "movie_genre": 99, "tv_genre": 99, "extra": "&without_genres=16", 
+        "scoring_keywords": [221355, 305903, 343303, 284176]
+    },
+    "drame": {
+        "label": "Drame", 
+        "color_dark": (10, 70, 140),      # Saphir Sombre
+        "color_light": (56, 189, 248),    # Bleu Ciel Éclatant
+        "movie_genre": 18, "tv_genre": 18, "extra": "&without_genres=16", 
+        "scoring_keywords": []
+    },
+    "famille": {
+        "label": "Famille", 
+        "color_dark": (130, 20, 150),     # Violet Byzantium
+        "color_light": (247, 130, 250),   # Rose Bonbon Lumineux
+        "movie_genre": 10751, "tv_genre": 10751, "extra": "&without_genres=16", 
+        "scoring_keywords": []
+    },
+    "fantastique": {
+        "label": "Fantastique", 
+        "color_dark": (90, 20, 160),      # Améthyste Profond
+        "color_light": (192, 132, 252),   # Mauve Électrique
+        "movie_genre": 14, "tv_genre": 10765, "extra": "&without_genres=16", 
+        "scoring_keywords": []
+    },
+    "guerre": {
+        "label": "Guerre", 
+        "color_dark": (60, 55, 50),       # Kaki/Terre Sombre
+        "color_light": (168, 162, 158),   # Pierre Lumineuse
+        "movie_genre": 10752, "tv_genre": 10768, "extra": "&without_genres=16", 
+        "scoring_keywords": []
+    },
+    "histoire": {
+        "label": "Histoire", 
+        "color_dark": (90, 50, 30),       # Bronze Sombre
+        "color_light": (197, 140, 90),    # Cuivre Doré
+        "movie_genre": 36, "tv_genre": 10768, "extra": "&without_genres=16", 
+        "scoring_keywords": []
+    },
+    "horreur": {
+        "label": "Horreur", 
+        "color_dark": (40, 10, 15),       # Sang Profond
+        "color_light": (245, 40, 40),     # Rouge Écarlate Vif
+        "movie_genre": 27, "tv_genre": 27, "extra": "&without_genres=16&with_keywords=3358|9748|6152", 
+        "scoring_keywords": []
+    },
+    "romance": {
+        "label": "Romance", 
+        "color_dark": (150, 30, 70),      # Rubis Profond
+        "color_light": (244, 143, 177),   # Rose Pastel Lumineux
+        "movie_genre": 10749, "tv_genre": 10749, "extra": "&without_genres=16&without_original_language=ko|ja|zh", 
+        "scoring_keywords": []
+    },
+    "science-fiction": {
+        "label": "Science-Fiction", 
+        "color_dark": (10, 40, 110),      # Bleu Abysse
+        "color_light": (34, 211, 238),    # Bleu Turquoise Spatial
+        "movie_genre": 878, "tv_genre": 10765, "extra": "&without_genres=16&with_keywords=4565|9882", 
+        "scoring_keywords": []
+    },
+    "thriller": {
+        "label": "Thriller", 
+        "color_dark": (10, 70, 50),       # Sarcelle Sombre
+        "color_light": (52, 211, 153),    # Menthe Électrique
+        "movie_genre": 53, "tv_genre": 80, "extra": "&without_genres=16&with_keywords=9826|10123", 
+        "scoring_keywords": []
+    },
+    "western": {
+        "label": "Western", 
+        "color_dark": (130, 50, 15),      # Terre de Sienne Brûlée
+        "color_light": (251, 146, 60),    # Orange Crépuscule
+        "movie_genre": 37, "tv_genre": 37, "extra": "&without_genres=16", 
+        "scoring_keywords": []
+    }
 }
 
 def tmdb_api_call(endpoint, params=None):
@@ -195,17 +291,24 @@ def analyze_and_score_backdrop(bg, item, downloaded_image=None):
     width = bg.get("width", 0)
     popularity = item.get("popularity", 0)
     vote_count = bg.get("vote_count", 0)
+    vote_average = bg.get("vote_average", 0) # On récupère la note moyenne de l'image sur TMDB
     
-    if vote_count == 0:
-        score -= 30
+    # 1. VALORISATION DE LA NOTE COMMUNAUTAIRE (TMDB)
+    # Plus l'image est plébiscitée et bien notée, plus elle gagne de points de manière significative
+    if vote_count > 0:
+        score += int(vote_average * 4)  # Ex: Une superbe image notée 8.5/10 gagne +34 points directs
+        if vote_count >= 10: score += 15
+        elif vote_count >= 5: score += 10
+    else:
+        score -= 20
 
     release_date_str = item.get("release_date") or item.get("first_air_date") or ""
     if release_date_str:
         try:
             year = datetime.strptime(release_date_str, "%Y-%m-%d").year
-            if year >= 2022: score += 25
-            elif year >= 2015: score += 10
-            elif year < 2005: score -= 20
+            if year >= 2022: score += 15
+            elif year >= 2015: score += 5
+            elif year < 2005: score -= 15
         except ValueError:
             pass
 
@@ -218,62 +321,83 @@ def analyze_and_score_backdrop(bg, item, downloaded_image=None):
     # Analyse de la netteté réelle (Anti-Upscale artificiel)
     if downloaded_image:
         try:
-            # Conversion rapide en niveaux de gris et tableau numpy pour analyse de fréquence
             gray_img = downloaded_image.convert("L").resize((480, 270), Image.Resampling.BILINEAR)
             arr = np.array(gray_img, dtype=np.float32)
             
-            # Calcul des gradients directionnels (variations d'intensité locales)
             grad_x = np.diff(arr, axis=1)
             grad_y = np.diff(arr, axis=0)
             edge_variance = np.var(grad_x) + np.var(grad_y)
             
-            # Bonus si les textures et contours sont réels et marqués (Vraie UHD / HD nette)
             if edge_variance > 140:
-                score += 25
-            # Malus si l'image est anormalement floue ou lissée artificiellement (Upscale étiré)
+                score += 20
             elif edge_variance < 55:
-                score -= 20
+                score -= 25
         except Exception:
             pass
             
     return score
 
-def apply_apple_tv_duotone(img, target_color):
-    """Applique un traitement adaptatif et non linéaire avec netteté accrue (Style Apple TV Premium)"""
+def apply_gradient_duotone(img, color_dark, color_light):
+    """Applique un traitement Duotone en dégradé diagonal avec préservation avancée des détails"""
+    # Étape 1 : Récupération des détails fins
     sharper = ImageEnhance.Sharpness(img)
-    img = sharper.enhance(2.2)  
+    img = sharper.enhance(1.8)  # Légèrement adouci (de 2.2 à 1.8) pour éviter le grain artificiel dans les zones sombres
     
+    # Étape 2 : Préparation de la carte des niveaux de gris
     gray = img.convert("L")
     gray_np = np.array(gray, dtype=np.float32)
     
+    # Normalisation propre des contrastes sans écraser les dynamiques extrêmes
     f_min, f_max = gray_np.min(), gray_np.max()
     if f_max > f_min:
         gray_np = (gray_np - f_min) * (255.0 / (f_max - f_min))
     
+    # Courbe contrastée lissée (Sigmoïde adoucie pour garder de la luminosité et déboucher les ombres)
     std_dev = np.std(gray_np)
-    contrast_factor = 0.028 if std_dev < 55.0 else 0.022
+    contrast_factor = 0.022 if std_dev < 55.0 else 0.016  # Facteurs abaissés pour révéler les détails
+    gray_np = 255.0 / (1.0 + np.exp(-contrast_factor * (gray_np - 110.0)))  # Point d'inflexion calé à 110 au lieu de 127.5 pour éclaircir le rendu global
     
-    gray_np = 255.0 / (1.0 + np.exp(-contrast_factor * (gray_np - 127.5)))
+    # Étape 3 : Génération de la matrice du dégradé diagonal (Bas-Gauche vers Haut-Droite)
+    h, w = gray_np.shape
+    y_indices, x_indices = np.indices((h, w), dtype=np.float32)
     
-    base_dark = np.array([12, 16, 26])  
-    target_light = np.array(target_color)
+    # Calcul de la projection diagonale (normalisée entre 0.0 et 1.0)
+    # Bas-Gauche (x=0, y=h) -> 0.0 | Haut-Droite (x=w, y=0) -> 1.0
+    diagonal_mask = (x_indices / float(w) + (1.0 - y_indices / float(h))) / 2.0
+    diagonal_mask = np.clip(diagonal_mask, 0.0, 1.0)
     
-    duotone = np.zeros((gray_np.shape[0], gray_np.shape[1], 3), dtype=np.uint8)
+    # Étape 4 : Définition des ancres de couleur
+    base_dark = np.array([12, 16, 24], dtype=np.float32) # Fond neutre très sombre pour préserver les noirs profonds
+    c_dark_np = np.array(color_dark, dtype=np.float32)
+    c_light_np = np.array(color_light, dtype=np.float32)
+    
+    # Interpolation de la couleur cible le long de la diagonale
+    # On mixe la teinte sombre (bas-gauche) vers la teinte claire (haut-droite)
+    target_color_matrix = np.zeros((h, w, 3), dtype=np.float32)
     for i in range(3):
-        duotone[..., i] = base_dark[i] + (gray_np / 255.0) * (target_light[i] - base_dark[i])
+        target_color_matrix[..., i] = c_dark_np[i] + diagonal_mask * (c_light_np[i] - c_dark_np[i])
+        
+    # Étape 5 : Application non linéaire du duotone
+    duotone = np.zeros((h, w, 3), dtype=np.uint8)
+    intensity_ratio = (gray_np / 255.0)[..., np.newaxis] # Facteur de luminance de l'image de base (0 à 1)
+    
+    for i in range(3):
+        # Cartographie progressive : les tons noirs tirent vers base_dark, les tons clairs fusionnent vers la matrice colorée du dégradé
+        color_channel = base_dark[i] + intensity_ratio[..., 0] * (target_color_matrix[..., i] - base_dark[i])
+        duotone[..., i] = np.clip(color_channel, 0, 255).astype(np.uint8)
         
     return Image.fromarray(duotone)
 
-def finalize_landscape_banner(img, label, target_color):
+def finalize_landscape_banner(img, label, color_dark, color_light):
     img = ImageOps.fit(img, (1920, 1080), method=Image.Resampling.LANCZOS)
-    img = apply_apple_tv_duotone(img, target_color)
+    img = apply_gradient_duotone(img, color_dark, color_light)
     
     img_rgba = img.convert("RGBA")
     
     gradient = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
     g_draw = ImageDraw.Draw(gradient)
     for y in range(400, 1080):
-        alpha = int(((y - 400) / 680) ** 1.8 * 252)
+        alpha = int(((y - 400) / 680) ** 1.8 * 240) # Légèrement diminué (252 -> 240) pour laisser passer plus de détails en bas
         g_draw.line([(0, y), (1920, y)], fill=(0, 0, 0, alpha))
         
     img_with_gradient = Image.alpha_composite(img_rgba, gradient)
@@ -392,7 +516,6 @@ def main():
         
         winner_data = scored_candidates[0]
         selected_media = winner_data["item"]
-        winner_score = winner_data["score"]
         
         media_id = selected_media["id"]
         media_type = selected_media["media_type"]
@@ -411,7 +534,6 @@ def main():
                 res = requests.get(img_url, stream=True, timeout=10)
                 if res.status_code == 200:
                     raw_img = Image.open(res.raw).convert("RGB")
-                    # Analyse intelligente de l'image physique en mémoire avec numpy
                     score = analyze_and_score_backdrop(bg, selected_media, downloaded_image=raw_img)
                     scored_backdrops.append({"image": raw_img, "score": score, "path": bg["file_path"]})
             except Exception:
@@ -423,7 +545,7 @@ def main():
             
             print(f"   ==> Backdrop élu (Score final: {winner_bg['score']}/140) | Image: {winner_bg['path']}")
             
-            final_banner = finalize_landscape_banner(winner_bg["image"], config["label"], config["color"])
+            final_banner = finalize_landscape_banner(winner_bg["image"], config["label"], config["color_dark"], config["color_light"])
             
             final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=92)
             final_banner.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=92)
@@ -444,7 +566,7 @@ def main():
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(sorted_history, f, ensure_ascii=False, indent=4)
         
-    print("\n[SUCCESS] Déploiement terminé. Système anti-upscale actif.")
+    print("\n[SUCCESS] Déploiement terminé. Nouveau duotone dégradé et système anti-upscale actifs.")
 
 if __name__ == "__main__":
     main()
