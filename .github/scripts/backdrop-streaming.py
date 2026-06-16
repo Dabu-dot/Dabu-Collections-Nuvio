@@ -56,8 +56,22 @@ def parse_accent_color(value):
         return (0, 0, 0)
     value = value.strip().lstrip("#")
     if "," in value:
-        return tuple(int(p.strip()) for p in value.split(","))
-    return tuple(int(value[i:i+2], 16) for i in (0, 2, 4))
+        try:
+            return tuple(int(p.strip()) for p in value.split(","))
+        except ValueError:
+            return (0, 0, 0)
+            
+    if len(value) == 6:
+        safe_chars = []
+        for c in value.upper():
+            safe_chars.append(c if c in "0123456789ABCDEF" else "0")
+        safe_value = "".join(safe_chars)
+        try:
+            return tuple(int(safe_value[i:i+2], 16) for i in (0, 2, 4))
+        except ValueError:
+            return (0, 0, 0)
+        
+    return (0, 0, 0)
 
 def tmdb_get(endpoint, params, api_key):
     query = dict(params)
