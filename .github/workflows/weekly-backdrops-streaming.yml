@@ -79,7 +79,7 @@ jobs:
           git add "Ressources/Collections Covers/Streaming Services/Backdrops/"
           
           if ! git diff --cached --exit-code --quiet; then
-            git commit -m "chore: update streaming platforms backdrops with multi-layer organic gradients [skip ci]"
+            git commit -m "chore: fixed grid continuity and angular brand gradients [skip ci]"
             git push origin main
           else
             echo "No changes found. Skipping commit."
