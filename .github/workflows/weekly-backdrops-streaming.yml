@@ -44,7 +44,7 @@ jobs:
           python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Prime Video" --accent-color "#00A8E8" --tmdb-request "movie:with_companies=20580" --tmdb-request "series:with_networks=1024" --output "Ressources/Collections Covers/Streaming Services/Backdrops/primevideo.jpg"
 
           # 3. DISNEY+
-          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Disney Plus" --accent-color "#0072R2" --tmdb-request "movie:with_companies=2" --tmdb-request "series:with_networks=2739" --output "Ressources/Collections Covers/Streaming Services/Backdrops/disneyplus.jpg"
+          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Disney Plus" --accent-color "#0072F2" --tmdb-request "movie:with_companies=2" --tmdb-request "series:with_networks=2739" --output "Ressources/Collections Covers/Streaming Services/Backdrops/disneyplus.jpg"
 
           # 4. APPLE TV+
           python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Apple TV" --accent-color "#FFFFFF" --tmdb-request "movie:with_companies=184564" --tmdb-request "series:with_networks=2552" --output "Ressources/Collections Covers/Streaming Services/Backdrops/appletv.jpg"
@@ -67,7 +67,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # On indexe le nouveau dossier spécifique
           git add "Ressources/Collections Covers/Streaming Services/Backdrops/"
           
           if ! git diff --cached --exit-code --quiet; then
