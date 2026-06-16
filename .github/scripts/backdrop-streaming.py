@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - Angular Alignment Engine (V4)
-Corrects grid layout positioning to eliminate abrupt cuts and aligns the 
-brand multi-layer gradient directly onto the -20 degree layout axis.
+Premium Backdrop Generator - Perfect Blend Engine (V5)
+Fixes the layering sequence (posters on top of background), adjusts the brand 
+gradient axis to a true 16:9 diagonal (-30°), and tightens the visibility mask.
 """
 
 import argparse
@@ -32,9 +32,9 @@ CARD_RADIUS = 22
 TILE_W = 280        
 TILE_H = 420        
 GAP = 30            
-TILT_DEG = -20      
+TILT_DEG = -20      # L'inclinaison des posters reste à -20° pour le style...
 
-# Grille surdimensionnée pour saturer l'espace et simuler la continuité hors-cadre
+# Grille large pour garantir la continuité hors-cadre à droite et en haut
 COLS = 12           
 ROWS = 8            
 
@@ -43,18 +43,18 @@ SIZE_PRESETS = {
     "4k": (3840, 2160, 2.0),
 }
 
-# --- PALETTES OFFICIELLES AJUSTÉES (Sombre en haut à droite -> Éclatant en bas à gauche) ---
+# --- PALETTES OFFICIELLES RECALIBRÉES ---
 BRAND_PALETTES = {
-    "netflix":      {"base": (8, 0, 2),       "mid": (95, 4, 8),      "light": (229, 9, 20)},
-    "disneyplus":   {"base": (2, 6, 23),      "mid": (4, 28, 79),     "light": (0, 110, 153)},
-    "hbomax":       {"base": (11, 3, 24),     "mid": (36, 11, 89),    "light": (107, 33, 224)},
-    "appletv":      {"base": (12, 12, 14),    "mid": (45, 45, 48),    "light": (150, 150, 155)},
-    "crunchyroll":  {"base": (18, 8, 2),      "mid": (135, 43, 2),    "light": (244, 117, 33)},
-    "hulu":         {"base": (0, 15, 7),      "mid": (10, 85, 45),    "light": (28, 231, 131)},
-    "peacock":      {"base": (4, 8, 20),      "mid": (8, 46, 115),    "light": (0, 108, 225)},
-    "shudder":      {"base": (15, 2, 2),      "mid": (80, 0, 0),      "light": (195, 10, 10)},
-    "primevideo":   {"base": (2, 14, 28),     "mid": (7, 68, 128),    "light": (26, 146, 244)},
-    "paramount":    {"base": (0, 8, 26),      "mid": (0, 50, 150),    "light": (0, 116, 228)}
+    "netflix":      {"base": (6, 0, 1),       "mid": (95, 4, 8),      "light": (229, 9, 20)},
+    "disneyplus":   {"base": (2, 6, 21),      "mid": (4, 32, 85),     "light": (0, 120, 165)},
+    "hbomax":       {"base": (9, 2, 20),      "mid": (36, 11, 95),    "light": (115, 30, 235)},
+    "appletv":      {"base": (10, 10, 11),    "mid": (45, 45, 48),    "light": (155, 155, 160)},
+    "crunchyroll":  {"base": (15, 6, 1),      "mid": (140, 40, 2),    "light": (244, 117, 33)},
+    "hulu":         {"base": (0, 12, 5),      "mid": (10, 85, 42),    "light": (28, 231, 131)},
+    "peacock":      {"base": (3, 6, 18),      "mid": (8, 50, 125),    "light": (0, 115, 235)},
+    "shudder":      {"base": (12, 1, 1),      "mid": (85, 0, 0),      "light": (205, 10, 10)},
+    "primevideo":   {"base": (2, 12, 25),     "mid": (7, 72, 135),    "light": (26, 146, 244)},
+    "paramount":    {"base": (0, 6, 22),      "mid": (0, 55, 160),    "light": (0, 122, 240)}
 }
 
 STREAMING_NETWORKS = {
@@ -159,7 +159,7 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     poster_card = Image.new("RGBA", (tile_width, tile_height), (0, 0, 0, 0))
     poster_card.paste(image, mask=mask)
     
-    # Ombre portée douce (Drop Shadow) sous la jaquette
+    # Drop shadow sous la jaquette
     shadow_padding = int(24 * scale)
     shadow_w = tile_width + (shadow_padding * 2)
     shadow_h = tile_height + (shadow_padding * 2)
@@ -169,7 +169,7 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     s_draw.rounded_rectangle(
         [shadow_padding, shadow_padding, shadow_padding + tile_width - 1, shadow_padding + tile_height - 1],
         radius=radius,
-        fill=(0, 0, 0, 140)
+        fill=(0, 0, 0, 150)  # Ombres légèrement plus denses pour détacher du fond coloré
     )
     shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(radius=int(10 * scale)))
     
@@ -180,7 +180,7 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     return tile_container
 
 def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
-    """Génère une nappe géante en quinconce débordant largement pour assurer la continuité."""
+    """Génère la nappe de jaquettes et applique le masque de fondu strict sans altérer les couleurs."""
     shadow_padding = int(24 * scale)
     tile_width = int(TILE_W * scale)
     tile_height = int(TILE_H * scale)
@@ -190,7 +190,6 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     step_y = tile_height + gap
     stagger_y = step_y // 2
 
-    # Dimensions massives pour encaisser la rotation sans créer de bordures vides
     grid_width = COLS * step_x + (shadow_padding * 2)
     grid_height = ROWS * step_y + stagger_y + (shadow_padding * 2)
     grid = Image.new("RGBA", (grid_width, grid_height), (0, 0, 0, 0))
@@ -207,39 +206,36 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
             y = row * step_y + y_offset + shadow_padding
             grid.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
 
-    # Rotation pivotée
     rotated = grid.rotate(TILT_DEG, expand=True, resample=Image.BICUBIC)
     rot_w, rot_h = rotated.size
 
-    # Ancrage décalé vers le haut et la gauche pour éliminer les coupures nettes
-    paste_x = int(canvas_width * 0.38 - (rot_w * 0.35))
+    # Point d'ancrage optimisé pour la visibilité droite
+    paste_x = int(canvas_width * 0.42 - (rot_w * 0.35))
     paste_y = int(canvas_height * 0.45 - (rot_h * 0.50))
 
     canvas = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
     canvas.paste(rotated, (paste_x, paste_y), rotated)
     
-    # Masque d'opacité progressif global sur la nappe de posters (Plus opaque à droite qu'à gauche)
+    # --- MASQUE D'OPACITÉ DES POSTERS (Resserré pour libérer la gauche) ---
     grid_fade = Image.new("L", (canvas_width, canvas_height), 255)
     f_draw = ImageDraw.Draw(grid_fade)
     for x in range(canvas_width):
-        if x < canvas_width * 0.20:
+        if x < canvas_width * 0.35:     # Disparition totale à gauche avant 35% de l'écran
             alpha = 0
-        elif x > canvas_width * 0.75:
-            alpha = 200
+        elif x > canvas_width * 0.85:   # Opacité maximale retenue à droite
+            alpha = 215
         else:
-            factor = (x - canvas_width * 0.20) / (canvas_width * 0.55)
-            alpha = int(200 * (factor ** 1.2))
+            factor = (x - canvas_width * 0.35) / (canvas_width * 0.50)
+            alpha = int(215 * (factor ** 1.4))  # Courbe plus abrupte pour un retrait propre
         f_draw.line([(x, 0), (x, canvas_height)], fill=alpha)
         
     final_grid = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
     final_grid.paste(canvas, (0, 0), mask=grid_fade)
     return final_grid
 
-def apply_premium_gradient(canvas, label):
-    """Génère un dégradé directionnel linéaire incliné parallèlement à l'angle des posters."""
-    width, height = canvas.size
+def generate_premium_background(width, height, label):
+    """Calcule un fond dégradé diagonal parfait à -30° (Bas-Gauche -> Haut-Droit)."""
     slug = label.lower().replace(" ", "").replace("+", "plus")
-    
     palette = BRAND_PALETTES.get(slug, {"base": (10, 12, 16), "mid": (35, 40, 55), "light": (90, 100, 125)})
     
     c_dark = palette["base"]
@@ -249,42 +245,38 @@ def apply_premium_gradient(canvas, label):
     bg_gradient = Image.new("RGBA", (width, height))
     pixels = bg_gradient.load()
     
-    # Angle aligné sur l'inclinaison des posters (-20 degrés convertis en radians)
-    angle_rad = math.radians(-TILT_DEG)
+    # Angle fixé à -30 degrés (Alignement diagonal idéal pour le format 16:9)
+    angle_rad = math.radians(30)
     cos_a = math.cos(angle_rad)
     sin_a = math.sin(angle_rad)
     
-    # Calcul de la projection maximale pour normaliser le dégradé sur la diagonale
     max_proj = width * cos_a + height * sin_a
     
     for y in range(height):
         for x in range(width):
-            # Inversion de l'axe Y pour forcer la lumière claire en bas à gauche
+            # Inversion de l'axe Y pour ancrer la lumière claire strictement en bas à gauche
             y_inv = height - y
             proj = x * cos_a + y_inv * sin_a
             factor = proj / max_proj
             factor = max(0.0, min(1.0, factor))
             
-            # Interpolation non-linéaire fluide (Courbe sigmoïde douce)
+            # Lissage sigmoïde pour étaler la transition de façon fluide
             factor = math.sin(factor * math.pi / 2)
             
             if factor < 0.5:
-                # Transition entre Light (Bas-Gauche) et Mid
                 t = factor * 2.0
                 r = int(c_light[0] + (c_mid[0] - c_light[0]) * t)
                 g = int(c_light[1] + (c_mid[1] - c_light[1]) * t)
                 b = int(c_light[2] + (c_mid[2] - c_light[2]) * t)
             else:
-                # Transition entre Mid et Dark (Haut-Droit)
                 t = (factor - 0.5) * 2.0
                 r = int(c_mid[0] + (c_dark[0] - c_mid[0]) * t)
                 g = int(c_mid[1] + (c_dark[1] - c_mid[1]) * t)
                 b = int(c_mid[2] + (c_dark[2] - c_mid[2]) * t)
                 
             pixels[x, y] = (r, g, b, 255)
-
-    # Fusion des posters par-dessus le fond coloré linéaire
-    return Image.alpha_composite(bg_gradient, canvas)
+            
+    return bg_gradient
 
 def main():
     parser = argparse.ArgumentParser()
@@ -294,7 +286,7 @@ def main():
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Executing Angular Generation Engine for: {args.label}")
+    print(f"Executing Layer-Corrected Blend Engine for: {args.label}")
     unique_items = fetch_premium_titles(args.label, args.api_key, count=90)
     
     tile_images = []
@@ -313,21 +305,24 @@ def main():
 
     width, height, scale = SIZE_PRESETS[args.size]
     
-    # 1. Génération de la nappe inclinée sans fin
-    canvas = build_tilted_grid(tile_images, width, height, scale=scale)
+    # Étape 1 : Génération du fond dégradé diagonal pur à -30°
+    background = generate_premium_background(width, height, args.label)
     
-    # 2. Application du dégradé de marque directionnel imbriqué à -20°
-    canvas = apply_premium_gradient(canvas, args.label)
+    # Étape 2 : Génération de la nappe de posters posée AU-DESSUS avec son masque d'opacité propre
+    posters_layer = build_tilted_grid(tile_images, width, height, scale=scale)
+    
+    # Étape 3 : Fusion finale (Grille de posters posée proprement sur le fond)
+    final_canvas = Image.alpha_composite(background, posters_layer)
 
     out_path = Path(args.output)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     
-    final = canvas.convert("RGB")
+    final = final_canvas.convert("RGB")
     settings = QUALITY_PRESETS["compressed"]
     
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully pushed aligned assets for {args.label}!")
+    print(f"Successfully pushed unified premium backdrop for {args.label}!")
 
 if __name__ == "__main__":
     try:
