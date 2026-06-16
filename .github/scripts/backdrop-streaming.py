@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - UI Optimized Style
-Pushes a clean, verticalized poster grid to the right while creating 
-a gorgeous, atmospheric color gradient background matching the platform identity.
+Premium Backdrop Generator - UI Optimized Style (V2)
+Aligns posters in strict vertical columns, applies a 50% vertical staggered 
+checkerboard pattern, fixes the aspect ratio, and restores rich, ambient brand gradients.
 """
 
 import argparse
@@ -27,21 +27,20 @@ TMDB_IMG_BASE = "https://image.tmdb.org/t/p"
 POSTER_SIZE = "w780"
 
 QUALITY_PRESETS = {
-    "compressed": {"quality": 88, "progressive": True, "subsampling": "4:2:0"}
+    "compressed": {"quality": 92, "progressive": True, "subsampling": "4:2:0"}
 }
 
-# Configuration de la Grille Premium (Aérienne, Zoomée et Verticale)
-CARD_RADIUS = 28    # Coins plus ronds pour l'effet moderne
-TILE_W = 280        # Plus grands posters
-TILE_H = 420        
-GAP = 32            # Espacement large et épuré
-ROWS = 6
-COLS = 7
-STAGGER = 0.50      # Décalage prononcé pour accentuer l'effet de colonnes verticales
-TILT_DEG = -18      # Inclinaison inversée pour basculer la grille sur la droite
+# --- AJUSTEMENTS DE LA GRILLE PREMIUM ---
+CARD_RADIUS = 24    # Coins arrondis fidèles aux modèles
+TILE_W = 270        # Largeur de l'affiche
+TILE_H = 405        # Ratio 1:1.5 pur (évite l'effet écrasé) [Point 2]
+GAP = 24            # Espacement resserré et harmonieux [Point 3]
+COLS = 6            # Nombre de colonnes verticales
+ROWS = 6            # Nombre de posters par colonne
+TILT_DEG = -20      # Inclinaison parfaite constatée sur les modèles
 
-# Ancrage du focus visuel sur le tiers droit
-FOCUS_X = 0.35
+# Ancrage pour pousser la grille sur le tiers droit
+FOCUS_X = 0.28
 FOCUS_Y = 0.50
 
 SIZE_PRESETS = {
@@ -93,7 +92,6 @@ def fetch_titles(request_specs, api_key, count=60):
         for page in range(1, 4):
             data = tmdb_get(endpoint, {**base_params, "page": page}, api_key)
             for item in data.get("results", []):
-                # Filtrage strict pour éviter les entrées sans poster ou sans titre informatif
                 if item.get("poster_path") and (item.get("title") or item.get("name")):
                     merged.append((spec["media_type"], item))
             if page >= data.get("total_pages", 4):
@@ -102,7 +100,6 @@ def fetch_titles(request_specs, api_key, count=60):
     seen_ids = set()
     unique = []
     for media_type, item in merged:
-        # RÈGLE ANTI-DOUBLON STRUCTURANTE : On bloque par ID TMDB unique
         uid = f"{media_type}_{item['id']}"
         if uid not in seen_ids:
             seen_ids.add(uid)
@@ -135,8 +132,7 @@ def make_tile(image, tile_width, tile_height, scale):
         
     image = image.resize((tile_width, tile_height), Image.LANCZOS)
     
-    # Masque aux coins arrondis lisses
-    radius = max(16, int(CARD_RADIUS * scale))
+    radius = max(12, int(CARD_RADIUS * scale))
     mask = Image.new("L", (tile_width, tile_height), 0)
     draw = ImageDraw.Draw(mask)
     draw.rounded_rectangle([0, 0, tile_width - 1, tile_height - 1], radius=radius, fill=255)
@@ -149,35 +145,40 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     tile_width = int(TILE_W * scale)
     tile_height = int(TILE_H * scale)
     gap = int(GAP * scale)
-    stagger_px = int(STAGGER * (tile_height + gap))
+    
+    # Décalage vertical de 50% de la hauteur totale (tuile + espace) pour le quinconce
+    stagger_y = (tile_height + gap) // 2
 
-    # Génération d'une nappe large pour couvrir la zone de rotation
-    grid_width = COLS * (tile_width + gap) + ROWS * stagger_px
-    grid_height = ROWS * (tile_height + gap) + 400
+    # Création d'une surface de calcul large pour contenir la rotation
+    grid_width = COLS * (tile_width + gap) + 400
+    grid_height = ROWS * (tile_height + gap) + stagger_y + 400
     grid = Image.new("RGBA", (grid_width, grid_height), (0, 0, 0, 0))
 
     tile_cycle = itertools.cycle(tiles)
 
-    for row in range(ROWS):
-        for col in range(COLS):
+    # CONSTRUIRE PAR COLONNES VERTICALES [Point 4]
+    for col in range(COLS):
+        # Chaque colonne alternée reçoit le décalage de 50% vers le bas
+        y_offset = stagger_y if (col % 2 == 1) else 0
+        
+        for row in range(ROWS):
             tile_img = next(tile_cycle)
             tile = make_tile(tile_img, tile_width, tile_height, scale)
             
-            # Alignement créant l'asymétrie verticale dynamique
-            x = col * (tile_width + gap) + (row * stagger_px)
-            y = row * (tile_height + gap)
+            x = col * (tile_width + gap)
+            y = row * (tile_height + gap) + y_offset
             grid.paste(tile, (x, y), tile)
 
-    # Rotation bicubique pour préserver la netteté des pochettes
+    # Rotation propre autour du centre de la grille nappe
     rotated = grid.rotate(TILT_DEG, expand=True, resample=Image.BICUBIC)
     rot_w, rot_h = rotated.size
 
-    # Positionnement ciblé sur la DROITE du canevas global
-    paste_x = int((canvas_width * 0.88) - (rot_w * FOCUS_X))
+    # Positionnement ancré sur la droite du fond global
+    paste_x = int((canvas_width * 0.95) - (rot_w * FOCUS_X))
     paste_y = int((canvas_height * 0.50) - (rot_h * FOCUS_Y))
 
-    # Base sombre neutre de cinéma avant application du dégradé de marque
-    canvas = Image.new("RGBA", (canvas_width, canvas_height), (6, 8, 12, 255))
+    # Fond transparent temporaire pour y injecter le dégradé complexe plus tard
+    canvas = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
     canvas.paste(rotated, (paste_x, paste_y), rotated)
     return canvas
 
@@ -185,85 +186,71 @@ def apply_premium_gradient(canvas, accent):
     width, height = canvas.size
     r, g, b = accent
     
-    # Convertir en HSV pour générer des variations harmonieuses (ambiance lumineuse et ombres)
+    # Conversion en HSV pour générer les teintes du dégradé de marque [Point 1]
     h, s, v = colorsys.rgb_to_hsv(r/255, g/255, b/255)
     
-    # 1. Fond dégradé de couleur (Simule la lueur globale de marque)
-    bg_glow = Image.new("RGBA", (width, height))
-    pixels_bg = bg_glow.load()
+    # 1. Génération du fond de couleur identitaire (copie fidèle des originaux)
+    bg_gradient = Image.new("RGBA", (width, height))
+    pixels_bg = bg_gradient.load()
     
-    # Base de couleur plus sombre pour le fond texturé
-    bg_r, bg_g, bg_b = [int(x * 255) for x in colorsys.hsv_to_rgb(h, max(0.2, s * 0.8), max(0.08, v * 0.25))]
-    
+    # On calcule une couleur de marque riche mais pas trop saturée pour le fond de base
+    base_r, base_g, base_b = [int(x * 255) for x in colorsys.hsv_to_rgb(h, max(0.4, s * 0.9), max(0.12, v * 0.35))]
+    # Teinte encore plus sombre pour le coin inférieur gauche
+    dark_r, dark_g, dark_b = [int(x * 255) for x in colorsys.hsv_to_rgb(h, max(0.5, s * 0.95), 0.04)]
+
     for y in range(height):
-        # Léger dégradé du haut vers le bas sur le fond
-        factor = 1.0 - (y / height) * 0.3
-        curr_r = min(255, max(0, int(bg_r * factor)))
-        curr_g = min(255, max(0, int(bg_g * factor)))
-        curr_b = min(255, max(0, int(bg_b * factor)))
         for x in range(width):
+            # Dégradé linéaire diagonal (du haut-droite coloré vers le bas-gauche sombre)
+            factor = (x / width) * (1.0 - (y / height) * 0.3)
+            curr_r = int(dark_r + (base_r - dark_r) * factor)
+            curr_g = int(dark_g + (base_g - dark_g) * factor)
+            curr_b = int(dark_b + (base_b - dark_b) * factor)
             pixels_bg[x, y] = (curr_r, curr_g, curr_b, 255)
 
-    # 2. Projecteur de couleur dynamique (Vibrant Glow localisé en haut à droite / centre droit)
+    # 2. Ajout du halo de lumière vif derrière la grille (Vibrant Backlight)
     spotlight = Image.new("RGBA", (width // 2, height // 2), (0, 0, 0, 0))
     pixels_spot = spotlight.load()
     spot_w, spot_h = spotlight.size
     
-    # Couleur d'accentuation pure et vibrante
-    spot_r, spot_g, spot_b = [int(x * 255) for x in colorsys.hsv_to_rgb(h, min(1.0, s * 1.1), min(1.0, v * 1.3))]
+    # Couleur d'accentuation pure (ex: Orange Crunchyroll ou Vert Hulu éclatant)
+    spot_r, spot_g, spot_b = [int(x * 255) for x in colorsys.hsv_to_rgb(h, min(1.0, s * 1.1), min(1.0, v * 1.4))]
     max_diag = math.hypot(spot_w, spot_h)
     
     for x in range(spot_w):
         for y in range(spot_h):
-            # Centre du spot calé vers la zone des posters
-            dist = math.hypot(x - (spot_w * 0.8), y - (spot_h * 0.4))
-            intensity = max(0.0, 1.0 - (dist / (max_diag * 0.75)))
-            alpha = int(160 * (intensity ** 1.6))
+            # Centre du point chaud calé sur la grille de posters
+            dist = math.hypot(x - (spot_w * 0.85), y - (spot_h * 0.5))
+            intensity = max(0.0, 1.0 - (dist / (max_diag * 0.65)))
+            alpha = int(180 * (intensity ** 1.4))
             if alpha > 0:
                 pixels_spot[x, y] = (spot_r, spot_g, spot_b, alpha)
                 
     spotlight = spotlight.resize((width, height), Image.BILINEAR)
-    spotlight = spotlight.filter(ImageFilter.GaussianBlur(radius=width // 12))
-
-    # Composite de l'arrière-plan coloré avant de fusionner la grille
-    background = Image.alpha_composite(bg_glow, spotlight)
+    spotlight = spotlight.filter(ImageFilter.GaussianBlur(radius=width // 14))
     
-    # Isoler la grille de pochettes
-    grid_layer = canvas.copy()
+    # Fusion des couches de fond
+    brand_bg = Image.alpha_composite(bg_gradient, spotlight)
     
-    # 3. Masque d'atténuation gauche (Vignettage lourd vers le noir à gauche pour l'interface UI)
-    left_fade = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    pixels_lf = left_fade.load()
+    # 3. Masque de fondu au noir linéaire progressif pour la partie gauche (Espace UI)
+    ui_fade = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    pixels_uf = ui_fade.load()
     for x in range(width):
-        # Transition fluide : le noir total occupe la partie gauche (0% à 40% de la largeur)
-        if x < width * 0.38:
-            alpha = 255
-        elif x > width * 0.85:
+        # Le noir s'estompe doucement à partir du centre vers la droite
+        if x < width * 0.35:
+            alpha = 245
+        elif x > width * 0.78:
             alpha = 0
         else:
-            factor = 1.0 - ((x - width * 0.38) / (width * 0.47))
-            alpha = int(255 * (factor ** 1.5))
+            factor = 1.0 - ((x - width * 0.35) / (width * 0.43))
+            alpha = int(245 * (factor ** 1.3))
             
         if alpha > 0:
             for y in range(height):
-                # Couleur d'ombre cinéma très profonde
-                pixels_lf[x, y] = (4, 6, 10, alpha)
+                pixels_uf[x, y] = (5, 7, 11, alpha)
 
-    # 4. Vignette globale d'intégration (Adoucit les bords hauts et bas de la grille)
-    edge_vignette = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    pixels_ev = edge_vignette.load()
-    for y in range(height):
-        v_top = max(0.0, (height * 0.18 - y) / (height * 0.18)) if y < height * 0.18 else 0.0
-        v_bottom = max(0.0, (y - height * 0.82) / (height * 0.18)) if y > height * 0.82 else 0.0
-        alpha = int(240 * (v_top ** 1.2)) + int(245 * (v_bottom ** 1.2))
-        if alpha > 0:
-            for x in range(width):
-                pixels_ev[x, y] = (4, 6, 10, min(255, alpha))
-
-    # Assemblage final couche par couche
-    final_art = Image.alpha_composite(background, grid_layer)
-    final_art = Image.alpha_composite(final_art, left_fade)
-    final_art = Image.alpha_composite(final_art, edge_vignette)
+    # Assemblage final structuré
+    final_art = Image.alpha_composite(brand_bg, canvas) # Fond coloré sous les affiches
+    final_art = Image.alpha_composite(final_art, ui_fade) # Assombrissement gauche par-dessus pour l'intégration
     return final_art
 
 def main():
@@ -293,16 +280,15 @@ def main():
         print(f"Error: No unique assets found for {args.label}.")
         sys.exit(1)
 
-    # Assurer un volume suffisant si la requête API est restreinte
     if len(tile_images) < 25:
         tile_images = (tile_images * (30 // len(tile_images) + 1))[:30]
 
     width, height, scale = SIZE_PRESETS[args.size]
     
-    # 1. Construction du damier asymétrique décalé à droite
+    # 1. Grille organisée en colonnes verticales et quinconce à 50%
     canvas = build_tilted_grid(tile_images, width, height, scale=scale)
     
-    # 2. Fusion des ambiances lumineuses et des masques UI transparents
+    # 2. Restitution de l'arrière-plan coloré dégradé
     canvas = apply_premium_gradient(canvas, accent)
 
     out_path = Path(args.output)
