@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - UI Optimized Style (Final Production Version)
-Generates high-end streaming service backgrounds using complex multi-color 
-brand palettes, 50% vertical staggered grids, drop shadows, and network-based curation.
+Premium Backdrop Generator - Angular Alignment Engine (V4)
+Corrects grid layout positioning to eliminate abrupt cuts and aligns the 
+brand multi-layer gradient directly onto the -20 degree layout axis.
 """
 
 import argparse
-import colorsys
 import io
 import itertools
 import math
@@ -28,38 +27,36 @@ QUALITY_PRESETS = {
     "compressed": {"quality": 95, "progressive": True, "subsampling": "4:2:0"}
 }
 
-# --- PARAMÈTRES DE GRILLE PREMIUM ---
-CARD_RADIUS = 24    # Coins arrondis des affiches
-TILE_W = 270        # Largeur de l'affiche
-TILE_H = 405        # Ratio 1:1.5 cinéma parfait
-GAP = 26            # Espacement élégant
-COLS = 8            # 8 colonnes pour occuper généreusement le visuel droit
-ROWS = 6            # 6 rangées par colonne
-TILT_DEG = -20      # Angle d'inclinaison de la nappe
+# --- CONFIGURATION GÉOMÉTRIQUE STRICTE ---
+CARD_RADIUS = 22    
+TILE_W = 280        
+TILE_H = 420        
+GAP = 30            
+TILT_DEG = -20      
 
-FOCUS_X = 0.22      # Alignement horizontal global
-FOCUS_Y = 0.50      # Centrage vertical de la nappe
+# Grille surdimensionnée pour saturer l'espace et simuler la continuité hors-cadre
+COLS = 12           
+ROWS = 8            
 
 SIZE_PRESETS = {
     "1080p": (1920, 1080, 1.0),
     "4k": (3840, 2160, 2.0),
 }
 
-# --- PALETTES DE MARQUES MULTI-COUCHES (Base sombre, Couleur médiane, Point chaud éclatant) ---
+# --- PALETTES OFFICIELLES AJUSTÉES (Sombre en haut à droite -> Éclatant en bas à gauche) ---
 BRAND_PALETTES = {
-    "netflix":      {"base": (20, 0, 3),      "mid": (185, 9, 11),    "light": (255, 45, 55)},
-    "disneyplus":   {"base": (2, 9, 26),      "mid": (0, 70, 140),    "light": (0, 163, 224)},
-    "hbomax":       {"base": (14, 2, 28),     "mid": (60, 0, 176),    "light": (145, 30, 255)},
-    "appletv":      {"base": (10, 10, 12),    "mid": (65, 65, 70),    "light": (180, 180, 185)},
-    "crunchyroll":  {"base": (25, 10, 0),     "mid": (200, 70, 10),   "light": (255, 140, 25)},
-    "hulu":         {"base": (0, 20, 10),     "mid": (28, 170, 90),   "light": (28, 231, 131)},
-    "peacock":      {"base": (5, 12, 28),     "mid": (0, 86, 179),    "light": (0, 180, 216)},
-    "shudder":      {"base": (20, 2, 2),      "mid": (130, 0, 0),     "light": (230, 30, 30)},
-    "primevideo":   {"base": (1, 15, 30),     "mid": (26, 146, 244),  "light": (0, 168, 225)},
-    "paramount":    {"base": (0, 10, 35),     "mid": (0, 84, 230),    "light": (0, 182, 255)}
+    "netflix":      {"base": (8, 0, 2),       "mid": (95, 4, 8),      "light": (229, 9, 20)},
+    "disneyplus":   {"base": (2, 6, 23),      "mid": (4, 28, 79),     "light": (0, 110, 153)},
+    "hbomax":       {"base": (11, 3, 24),     "mid": (36, 11, 89),    "light": (107, 33, 224)},
+    "appletv":      {"base": (12, 12, 14),    "mid": (45, 45, 48),    "light": (150, 150, 155)},
+    "crunchyroll":  {"base": (18, 8, 2),      "mid": (135, 43, 2),    "light": (244, 117, 33)},
+    "hulu":         {"base": (0, 15, 7),      "mid": (10, 85, 45),    "light": (28, 231, 131)},
+    "peacock":      {"base": (4, 8, 20),      "mid": (8, 46, 115),    "light": (0, 108, 225)},
+    "shudder":      {"base": (15, 2, 2),      "mid": (80, 0, 0),      "light": (195, 10, 10)},
+    "primevideo":   {"base": (2, 14, 28),     "mid": (7, 68, 128),    "light": (26, 146, 244)},
+    "paramount":    {"base": (0, 8, 26),      "mid": (0, 50, 150),    "light": (0, 116, 228)}
 }
 
-# --- CONFIGURATION DU FILTRAGE ET CURATION DES CONTENUS EMBLÉMATIQUES (TMDB IDs) ---
 STREAMING_NETWORKS = {
     "netflix": {"networks": "213", "origin_country": "US"},
     "disneyplus": {"networks": "2739", "origin_country": "US"},
@@ -87,8 +84,7 @@ def tmdb_get(endpoint, params, api_key):
                 raise
             time.sleep(1 + attempt)
 
-def fetch_premium_titles(label, api_key, count=75):
-    """Filtre et extrait les films et séries phares par popularité décroissante."""
+def fetch_premium_titles(label, api_key, count=90):
     merged = []
     slug = label.lower().replace(" ", "").replace("+", "plus")
     net_config = STREAMING_NETWORKS.get(slug, {})
@@ -97,7 +93,7 @@ def fetch_premium_titles(label, api_key, count=75):
         endpoint = f"/discover/{media_type}"
         base_params = {
             "sort_by": "popularity.desc",
-            "vote_count.gte": "150",
+            "vote_count.gte": "100",
             "include_adult": "false",
             "with_original_language": "en|ja" if slug == "crunchyroll" else "en"
         }
@@ -105,7 +101,7 @@ def fetch_premium_titles(label, api_key, count=75):
         if "networks" in net_config and media_type == "tv":
             base_params["with_networks"] = net_config["networks"]
         elif "networks" in net_config and media_type == "movie" and slug == "disneyplus":
-            base_params["with_companies"] = "22" # ID Walt Disney Pictures
+            base_params["with_companies"] = "22"
         
         if "origin_country" in net_config:
             base_params["with_origin_country"] = net_config["origin_country"]
@@ -119,7 +115,7 @@ def fetch_premium_titles(label, api_key, count=75):
                     if item.get("poster_path"):
                         merged.append(item)
         except Exception as e:
-            print(f"Warning fetching {media_type} for {label}: {e}")
+            print(f"Warning fetching {media_type}: {e}")
 
     seen_ids = set()
     unique = []
@@ -129,7 +125,6 @@ def fetch_premium_titles(label, api_key, count=75):
             unique.append(item)
             if len(unique) >= count:
                 break
-                
     return unique
 
 def download_image_url(url):
@@ -141,7 +136,6 @@ def download_image_url(url):
         return None
 
 def make_premium_tile(image, tile_width, tile_height, scale):
-    """Formate le poster avec bords arrondis et injecte une ombre portée floutée sous la carte."""
     src_w, src_h = image.size
     target_ratio = tile_width / tile_height
     src_ratio = src_w / src_h
@@ -165,29 +159,29 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     poster_card = Image.new("RGBA", (tile_width, tile_height), (0, 0, 0, 0))
     poster_card.paste(image, mask=mask)
     
-    # --- CRÉATION DE L'OMBRE PORTÉE SUBTILE ---
-    shadow_padding = int(20 * scale)
-    shadow_canvas_w = tile_width + (shadow_padding * 2)
-    shadow_canvas_h = tile_height + (shadow_padding * 2)
+    # Ombre portée douce (Drop Shadow) sous la jaquette
+    shadow_padding = int(24 * scale)
+    shadow_w = tile_width + (shadow_padding * 2)
+    shadow_h = tile_height + (shadow_padding * 2)
     
-    shadow_layer = Image.new("RGBA", (shadow_canvas_w, shadow_canvas_h), (0, 0, 0, 0))
+    shadow_layer = Image.new("RGBA", (shadow_w, shadow_h), (0, 0, 0, 0))
     s_draw = ImageDraw.Draw(shadow_layer)
     s_draw.rounded_rectangle(
         [shadow_padding, shadow_padding, shadow_padding + tile_width - 1, shadow_padding + tile_height - 1],
         radius=radius,
-        fill=(0, 0, 0, 110) # Opacité à ~43% pour un rendu aérien réaliste
+        fill=(0, 0, 0, 140)
     )
-    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(radius=int(9 * scale)))
+    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(radius=int(10 * scale)))
     
-    tile_container = Image.new("RGBA", (shadow_canvas_w, shadow_canvas_h), (0, 0, 0, 0))
-    tile_container.paste(shadow_layer, (0, int(4 * scale))) # Léger décalage Y de l'ombre
+    tile_container = Image.new("RGBA", (shadow_w, shadow_h), (0, 0, 0, 0))
+    tile_container.paste(shadow_layer, (0, int(6 * scale)))
     tile_container.paste(poster_card, (shadow_padding, shadow_padding), poster_card)
     
     return tile_container
 
 def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
-    """Génère la nappe inclinée organisée en colonnes avec un décalage vertical de 50% (quinconce)."""
-    shadow_padding = int(20 * scale)
+    """Génère une nappe géante en quinconce débordant largement pour assurer la continuité."""
+    shadow_padding = int(24 * scale)
     tile_width = int(TILE_W * scale)
     tile_height = int(TILE_H * scale)
     gap = int(GAP * scale)
@@ -196,14 +190,13 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     step_y = tile_height + gap
     stagger_y = step_y // 2
 
-    grid_width = COLS * step_x + (shadow_padding * 4) + 600
-    grid_height = ROWS * step_y + stagger_y + (shadow_padding * 4) + 600
+    # Dimensions massives pour encaisser la rotation sans créer de bordures vides
+    grid_width = COLS * step_x + (shadow_padding * 2)
+    grid_height = ROWS * step_y + stagger_y + (shadow_padding * 2)
     grid = Image.new("RGBA", (grid_width, grid_height), (0, 0, 0, 0))
 
-    # Consommation linéaire séquentielle du pool pour détruire l'effet copié-collé
     tile_pool = itertools.cycle(tiles)
 
-    # Remplissage par colonnes verticales pures
     for col in range(COLS):
         y_offset = stagger_y if (col % 2 == 1) else 0
         for row in range(ROWS):
@@ -212,95 +205,97 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
             
             x = col * step_x + shadow_padding
             y = row * step_y + y_offset + shadow_padding
-            grid.paste(tile_with_shadow, (x, y), tile_with_shadow)
+            grid.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
 
-    # Rotation globale de la nappe
+    # Rotation pivotée
     rotated = grid.rotate(TILT_DEG, expand=True, resample=Image.BICUBIC)
     rot_w, rot_h = rotated.size
 
-    paste_x = int((canvas_width * 0.98) - (rot_w * FOCUS_X))
-    paste_y = int((canvas_height * 0.50) - (rot_h * FOCUS_Y))
+    # Ancrage décalé vers le haut et la gauche pour éliminer les coupures nettes
+    paste_x = int(canvas_width * 0.38 - (rot_w * 0.35))
+    paste_y = int(canvas_height * 0.45 - (rot_h * 0.50))
 
     canvas = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
     canvas.paste(rotated, (paste_x, paste_y), rotated)
-    return canvas
+    
+    # Masque d'opacité progressif global sur la nappe de posters (Plus opaque à droite qu'à gauche)
+    grid_fade = Image.new("L", (canvas_width, canvas_height), 255)
+    f_draw = ImageDraw.Draw(grid_fade)
+    for x in range(canvas_width):
+        if x < canvas_width * 0.20:
+            alpha = 0
+        elif x > canvas_width * 0.75:
+            alpha = 200
+        else:
+            factor = (x - canvas_width * 0.20) / (canvas_width * 0.55)
+            alpha = int(200 * (factor ** 1.2))
+        f_draw.line([(x, 0), (x, canvas_height)], fill=alpha)
+        
+    final_grid = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
+    final_grid.paste(canvas, (0, 0), mask=grid_fade)
+    return final_grid
 
 def apply_premium_gradient(canvas, label):
-    """Construit les mélanges de lumière ambiante à partir des palettes de marque complexes."""
+    """Génère un dégradé directionnel linéaire incliné parallèlement à l'angle des posters."""
     width, height = canvas.size
     slug = label.lower().replace(" ", "").replace("+", "plus")
     
-    palette = BRAND_PALETTES.get(slug, {"base": (10, 12, 16), "mid": (40, 50, 70), "light": (100, 110, 130)})
+    palette = BRAND_PALETTES.get(slug, {"base": (10, 12, 16), "mid": (35, 40, 55), "light": (90, 100, 125)})
     
-    bg_dark = palette["base"]
-    bg_mid = palette["mid"]
-    bg_light = palette["light"]
+    c_dark = palette["base"]
+    c_mid = palette["mid"]
+    c_light = palette["light"]
     
-    # 1. Fond organique avec dégradé linéaire diagonal (Sombre vers Médian)
     bg_gradient = Image.new("RGBA", (width, height))
-    pixels_bg = bg_gradient.load()
+    pixels = bg_gradient.load()
+    
+    # Angle aligné sur l'inclinaison des posters (-20 degrés convertis en radians)
+    angle_rad = math.radians(-TILT_DEG)
+    cos_a = math.cos(angle_rad)
+    sin_a = math.sin(angle_rad)
+    
+    # Calcul de la projection maximale pour normaliser le dégradé sur la diagonale
+    max_proj = width * cos_a + height * sin_a
     
     for y in range(height):
         for x in range(width):
-            factor = (x / width) * 0.7 + (1.0 - (y / height)) * 0.3
+            # Inversion de l'axe Y pour forcer la lumière claire en bas à gauche
+            y_inv = height - y
+            proj = x * cos_a + y_inv * sin_a
+            factor = proj / max_proj
             factor = max(0.0, min(1.0, factor))
             
-            curr_r = int(bg_dark[0] + (bg_mid[0] - bg_dark[0]) * factor)
-            curr_g = int(bg_dark[1] + (bg_mid[1] - bg_dark[1]) * factor)
-            curr_b = int(bg_dark[2] + (bg_mid[2] - bg_dark[2]) * factor)
-            pixels_bg[x, y] = (curr_r, curr_g, curr_b, 255)
-
-    # 2. Point chaud d'arrière-plan (Vibrant Spotlight Backlight) placé sous les affiches
-    spotlight = Image.new("RGBA", (width // 2, height // 2), (0, 0, 0, 0))
-    pixels_spot = spotlight.load()
-    spot_w, spot_h = spotlight.size
-    max_diag = math.hypot(spot_w, spot_h)
-    
-    for x in range(spot_w):
-        for y in range(spot_h):
-            dist = math.hypot(x - (spot_w * 0.82), y - (spot_h * 0.5))
-            intensity = max(0.0, 1.0 - (dist / (max_diag * 0.75)))
-            intensity = intensity ** 1.6 # Lissage mathématique de la courbe de diffusion
+            # Interpolation non-linéaire fluide (Courbe sigmoïde douce)
+            factor = math.sin(factor * math.pi / 2)
             
-            alpha = int(220 * intensity)
-            if alpha > 0:
-                pixels_spot[x, y] = (bg_light[0], bg_light[1], bg_light[2], alpha)
+            if factor < 0.5:
+                # Transition entre Light (Bas-Gauche) et Mid
+                t = factor * 2.0
+                r = int(c_light[0] + (c_mid[0] - c_light[0]) * t)
+                g = int(c_light[1] + (c_mid[1] - c_light[1]) * t)
+                b = int(c_light[2] + (c_mid[2] - c_light[2]) * t)
+            else:
+                # Transition entre Mid et Dark (Haut-Droit)
+                t = (factor - 0.5) * 2.0
+                r = int(c_mid[0] + (c_dark[0] - c_mid[0]) * t)
+                g = int(c_mid[1] + (c_dark[1] - c_mid[1]) * t)
+                b = int(c_mid[2] + (c_dark[2] - c_mid[2]) * t)
                 
-    spotlight = spotlight.resize((width, height), Image.BILINEAR)
-    spotlight = spotlight.filter(ImageFilter.GaussianBlur(radius=width // 12))
-    brand_bg = Image.alpha_composite(bg_gradient, spotlight)
-    
-    # 3. Masque d'obscurité gauche rééquilibré pour l'interface (Laisse transparaître la couleur)
-    ui_fade = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    pixels_uf = ui_fade.load()
-    for x in range(width):
-        if x < width * 0.12:
-            alpha = 240
-        elif x > width * 0.58:
-            alpha = 0
-        else:
-            factor = 1.0 - ((x - width * 0.12) / (width * 0.46))
-            alpha = int(240 * (factor ** 1.7))
-            
-        if alpha > 0:
-            for y in range(height):
-                pixels_uf[x, y] = (5, 6, 9, alpha)
+            pixels[x, y] = (r, g, b, 255)
 
-    # Assemblage final
-    final_art = Image.alpha_composite(brand_bg, canvas)
-    final_art = Image.alpha_composite(final_art, ui_fade)
-    return final_art
+    # Fusion des posters par-dessus le fond coloré linéaire
+    return Image.alpha_composite(bg_gradient, canvas)
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--api-key", required=True, help="TMDB API key")
-    parser.add_argument("--label", required=True, help="Streaming Service name (e.g. Netflix, Disney Plus)")
+    parser.add_argument("--label", required=True, help="Streaming Service name")
     parser.add_argument("--output", required=True, help="Output target path")
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Executing Premium Backdrop Engine for: {args.label}")
-    unique_items = fetch_premium_titles(args.label, args.api_key, count=75)
+    print(f"Executing Angular Generation Engine for: {args.label}")
+    unique_items = fetch_premium_titles(args.label, args.api_key, count=90)
     
     tile_images = []
     for item in unique_items:
@@ -310,16 +305,18 @@ def main():
             tile_images.append(img)
 
     if not tile_images:
-        print(f"Error: No content elements found for label: {args.label}.")
+        print(f"Error: No source posters fetched.")
         sys.exit(1)
 
-    if len(tile_images) < 48:
-        tile_images = (tile_images * (48 // len(tile_images) + 1))[:48]
+    if len(tile_images) < 70:
+        tile_images = (tile_images * (70 // len(tile_images) + 1))[:70]
 
     width, height, scale = SIZE_PRESETS[args.size]
     
-    # Construction de la grille et application du dégradé de marque multicouche
+    # 1. Génération de la nappe inclinée sans fin
     canvas = build_tilted_grid(tile_images, width, height, scale=scale)
+    
+    # 2. Application du dégradé de marque directionnel imbriqué à -20°
     canvas = apply_premium_gradient(canvas, args.label)
 
     out_path = Path(args.output)
@@ -328,10 +325,9 @@ def main():
     final = canvas.convert("RGB")
     settings = QUALITY_PRESETS["compressed"]
     
-    # Sauvegarde
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully deployed premium visual assets for {args.label}!")
+    print(f"Successfully pushed aligned assets for {args.label}!")
 
 if __name__ == "__main__":
     try:
