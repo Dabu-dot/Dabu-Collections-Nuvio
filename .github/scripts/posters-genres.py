@@ -5,6 +5,7 @@ import json
 import random
 import requests
 from datetime import datetime, timedelta
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageOps, ImageFilter
 
 # Configuration TMDB
@@ -15,12 +16,17 @@ if not TMDB_API_KEY:
     print("Erreur : La variable TMDB_API_KEY n'est pas définie.")
     sys.exit(1)
 
+# Dossiers et Fichiers cibles
 OUTPUT_DIR = "Ressources/Collections Covers/Genres/Static Covers"
 HISTORY_FILE = ".github/scripts/posters_history.json"
+
+# Langues occidentales populaires autorisées (Filtre de base)
 ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it"}
+
+# Variable globale pour suivre les médias traités pendant l'exécution
 RUN_PROCESSED_IDS = set()
 
-# Palette Apple TV Premium optimisée avec mots-clés stricts (Nature, Animaux, Espace pour docus)
+# Configuration chirurgicale des genres - Palette Apple TV Premium optimisée
 GENRES_CONFIG = {
     "action": {"label": "Action", "color": (210, 40, 45), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [3930, 6054, 12993, 9951, 8440, 188955, 226499, 83, 312, 779, 4565, 14955, 853, 9665, 10044]},
     "animation-japonaise": {"label": "Animation Japonaise", "color": (140, 45, 210), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True, "override_lang": True, "scoring_keywords": [210024, 13141, 207826]},
@@ -28,7 +34,7 @@ GENRES_CONFIG = {
     "aventure": {"label": "Aventure", "color": (20, 130, 70), "movie_genre": 12, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [195114, 161176, 818, 4152, 170362, 210246, 10364, 41586, 6956, 269233]},
     "comedie": {"label": "Comédie", "color": (220, 110, 10), "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16", "scoring_keywords": [8201, 9755, 9964, 375047, 6241, 9253]},
     "crime": {"label": "Crime", "color": (70, 85, 105), "movie_genre": 80, "tv_genre": 80, "extra": "&without_genres=16", "scoring_keywords": [2095, 9748, 181644, 157241, 206958, 268067, 703, 5340, 6149, 9826, 155790, 207046]},
-    "documentaire": {"label": "Documentaire", "color": (20, 140, 60), "movie_genre": 99, "tv_genre": 99, "extra": "&with_keywords=210002|283115|6432|209250|9714", "scoring_keywords": [210002, 283115, 6432, 209250, 9714]}, # Tags Nature, Animaux, Espace
+    "documentaire": {"label": "Documentaire", "color": (20, 140, 60), "movie_genre": 99, "tv_genre": 99, "extra": "&with_keywords=210002|283115|6432|209250|9714", "scoring_keywords": [210002, 283115, 6432, 209250, 9714]},
     "drame": {"label": "Drame", "color": (30, 90, 170), "movie_genre": 18, "tv_genre": 18, "extra": "&without_genres=16", "scoring_keywords": []},
     "famille": {"label": "Famille", "color": (170, 25, 150), "movie_genre": 10751, "tv_genre": 10751, "extra": "&without_genres=16", "scoring_keywords": []},
     "fantastique": {"label": "Fantastique", "color": (110, 30, 190), "movie_genre": 14, "tv_genre": 10765, "extra": "&without_genres=16", "scoring_keywords": []},
@@ -37,6 +43,7 @@ GENRES_CONFIG = {
     "horreur": {"label": "Horreur", "color": (180, 20, 20), "movie_genre": 27, "tv_genre": 27, "extra": "&without_genres=16&with_keywords=3358|9748|6152", "scoring_keywords": []},
     "romance": {"label": "Romance", "color": (180, 35, 90), "movie_genre": 10749, "tv_genre": 10749, "extra": "&without_genres=16&without_original_language=ko|ja|zh", "scoring_keywords": []},
     "science-fiction": {"label": "Science-Fiction", "color": (15, 60, 160), "movie_genre": 878, "tv_genre": 10765, "extra": "&without_genres=16&with_keywords=4565|9882", "scoring_keywords": []},
+    "sport": {"label": "Sport", "color": (235, 170, 0), "movie_genre": 18, "tv_genre": 73, "extra": "&with_keywords=6075|9262|1515|2903|5565|10543", "scoring_keywords": [6075, 9262, 1515, 2903, 5565, 10543]}, # Keywords: sports, football, basketball, racing, boxing, baseball
     "thriller": {"label": "Thriller", "color": (15, 100, 85), "movie_genre": 53, "tv_genre": 80, "extra": "&without_genres=16&with_keywords=9826|10123", "scoring_keywords": []},
     "western": {"label": "Western", "color": (160, 60, 15), "movie_genre": 37, "tv_genre": 37, "extra": "&without_genres=16", "scoring_keywords": []}
 }
@@ -101,29 +108,21 @@ def get_media_keywords(media_type, media_id):
     except: return set()
 
 def get_best_textless_backdrops(media_type, media_id, fallback_path):
-    """
-    Récupère une liste élargie d'images et applique un filtrage strict sur la nudité / contenus adultes non répertoriés.
-    """
     try:
         res = tmdb_api_call(f"/{media_type}/{media_id}/images", {"include_image_language": "null"})
         bd = res.get("backdrops", [])
         if not bd: return [{"file_path": fallback_path, "width": 1920, "vote_count": 5}]
         
-        # Filtrage de sécurité : Élimine les images qui ont des anomalies de métadonnées utilisateur
         safe_bd = []
         for b in bd:
-            # Si l'image a reçu des votes négatifs ou un flag suspect dans l'API, on l'écarte
             if b.get("vote_average", 5) < 3.0: continue
             safe_bd.append(b)
             
         if not safe_bd: safe_bd = bd
-        return safe_bd[:15] # On élargit la sélection pour avoir le choix de la définition
+        return safe_bd[:15]
     except: return [{"file_path": fallback_path, "width": 1920, "vote_count": 5}]
 
 def score_and_select_backdrop(backdrops):
-    """
-    Système de notation qui favorise massivement la Ultra Haute Définition (4K / 2K)
-    """
     scored_images = []
     for bg in backdrops:
         width = bg.get("width", 0)
@@ -132,15 +131,14 @@ def score_and_select_backdrop(backdrops):
         
         base_score = votes * 2
         
-        # Bonus de résolution drastique
         if width >= 3840 or height >= 2160:
-            base_score += 500  # Priorité absolue aux sources 4K
+            base_score += 500  
         elif width >= 2560 or height >= 1440:
-            base_score += 250  # Forte priorité au 2K
+            base_score += 250  
         elif width >= 1920 or height >= 1080:
-            base_score += 50   # Standard correct
+            base_score += 50   
         else:
-            base_score -= 100  # Malus pour les basses résolutions
+            base_score -= 100  
             
         scored_images.append((base_score, bg))
         
@@ -148,18 +146,11 @@ def score_and_select_backdrop(backdrops):
     return scored_images[0][1] if scored_images else backdrops[0]
 
 def apply_premium_duotone(img, base_color):
-    """
-    Mode de fusion 'Couleur' YCbCr avec gestionnaire anti-brûlure intelligent
-    pour empêcher les images d'origine trop claires de devenir aveuglantes.
-    """
-    # 1. Équilibrage dynamique pour éviter la surbrillance (Anti-brûlure)
-    # Si l'image est globalement trop lumineuse, on applique un léger masque de sous-exposition protecteur
     img_gray = img.convert("L")
     stat = img_gray.histogram()
-    pixels_lumineux = sum(stat[200:]) / sum(stat) # Ratio de pixels très blancs
+    pixels_lumineux = sum(stat[200:]) / sum(stat)
     
     if pixels_lumineux > 0.25:
-        # L'image est sur-exposée d'origine, on compense pour ne pas saturer le mode couleur
         img = ImageEnhance.Brightness(img).enhance(0.88)
         img = ImageEnhance.Contrast(img).enhance(1.15)
     else:
@@ -173,13 +164,11 @@ def apply_premium_duotone(img, base_color):
     y_img, _, _ = img_ycbcr.split()
     _, cb_color, cr_color = color_ycbcr.split()
     
-    # Limitation supplémentaire du canal de lumière max pour stabiliser la fusion
     y_img = ImageEnhance.Brightness(y_img).enhance(0.96)
     
     final_ycbcr = Image.merge("YCbCr", (y_img, cb_color, cr_color))
     final_rgb = final_ycbcr.convert("RGB")
     
-    # Saturation calibrée
     final_rgb = ImageEnhance.Color(final_rgb).enhance(1.12)
     return final_rgb.filter(ImageFilter.SHARPEN)
 
@@ -189,7 +178,6 @@ def finalize_landscape_banner(img, label, color):
     
     img_rgba = img.convert("RGBA")
     
-    # Dégradé noir vertical classique en bas pour le texte
     gradient = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
     g_draw = ImageDraw.Draw(gradient)
     for y in range(450, 1080):
@@ -258,7 +246,6 @@ def main():
             media = candidate["item"]
             backdrops = get_best_textless_backdrops(media["media_type"], media["id"], media["backdrop_path"])
             
-            # Élection du meilleur backdrop basé sur la résolution (4K/2K en priorité)
             best_bg = score_and_select_backdrop(backdrops)
             
             try:
@@ -281,7 +268,7 @@ def main():
 
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(dict(sorted(history.items(), key=lambda x: x[1]['date'], reverse=True)), f, ensure_ascii=False, indent=4)
-    print("\n[SUCCESS] Script ultra-hd avec filtrage adulte renforcé et anti-brûlure opérationnel.")
+    print("\n[SUCCESS] Script avec intégration du genre Sport exécuté.")
 
 if __name__ == "__main__":
     main()
