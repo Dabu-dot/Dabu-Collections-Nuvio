@@ -31,9 +31,9 @@ QUALITY_PRESETS = {
 # --- PARAMÈTRES DE GRILLE PREMIUM ---
 CARD_RADIUS = 24    # Coins arrondis des affiches
 TILE_W = 270        # Largeur de l'affiche
-TILE_H = 405        # Ratio 1:1.5 cinéma parfait (évite l'effet écrasé)
-GAP = 26            # Espacement serré et élégant
-COLS = 8            # 8 colonnes pour occuper généreusement le visuel
+TILE_H = 405        # Ratio 1:1.5 cinéma parfait
+GAP = 26            # Espacement élégant
+COLS = 8            # 8 colonnes pour occuper généreusement le visuel droit
 ROWS = 6            # 6 rangées par colonne
 TILT_DEG = -20      # Angle d'inclinaison de la nappe
 
@@ -59,7 +59,7 @@ BRAND_PALETTES = {
     "paramount":    {"base": (0, 10, 35),     "mid": (0, 84, 230),    "light": (0, 182, 255)}
 }
 
-# --- CONFIGURATION DU FILTRAGE ET CURATION DES CONTENUS EMBLÉMATIQUES ---
+# --- CONFIGURATION DU FILTRAGE ET CURATION DES CONTENUS EMBLÉMATIQUES (TMDB IDs) ---
 STREAMING_NETWORKS = {
     "netflix": {"networks": "213", "origin_country": "US"},
     "disneyplus": {"networks": "2739", "origin_country": "US"},
@@ -180,7 +180,7 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(radius=int(9 * scale)))
     
     tile_container = Image.new("RGBA", (shadow_canvas_w, shadow_canvas_h), (0, 0, 0, 0))
-    tile_container.paste(shadow_layer, (0, int(4 * scale))) # Léger décalage Y de la lumière
+    tile_container.paste(shadow_layer, (0, int(4 * scale))) # Léger décalage Y de l'ombre
     tile_container.paste(poster_card, (shadow_padding, shadow_padding), poster_card)
     
     return tile_container
@@ -313,16 +313,13 @@ def main():
         print(f"Error: No content elements found for label: {args.label}.")
         sys.exit(1)
 
-    # Sécurité si l'API TMDB renvoie exceptionnellement moins de titres que la taille de grille minimale
     if len(tile_images) < 48:
         tile_images = (tile_images * (48 // len(tile_images) + 1))[:48]
 
     width, height, scale = SIZE_PRESETS[args.size]
     
-    # Étape 1 : Construction de la nappe géométrique complexe
+    # Construction de la grille et application du dégradé de marque multicouche
     canvas = build_tilted_grid(tile_images, width, height, scale=scale)
-    
-    # Étape 2 : Fusion avec le système de dégradés d'ambiance
     canvas = apply_premium_gradient(canvas, args.label)
 
     out_path = Path(args.output)
@@ -331,7 +328,7 @@ def main():
     final = canvas.convert("RGB")
     settings = QUALITY_PRESETS["compressed"]
     
-    # Sauvegarde optimisée multi-formats
+    # Sauvegarde
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
     print(f"Successfully deployed premium visual assets for {args.label}!")
