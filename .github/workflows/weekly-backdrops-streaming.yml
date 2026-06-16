@@ -41,22 +41,31 @@ jobs:
           python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Netflix" --accent-color "#E50914" --tmdb-request "movie:with_companies=420" --tmdb-request "series:with_networks=213" --output "Ressources/Collections Covers/Streaming Services/Backdrops/netflix.jpg"
 
           # 2. AMAZON PRIME VIDEO
-          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Prime Video" --accent-color "#00A8E8" --tmdb-request "movie:with_companies=20580" --tmdb-request "series:with_networks=1024" --output "Ressources/Collections Covers/Streaming Services/Backdrops/primevideo.jpg"
+          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Prime Video" --accent-color "#1A92F4" --tmdb-request "movie:with_companies=20580" --tmdb-request "series:with_networks=1024" --output "Ressources/Collections Covers/Streaming Services/Backdrops/primevideo.jpg"
 
           # 3. DISNEY+
-          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Disney Plus" --accent-color "#0072F2" --tmdb-request "movie:with_companies=2" --tmdb-request "series:with_networks=2739" --output "Ressources/Collections Covers/Streaming Services/Backdrops/disneyplus.jpg"
+          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Disney Plus" --accent-color "#02346C" --tmdb-request "movie:with_companies=2" --tmdb-request "series:with_networks=2739" --output "Ressources/Collections Covers/Streaming Services/Backdrops/disneyplus.jpg"
 
           # 4. APPLE TV+
-          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Apple TV" --accent-color "#FFFFFF" --tmdb-request "movie:with_companies=184564" --tmdb-request "series:with_networks=2552" --output "Ressources/Collections Covers/Streaming Services/Backdrops/appletv.jpg"
+          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Apple TV" --accent-color "#2D2D2D" --tmdb-request "movie:with_companies=184564" --tmdb-request "series:with_networks=2552" --output "Ressources/Collections Covers/Streaming Services/Backdrops/appletv.jpg"
 
           # 5. CRUNCHYROLL
-          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Crunchyroll" --accent-color "#F47521" --tmdb-request "movie:with_companies=12417" --tmdb-request "series:with_networks=1112" --output "Ressources/Collections Covers/Streaming Services/Backdrops/crunchyroll.jpg"
+          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Crunchyroll" --accent-color "#DF5A15" --tmdb-request "movie:with_companies=12417" --tmdb-request "series:with_networks=1112" --output "Ressources/Collections Covers/Streaming Services/Backdrops/crunchyroll.jpg"
 
           # 6. HBO MAX / MAX
-          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "HBO Max" --accent-color "#4000BF" --tmdb-request "movie:with_companies=3268" --tmdb-request "series:with_networks=3186" --output "Ressources/Collections Covers/Streaming Services/Backdrops/hbomax.jpg"
+          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "HBO Max" --accent-color "#0A183D" --tmdb-request "movie:with_companies=3268" --tmdb-request "series:with_networks=3186" --output "Ressources/Collections Covers/Streaming Services/Backdrops/hbomax.jpg"
 
           # 7. PARAMOUNT+
-          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Paramount" --accent-color "#0064FF" --tmdb-request "movie:with_companies=4" --tmdb-request "series:with_networks=4330" --output "Ressources/Collections Covers/Streaming Services/Backdrops/paramount.jpg"
+          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Paramount" --accent-color "#0054E6" --tmdb-request "movie:with_companies=4" --tmdb-request "series:with_networks=4330" --output "Ressources/Collections Covers/Streaming Services/Backdrops/paramount.jpg"
+
+          # 8. HULU
+          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Hulu" --accent-color "#1CE783" --tmdb-request "movie:with_companies=23217" --tmdb-request "series:with_networks=453" --output "Ressources/Collections Covers/Streaming Services/Backdrops/hulu.jpg"
+
+          # 9. PEACOCK
+          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Peacock" --accent-color "#000000" --tmdb-request "movie:with_companies=33682" --tmdb-request "series:with_networks=3353" --output "Ressources/Collections Covers/Streaming Services/Backdrops/peacock.jpg"
+
+          # 10. SHUDDER
+          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Shudder" --accent-color "#990000" --tmdb-request "movie:with_keywords=9748|3640" --tmdb-request "series:with_keywords=9748|3640" --output "Ressources/Collections Covers/Streaming Services/Backdrops/shudder.jpg"
 
       - name: Clean Python cache folders
         run: |
@@ -70,7 +79,7 @@ jobs:
           git add "Ressources/Collections Covers/Streaming Services/Backdrops/"
           
           if ! git diff --cached --exit-code --quiet; then
-            git commit -m "chore: update streaming platforms backdrops [skip ci]"
+            git commit -m "chore: update streaming platforms backdrops with premium style [skip ci]"
             git push origin main
           else
             echo "No changes found. Skipping commit."
