@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Backdrop generator adapted for Streaming Services using Vertical Posters.
-Features heavy left-fading dark gradients and brand color accents.
+Premium Backdrop Generator - UI Optimized Style
+Pushes a clean, verticalized poster grid to the right while creating 
+a gorgeous, atmospheric color gradient background matching the platform identity.
 """
 
 import argparse
@@ -21,31 +22,31 @@ import requests
 from PIL import Image, ImageDraw, ImageFilter
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "output"
 TMDB_BASE = "https://api.themoviedb.org/3"
 TMDB_IMG_BASE = "https://image.tmdb.org/t/p"
+POSTER_SIZE = "w780"
 
-POSTER_SIZE = "w780" 
 QUALITY_PRESETS = {
-    "compressed": {"quality": 85, "progressive": True, "subsampling": "4:2:0"},
-    "high": {"quality": 95, "progressive": False, "subsampling": 0},
+    "compressed": {"quality": 88, "progressive": True, "subsampling": "4:2:0"}
 }
 
-CARD_RADIUS = 16
-TILT_DEG = 10
-TILE_W = 220        
-TILE_H = 330        
-GAP = 14            
-ROWS = 7
-COLS = 9
-STAGGER = 0.35
+# Configuration de la Grille Premium (Aérienne, Zoomée et Verticale)
+CARD_RADIUS = 28    # Coins plus ronds pour l'effet moderne
+TILE_W = 280        # Plus grands posters
+TILE_H = 420        
+GAP = 32            # Espacement large et épuré
+ROWS = 6
+COLS = 7
+STAGGER = 0.50      # Décalage prononcé pour accentuer l'effet de colonnes verticales
+TILT_DEG = -18      # Inclinaison inversée pour basculer la grille sur la droite
 
-FOCUS_X = 0.75
+# Ancrage du focus visuel sur le tiers droit
+FOCUS_X = 0.35
 FOCUS_Y = 0.50
 
 SIZE_PRESETS = {
-    "4k": (3840, 2160, 3840 / 1920),
     "1080p": (1920, 1080, 1.0),
+    "4k": (3840, 2160, 2.0),
 }
 
 def cleanup_pycache():
@@ -53,25 +54,13 @@ def cleanup_pycache():
 
 def parse_accent_color(value):
     if not value:
-        return (0, 0, 0)
+        return (10, 15, 25)
     value = value.strip().lstrip("#")
-    if "," in value:
-        try:
-            return tuple(int(p.strip()) for p in value.split(","))
-        except ValueError:
-            return (0, 0, 0)
-            
     if len(value) == 6:
-        safe_chars = []
-        for c in value.upper():
-            safe_chars.append(c if c in "0123456789ABCDEF" else "0")
+        safe_chars = [c if c in "0123456789ABCDEF" else "0" for c in value.upper()]
         safe_value = "".join(safe_chars)
-        try:
-            return tuple(int(safe_value[i:i+2], 16) for i in (0, 2, 4))
-        except ValueError:
-            return (0, 0, 0)
-        
-    return (0, 0, 0)
+        return tuple(int(safe_value[i:i+2], 16) for i in (0, 2, 4))
+    return (10, 15, 25)
 
 def tmdb_get(endpoint, params, api_key):
     query = dict(params)
@@ -91,31 +80,33 @@ def parse_request_spec(spec):
     media_type = "tv" if raw_media_type.strip() == "series" else raw_media_type.strip()
     return {"media_type": media_type, "params": dict(parse_qsl(raw_request.strip(), keep_blank_values=True))}
 
-def fetch_titles(request_specs, api_key, count=50):
+def fetch_titles(request_specs, api_key, count=60):
     merged = []
     for spec in request_specs:
         endpoint = f"/discover/{spec['media_type']}"
         base_params = {
             "sort_by": "popularity.desc",
-            "vote_count.gte": "150",
+            "vote_count.gte": "100",
             **spec["params"]
         }
         
-        for page in range(1, 3):
+        for page in range(1, 4):
             data = tmdb_get(endpoint, {**base_params, "page": page}, api_key)
             for item in data.get("results", []):
-                if item.get("poster_path"):
+                # Filtrage strict pour éviter les entrées sans poster ou sans titre informatif
+                if item.get("poster_path") and (item.get("title") or item.get("name")):
                     merged.append((spec["media_type"], item))
-            if page >= data.get("total_pages", 3):
+            if page >= data.get("total_pages", 4):
                 break
 
-    seen = set()
+    seen_ids = set()
     unique = []
     for media_type, item in merged:
-        key = (media_type, item["id"])
-        if key not in seen:
-            seen.add(key)
-            unique.append((media_type, item))
+        # RÈGLE ANTI-DOUBLON STRUCTURANTE : On bloque par ID TMDB unique
+        uid = f"{media_type}_{item['id']}"
+        if uid not in seen_ids:
+            seen_ids.add(uid)
+            unique.append(item)
             if len(unique) >= count:
                 break
     return unique
@@ -128,29 +119,28 @@ def download_image_url(url):
     except Exception:
         return None
 
-def rounded_rect_mask(width, height, radius=CARD_RADIUS):
-    mask = Image.new("L", (width, height), 0)
-    draw = ImageDraw.Draw(mask)
-    draw.rounded_rectangle([0, 0, width - 1, height - 1], radius=radius, fill=255)
-    return mask
-
-def make_tile(image, tile_width, tile_height):
-    source_width, source_height = image.size
+def make_tile(image, tile_width, tile_height, scale):
+    src_w, src_h = image.size
     target_ratio = tile_width / tile_height
-    current_ratio = source_width / source_height
+    src_ratio = src_w / src_h
     
-    if current_ratio > target_ratio:
-        new_width = int(source_height * target_ratio)
-        left = (source_width - new_width) // 2
-        image = image.crop((left, 0, left + new_width, source_height))
+    if src_ratio > target_ratio:
+        new_w = int(src_h * target_ratio)
+        left = (src_w - new_w) // 2
+        image = image.crop((left, 0, left + new_w, src_h))
     else:
-        new_height = int(source_width / target_ratio)
-        top = (source_height - new_height) // 2
-        image = image.crop((0, top, source_width, top + new_height))
+        new_h = int(src_w / target_ratio)
+        top = (src_h - new_h) // 2
+        image = image.crop((0, top, src_w, top + new_h))
         
     image = image.resize((tile_width, tile_height), Image.LANCZOS)
-    scaled_radius = max(12, int(CARD_RADIUS * tile_width / TILE_W))
-    mask = rounded_rect_mask(tile_width, tile_height, radius=scaled_radius)
+    
+    # Masque aux coins arrondis lisses
+    radius = max(16, int(CARD_RADIUS * scale))
+    mask = Image.new("L", (tile_width, tile_height), 0)
+    draw = ImageDraw.Draw(mask)
+    draw.rounded_rectangle([0, 0, tile_width - 1, tile_height - 1], radius=radius, fill=255)
+    
     result = Image.new("RGBA", (tile_width, tile_height), (0, 0, 0, 0))
     result.paste(image, mask=mask)
     return result
@@ -159,79 +149,122 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     tile_width = int(TILE_W * scale)
     tile_height = int(TILE_H * scale)
     gap = int(GAP * scale)
+    stagger_px = int(STAGGER * (tile_height + gap))
 
-    cols, rows = COLS + 4, ROWS + 4
-    needed = rows * cols
-    tile_list = (tiles * (needed // len(tiles) + 1))[:needed]
-    stagger_px = int(STAGGER * (tile_width + gap))
-
-    grid_width = cols * (tile_width + gap) + rows * stagger_px
-    grid_height = rows * (tile_height + gap)
+    # Génération d'une nappe large pour couvrir la zone de rotation
+    grid_width = COLS * (tile_width + gap) + ROWS * stagger_px
+    grid_height = ROWS * (tile_height + gap) + 400
     grid = Image.new("RGBA", (grid_width, grid_height), (0, 0, 0, 0))
 
-    for row in range(rows):
-        for col in range(cols):
-            idx = row * cols + col
-            if idx >= len(tile_list):
-                break
-            x = row * stagger_px + col * (tile_width + gap)
+    tile_cycle = itertools.cycle(tiles)
+
+    for row in range(ROWS):
+        for col in range(COLS):
+            tile_img = next(tile_cycle)
+            tile = make_tile(tile_img, tile_width, tile_height, scale)
+            
+            # Alignement créant l'asymétrie verticale dynamique
+            x = col * (tile_width + gap) + (row * stagger_px)
             y = row * (tile_height + gap)
-            tile = make_tile(tile_list[idx], tile_width, tile_height)
             grid.paste(tile, (x, y), tile)
 
+    # Rotation bicubique pour préserver la netteté des pochettes
     rotated = grid.rotate(TILT_DEG, expand=True, resample=Image.BICUBIC)
-    rotated_width, rotated_height = rotated.size
+    rot_w, rot_h = rotated.size
 
-    focus_in_rot_x = FOCUS_X * rotated_width
-    focus_in_rot_y = FOCUS_Y * rotated_height
+    # Positionnement ciblé sur la DROITE du canevas global
+    paste_x = int((canvas_width * 0.88) - (rot_w * FOCUS_X))
+    paste_y = int((canvas_height * 0.50) - (rot_h * FOCUS_Y))
 
-    paste_x = int(canvas_width * 0.55 - focus_in_rot_x)
-    paste_y = int(canvas_height * 0.50 - focus_in_rot_y)
-
-    canvas = Image.new("RGBA", (canvas_width, canvas_height), (5, 7, 9, 255))
+    # Base sombre neutre de cinéma avant application du dégradé de marque
+    canvas = Image.new("RGBA", (canvas_width, canvas_height), (6, 8, 12, 255))
     canvas.paste(rotated, (paste_x, paste_y), rotated)
     return canvas
 
-def apply_gradient(canvas, accent):
+def apply_premium_gradient(canvas, accent):
     width, height = canvas.size
-    
-    left_black = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    pixels_lb = left_black.load()
-    for x in range(width):
-        mix = max(0.0, 1.0 - (x / (width * 0.58)))
-        alpha = int(255 * (mix ** 1.3))
-        if alpha:
-            for y in range(height):
-                pixels_lb[x, y] = (5, 7, 9, alpha)
-
-    vignette = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    pixels_v = vignette.load()
-    for y in range(height):
-        mix_bottom = max(0.0, (y - height * 0.65) / (height * 0.35))
-        mix_top = max(0.0, (height * 0.25 - y) / (height * 0.25))
-        alpha = int(220 * (mix_bottom ** 1.5)) + int(180 * (mix_top ** 1.5))
-        if alpha:
-            for x in range(width):
-                pixels_v[x, y] = (5, 7, 9, min(255, alpha))
-
-    accent_layer = Image.new("RGBA", (width // 4, height // 4), (0, 0, 0, 0))
-    pixels_a = accent_layer.load()
     r, g, b = accent
-    max_diag = math.hypot(width // 4, height // 4)
-    for x in range(width // 4):
-        for y in range(height // 4):
-            dist = math.hypot((width // 4) - x, y)
-            mix = max(0.0, 1.0 - (dist / (max_diag * 0.85)))
-            alpha = int(140 * (mix ** 1.8))
-            if alpha:
-                pixels_a[x, y] = (r, g, b, alpha)
-                
-    accent_layer = accent_layer.resize((width, height), Image.BILINEAR)
-    accent_layer = accent_layer.filter(ImageFilter.GaussianBlur(radius=width // 32))
+    
+    # Convertir en HSV pour générer des variations harmonieuses (ambiance lumineuse et ombres)
+    h, s, v = colorsys.rgb_to_hsv(r/255, g/255, b/255)
+    
+    # 1. Fond dégradé de couleur (Simule la lueur globale de marque)
+    bg_glow = Image.new("RGBA", (width, height))
+    pixels_bg = bg_glow.load()
+    
+    # Base de couleur plus sombre pour le fond texturé
+    bg_r, bg_g, bg_b = [int(x * 255) for x in colorsys.hsv_to_rgb(h, max(0.2, s * 0.8), max(0.08, v * 0.25))]
+    
+    for y in range(height):
+        # Léger dégradé du haut vers le bas sur le fond
+        factor = 1.0 - (y / height) * 0.3
+        curr_r = min(255, max(0, int(bg_r * factor)))
+        curr_g = min(255, max(0, int(bg_g * factor)))
+        curr_b = min(255, max(0, int(bg_b * factor)))
+        for x in range(width):
+            pixels_bg[x, y] = (curr_r, curr_g, curr_b, 255)
 
-    result = Image.alpha_composite(canvas, left_black)
-    result = Image.alpha_composite(result, vignette)
-    return Image.alpha_composite(result, accent_layer)
+    # 2. Projecteur de couleur dynamique (Vibrant Glow localisé en haut à droite / centre droit)
+    spotlight = Image.new("RGBA", (width // 2, height // 2), (0, 0, 0, 0))
+    pixels_spot = spotlight.load()
+    spot_w, spot_h = spotlight.size
+    
+    # Couleur d'accentuation pure et vibrante
+    spot_r, spot_g, spot_b = [int(x * 255) for x in colorsys.hsv_to_rgb(h, min(1.0, s * 1.1), min(1.0, v * 1.3))]
+    max_diag = math.hypot(spot_w, spot_h)
+    
+    for x in range(spot_w):
+        for y in range(spot_h):
+            # Centre du spot calé vers la zone des posters
+            dist = math.hypot(x - (spot_w * 0.8), y - (spot_h * 0.4))
+            intensity = max(0.0, 1.0 - (dist / (max_diag * 0.75)))
+            alpha = int(160 * (intensity ** 1.6))
+            if alpha > 0:
+                pixels_spot[x, y] = (spot_r, spot_g, spot_b, alpha)
+                
+    spotlight = spotlight.resize((width, height), Image.BILINEAR)
+    spotlight = spotlight.filter(ImageFilter.GaussianBlur(radius=width // 12))
+
+    # Composite de l'arrière-plan coloré avant de fusionner la grille
+    background = Image.alpha_composite(bg_glow, spotlight)
+    
+    # Isoler la grille de pochettes
+    grid_layer = canvas.copy()
+    
+    # 3. Masque d'atténuation gauche (Vignettage lourd vers le noir à gauche pour l'interface UI)
+    left_fade = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    pixels_lf = left_fade.load()
+    for x in range(width):
+        # Transition fluide : le noir total occupe la partie gauche (0% à 40% de la largeur)
+        if x < width * 0.38:
+            alpha = 255
+        elif x > width * 0.85:
+            alpha = 0
+        else:
+            factor = 1.0 - ((x - width * 0.38) / (width * 0.47))
+            alpha = int(255 * (factor ** 1.5))
+            
+        if alpha > 0:
+            for y in range(height):
+                # Couleur d'ombre cinéma très profonde
+                pixels_lf[x, y] = (4, 6, 10, alpha)
+
+    # 4. Vignette globale d'intégration (Adoucit les bords hauts et bas de la grille)
+    edge_vignette = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    pixels_ev = edge_vignette.load()
+    for y in range(height):
+        v_top = max(0.0, (height * 0.18 - y) / (height * 0.18)) if y < height * 0.18 else 0.0
+        v_bottom = max(0.0, (y - height * 0.82) / (height * 0.18)) if y > height * 0.82 else 0.0
+        alpha = int(240 * (v_top ** 1.2)) + int(245 * (v_bottom ** 1.2))
+        if alpha > 0:
+            for x in range(width):
+                pixels_ev[x, y] = (4, 6, 10, min(255, alpha))
+
+    # Assemblage final couche par couche
+    final_art = Image.alpha_composite(background, grid_layer)
+    final_art = Image.alpha_composite(final_art, left_fade)
+    final_art = Image.alpha_composite(final_art, edge_vignette)
+    return final_art
 
 def main():
     parser = argparse.ArgumentParser()
@@ -246,25 +279,31 @@ def main():
     accent = parse_accent_color(args.accent_color)
     request_specs = [parse_request_spec(req) for req in args.tmdb_request]
     
-    print(f"Generating optimized streaming backdrop for: {args.label}")
-    titles = fetch_titles(request_specs, args.api_key, count=45)
+    print(f"Generating premium UI backdrop for: {args.label}")
+    unique_items = fetch_titles(request_specs, args.api_key, count=55)
     
     tile_images = []
-    for idx, (media_type, item) in enumerate(titles, start=1):
+    for item in unique_items:
         poster_path = item.get("poster_path")
         img = download_image_url(f"{TMDB_IMG_BASE}/{POSTER_SIZE}{poster_path}")
         if img:
             tile_images.append(img)
 
     if not tile_images:
-        print("Error: No posters downloaded.")
+        print(f"Error: No unique assets found for {args.label}.")
         sys.exit(1)
 
-    tile_images = (tile_images * (20 // len(tile_images) + 1))[:20] if len(tile_images) < 15 else tile_images
+    # Assurer un volume suffisant si la requête API est restreinte
+    if len(tile_images) < 25:
+        tile_images = (tile_images * (30 // len(tile_images) + 1))[:30]
 
     width, height, scale = SIZE_PRESETS[args.size]
+    
+    # 1. Construction du damier asymétrique décalé à droite
     canvas = build_tilted_grid(tile_images, width, height, scale=scale)
-    canvas = apply_gradient(canvas, accent)
+    
+    # 2. Fusion des ambiances lumineuses et des masques UI transparents
+    canvas = apply_premium_gradient(canvas, accent)
 
     out_path = Path(args.output)
     out_path.parent.mkdir(parents=True, exist_ok=True)
