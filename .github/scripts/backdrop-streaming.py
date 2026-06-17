@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+#!/usr/bin/env python3
 """
-Premium Backdrop Generator - Strict Right Edge Positioning & Vertical Centering (V13)
-Fixes the vertical sag and forces the grid layer to align flawlessly with the right boundary.
+Premium Backdrop Generator - Fixed Right Pivot Rotation (V14)
+Eliminates dynamic bounding box issues by drawing directly on a frame-sized layer
+and forcing the rotation to pivot near the right edge.
 """
 
 import argparse
@@ -26,7 +28,7 @@ QUALITY_PRESETS = {
     "compressed": {"quality": 95, "progressive": True, "subsampling": "4:2:0"}
 }
 
-# --- CONFIGURATION GÉOMÉTRIQUE VERROUILLÉE ---
+# --- CONFIGURATION GÉOMÉTRIQUE STRICTE ---
 CARD_RADIUS = 22    
 TILE_W = 320        
 TILE_H = 480        
@@ -34,7 +36,7 @@ GAP = 34
 TILT_DEG = -20      
 
 COLS = 4            
-ROWS = 5            # Repassage à 5 lignes bien centrées pour éviter l'effet "trop bas"
+ROWS = 6            # 6 lignes pour s'assurer que le haut et le bas soient totalement remplis après inclinaison
 
 SIZE_PRESETS = {
     "1080p": (1920, 1080, 1.0),
@@ -172,7 +174,7 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     poster_card = Image.new("RGBA", (tile_width, tile_height), (0, 0, 0, 0))
     poster_card.paste(image, mask=mask)
     
-    # Ombre Portée Rehaussée V12 préservée
+    # Ombres V12/V13 validées
     shadow_padding = int(36 * scale)
     shadow_w = tile_width + (shadow_padding * 2)
     shadow_h = tile_height + (shadow_padding * 2)
@@ -182,7 +184,7 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     s_draw.rounded_rectangle(
         [shadow_padding, shadow_padding, shadow_padding + tile_width - 1, shadow_padding + tile_height - 1],
         radius=radius,
-        fill=(0, 0, 0, 210)  
+        fill=(0, 0, 0, 210)
     )
     shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(radius=int(14 * scale)))
     
@@ -193,7 +195,7 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     return tile_container
 
 def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
-    """Génère et plaque la grille de manière robuste contre la bordure droite."""
+    """Calcule la grille sur un plan fixe et force le pivot de rotation sur l'arête droite."""
     shadow_padding = int(36 * scale)
     tile_width = int(TILE_W * scale)
     tile_height = int(TILE_H * scale)
@@ -203,12 +205,18 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     step_y = tile_height + gap
     stagger_y = step_y // 2
 
-    # Grille resserrée et prévisible avant rotation
-    grid_width = COLS * step_x + (shadow_padding * 2)
-    grid_height = ROWS * step_y + stagger_y + (shadow_padding * 2)
-    grid = Image.new("RGBA", (grid_width, grid_height), (0, 0, 0, 0))
+    # Étape 1 : On crée un calque temporaire de la taille exacte de l'image finale, étendu en hauteur pour la rotation
+    layer_w = canvas_width
+    layer_h = canvas_height * 2
+    grid_layer = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
 
     tile_pool = itertools.cycle(tiles)
+
+    # Étape 2 : Alignement absolu pré-rotation sur le flanc droit du calque
+    # On laisse juste un débordement planifié de 40px pour mordre élégamment sur le vide
+    total_grid_w = (COLS * step_x) - gap
+    start_x = layer_w - total_grid_w + int(40 * scale)
+    start_y = int(40 * scale)
 
     for col in range(COLS):
         y_offset = stagger_y if (col % 2 == 1) else 0
@@ -216,22 +224,27 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
             tile_asset = next(tile_pool)
             tile_with_shadow = make_premium_tile(tile_asset, tile_width, tile_height, scale)
             
-            x = col * step_x + shadow_padding
-            y = row * step_y + y_offset + shadow_padding
-            grid.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
+            x = start_x + (col * step_x)
+            y = start_y + (row * step_y) + y_offset
+            grid_layer.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
 
-    # Pivotement propre
-    rotated = grid.rotate(TILT_DEG, expand=True, resample=Image.BICUBIC)
-    rot_w, rot_h = rotated.size
-
-    # CALCUL DE POSITION IMMUABLE : Plaquage flanc droit et recentrage vertical strict
-    paste_x = int(canvas_width - rot_w + (120 * scale)) 
-    paste_y = int((canvas_height - rot_h) // 2)
-
-    canvas = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
-    canvas.paste(rotated, (paste_x, paste_y), rotated)
+    # Étape 3 : Rotation SANS expansion, mais avec pivot fixé à droite !
+    # Le centre de rotation est placé vers le milieu vertical et calé sur l'arête droite du canevas
+    pivot_x = layer_w + int(80 * scale)
+    pivot_y = layer_h // 2
     
-    return canvas
+    rotated_layer = grid_layer.rotate(
+        TILT_DEG, 
+        expand=False, 
+        center=(pivot_x, pivot_y), 
+        resample=Image.BICUBIC
+    )
+
+    # Étape 4 : Découpe de la zone centrale utile pour retrouver notre format cible
+    crop_top = (layer_h - canvas_height) // 2
+    final_posters = rotated_layer.crop((0, crop_top, canvas_width, crop_top + canvas_height))
+    
+    return final_posters
 
 def generate_diagonal_gradient(width, height, label):
     slug = label.lower().replace(" ", "").replace("+", "plus")
@@ -272,7 +285,7 @@ def main():
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Compiling Solid Anchored Layout V13 for: {args.label}")
+    print(f"Compiling Fixed Right Pivot Layout V14 for: {args.label}")
     unique_items = fetch_curated_titles(args.label, args.api_key, target_count=40)
     
     tile_images = []
@@ -303,7 +316,7 @@ def main():
     
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully rendered final layout for {args.label}!")
+    print(f"Successfully rendered fixed layout for {args.label}!")
 
 if __name__ == "__main__":
     try:
