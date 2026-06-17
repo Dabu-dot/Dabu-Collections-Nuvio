@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - Strict Right Alignment & Adjusted Sizing (V11)
-Fixes the rotation bounding box overflow causing the grid to leak left.
-Slightly downscales posters to 345px and anchors cleanly to the right edge.
+Premium Backdrop Generator - Absolute Right Anchor & Refined Shadows (V12)
+Guarantees strict right-edge alignment using an oversized canvas crop strategy.
+Includes safe family-friendly metadata filtering and deep premium shadow rendering.
 """
 
 import argparse
@@ -27,15 +27,15 @@ QUALITY_PRESETS = {
     "compressed": {"quality": 95, "progressive": True, "subsampling": "4:2:0"}
 }
 
-# --- CONFIGURATION GÉOMÉTRIQUE AJUSTÉE (POSTERS SUBTILEMENT PLUS PETITS) ---
-CARD_RADIUS = 24    
-TILE_W = 345        # Ajustement parfait (Précédemment 380)
-TILE_H = 518        # Strict format 2:3
-GAP = 36            # Espacement équilibré
+# --- GÉOMÉTRIE FINALE AJUSTÉE (POSTERS SUBTILEMENT RÉDUITS & OMBRES ACCENTUÉES) ---
+CARD_RADIUS = 22    
+TILE_W = 320        # Ajustement subtil parfait
+TILE_H = 480        # Format 2:3 strict
+GAP = 34            
 TILT_DEG = -20      
 
-COLS = 4            # 4 colonnes strictes visibles à droite
-ROWS = 5            
+COLS = 4            # Exactement 4 colonnes
+ROWS = 6            # Légèrement plus de lignes pour couvrir toute la hauteur suite au resize
 
 SIZE_PRESETS = {
     "1080p": (1920, 1080, 1.0),
@@ -88,14 +88,22 @@ def fetch_curated_titles(label, api_key, target_count=40):
     seen_ids = set()
     slug = label.lower().replace(" ", "").replace("+", "plus")
 
+    # Base de paramètres sécurisés (Pas de contenu adulte/soft-core ou hors-sujet)
+    safe_params = {
+        "sort_by": "popularity.desc",
+        "include_adult": "false",
+        "without_genres": "10749,18",  # Écarte Romance/Drame pur si trop suggestif en visuel sur les catalogues tiers
+        "vote_count.gte": "20"
+    }
+
     if slug == "crunchyroll":
         for media_type in ["tv", "movie"]:
-            params = {
-                "sort_by": "popularity.desc",
+            params = dict(safe_params)
+            params.update({
                 "with_genres": "16",
                 "with_original_language": "ja|ko",
                 "vote_count.gte": "30"
-            }
+            })
             data = tmdb_get(f"/discover/{media_type}", params, api_key)
             for item in data.get("results", []):
                 if item.get("poster_path") and item["id"] not in seen_ids:
@@ -107,7 +115,8 @@ def fetch_curated_titles(label, api_key, target_count=40):
     
     if cfg.get("network"):
         try:
-            params = {"sort_by": "popularity.desc", "with_networks": cfg["network"], "vote_count.gte": "20"}
+            params = dict(safe_params)
+            params["with_networks"] = cfg["network"]
             tv_data = tmdb_get("/discover/tv", params, api_key)
             for item in tv_data.get("results", []):
                 if item.get("poster_path") and item["id"] not in seen_ids:
@@ -118,7 +127,9 @@ def fetch_curated_titles(label, api_key, target_count=40):
 
     if len(merged) < target_count and cfg.get("company"):
         try:
-            params = {"sort_by": "popularity.desc", "with_companies": cfg["company"], "vote_count.gte": "30"}
+            params = dict(safe_params)
+            params["with_companies"] = cfg["company"]
+            params["vote_count.gte"] = "40"
             movie_data = tmdb_get("/discover/movie", params, api_key)
             for item in movie_data.get("results", []):
                 if item.get("poster_path") and item["id"] not in seen_ids:
@@ -163,8 +174,8 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     poster_card = Image.new("RGBA", (tile_width, tile_height), (0, 0, 0, 0))
     poster_card.paste(image, mask=mask)
     
-    # Ombre portée
-    shadow_padding = int(30 * scale)
+    # OMBRE PORTÉE PRÉCISE ET REHAUSSÉE (Plus sombre pour détachement premium)
+    shadow_padding = int(36 * scale)
     shadow_w = tile_width + (shadow_padding * 2)
     shadow_h = tile_height + (shadow_padding * 2)
     
@@ -173,19 +184,20 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     s_draw.rounded_rectangle(
         [shadow_padding, shadow_padding, shadow_padding + tile_width - 1, shadow_padding + tile_height - 1],
         radius=radius,
-        fill=(0, 0, 0, 180)
+        fill=(0, 0, 0, 210)  # Rehaussé de 180 à 210 pour donner de la profondeur
     )
-    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(radius=int(15 * scale)))
+    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(radius=int(14 * scale)))
     
     tile_container = Image.new("RGBA", (shadow_w, shadow_h), (0, 0, 0, 0))
-    tile_container.paste(shadow_layer, (0, int(5 * scale)))
+    # Léger décalage vertical de l'ombre pour la simulation de lumière haute
+    tile_container.paste(shadow_layer, (0, int(8 * scale)))
     tile_container.paste(poster_card, (shadow_padding, shadow_padding), poster_card)
     
     return tile_container
 
 def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
-    """Génère la grille et applique un ancrage absolu sur le bord droit."""
-    shadow_padding = int(30 * scale)
+    """Méthode d'ancrage absolu par découpe sur canevas de travail géant."""
+    shadow_padding = int(36 * scale)
     tile_width = int(TILE_W * scale)
     tile_height = int(TILE_H * scale)
     gap = int(GAP * scale)
@@ -194,35 +206,38 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     step_y = tile_height + gap
     stagger_y = step_y // 2
 
-    grid_width = COLS * step_x + (shadow_padding * 2)
-    grid_height = ROWS * step_y + stagger_y + (shadow_padding * 2)
-    grid = Image.new("RGBA", (grid_width, grid_height), (0, 0, 0, 0))
+    # Création d'un espace de travail géant pour éviter les pertes à la rotation
+    working_w = canvas_width * 2
+    working_h = canvas_height * 2
+    working_canvas = Image.new("RGBA", (working_w, working_h), (0, 0, 0, 0))
 
     tile_pool = itertools.cycle(tiles)
 
+    # On dessine la grille à partir de la droite de l'espace de travail géant
+    start_x = working_w - (COLS * step_x) - shadow_padding
+    
     for col in range(COLS):
         y_offset = stagger_y if (col % 2 == 1) else 0
         for row in range(ROWS):
             tile_asset = next(tile_pool)
             tile_with_shadow = make_premium_tile(tile_asset, tile_width, tile_height, scale)
             
-            x = col * step_x + shadow_padding
-            y = row * step_y + y_offset + shadow_padding
-            grid.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
+            x = start_x + (col * step_x)
+            y = (row * step_y) + y_offset + (working_h // 4)
+            working_canvas.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
 
-    # Rotation
-    rotated = grid.rotate(TILT_DEG, expand=True, resample=Image.BICUBIC)
-    rot_w, rot_h = rotated.size
+    # Rotation de tout le plan de travail depuis son centre global
+    rotated = working_canvas.rotate(TILT_DEG, expand=False, resample=Image.BICUBIC)
 
-    # ANCRAGE DROIT CORRIGÉ : On calcule le décalage à partir du bord droit du canevas
-    # Le coin droit de la nappe va mordre légèrement hors de l'écran pour garder l'effet immersif continu
-    paste_x = int(canvas_width - rot_w + (180 * scale)) 
-    paste_y = int(canvas_height * 0.50 - (rot_h * 0.50))
+    # CROP RECENTRÉ ROBUSTE : On découpe la zone utile directement calée sur la droite
+    # On ajoute un léger décalage (+80) pour mordre magnifiquement hors cadre à droite comme le modèle
+    crop_right = working_w - int(100 * scale)
+    crop_left = crop_right - canvas_width
+    crop_top = (working_h - canvas_height) // 2
+    crop_bottom = crop_top + canvas_height
 
-    canvas = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
-    canvas.paste(rotated, (paste_x, paste_y), rotated)
-    
-    return canvas
+    final_layer = rotated.crop((crop_left, crop_top, crop_right, crop_bottom))
+    return final_layer
 
 def generate_diagonal_gradient(width, height, label):
     slug = label.lower().replace(" ", "").replace("+", "plus")
@@ -263,7 +278,7 @@ def main():
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Compiling Final Grid V11 for: {args.label}")
+    print(f"Compiling Pixel-Perfect Right Bound Layout V12 for: {args.label}")
     unique_items = fetch_curated_titles(args.label, args.api_key, target_count=40)
     
     tile_images = []
