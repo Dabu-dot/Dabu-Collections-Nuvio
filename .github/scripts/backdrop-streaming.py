@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - Absolute Box Anchor & Multi-Layer Purge (V17)
-Uses a deterministic large-frame slicing method to eliminate the right-side gap.
-Features an aggressive hybrid keyword/text-matching safety filter for anime content.
+Premium Backdrop Generator - Explicit Geometric Alignment & Hardened Content Filter (V18)
+Fixes the left/right shifting loop by locking the grid center to an absolute canvas coordinate.
+Guarantees full saturation of the right-hand canvas border and corners.
 """
 
 import argparse
@@ -27,7 +27,7 @@ QUALITY_PRESETS = {
     "compressed": {"quality": 95, "progressive": True, "subsampling": "4:2:0"}
 }
 
-# --- GÉOMÉTRIE VERROUILLÉE ---
+# --- PARAMÈTRES GÉOMÉTRIQUES VERROUILLÉS ---
 CARD_RADIUS = 22    
 TILE_W = 320        
 TILE_H = 480        
@@ -36,6 +36,11 @@ TILT_DEG = -20
 
 COLS = 5            
 ROWS = 7            
+
+# Positionnement cible du centre de la grille sur le canevas final (1920x1080)
+# Calé à 1350 pour saturer la moitié droite tout en laissant le dégradé respirer à gauche
+TARGET_CENTER_X = 1350
+TARGET_CENTER_Y = 540
 
 SIZE_PRESETS = {
     "1080p": (1920, 1080, 1.0),
@@ -67,9 +72,9 @@ BRAND_PALETTES = {
     "paramount":    {"base": (0, 8, 26),      "mid": (0, 50, 145),    "light": (0, 116, 228)}
 }
 
-# Liste noire de mots-clés (textuels et IDs) pour Crunchyroll
-BANNED_IDS = {12361, 219416, 156096, 12543, 193204}
-BANNED_WORDS = ["ecchi", "harem", "fan service", "fanservice", "soft-core", "suggestive", "sinful", "nudity"]
+# Filtrage strict de contenus matures / suggestifs (Crunchyroll / Anime)
+BANNED_IDS = {12361, 219416, 156096, 12543, 193204, 230113}
+BANNED_WORDS = ["ecchi", "harem", "fan service", "fanservice", "soft-core", "suggestive", "sinful", "nudity", "erotic", "sensual"]
 
 def cleanup_pycache():
     shutil.rmtree(SCRIPT_DIR / "__pycache__", ignore_errors=True)
@@ -88,16 +93,15 @@ def tmdb_get(endpoint, params, api_key):
             time.sleep(1 + attempt)
 
 def is_clean_content(media_type, item, api_key):
-    """Filtre hybride : Analyse l'overview et interroge les mots-clés de l'œuvre."""
-    title = item.get("name", item.get("title", "")).lower()
-    overview = item.get("overview", "").lower()
+    """Analyse textuelle locale combinée avec l'extraction des tags de mots-clés TMDB."""
+    title = item.get("name", item.get("title", "") or "").lower()
+    overview = item.get("overview", "") or ""
+    overview = overview.lower()
     
-    # Étape 1 : Analyse rapide des métadonnées textuelles de base
     for word in BANNED_WORDS:
         if word in title or word in overview:
             return False
 
-    # Étape 2 : Validation des mots-clés de l'API
     try:
         item_id = item["id"]
         endpoint = f"/tv/{item_id}/keywords" if media_type == "tv" else f"/movie/{item_id}/keywords"
@@ -140,7 +144,7 @@ def fetch_curated_titles(label, api_key, target_count=45):
                         seen_ids.add(item["id"])
                         merged.append(item)
                     else:
-                        print(f"[-] Filtered out: {item.get('name', item.get('title', 'Unknown'))}")
+                        print(f"[-] Purged softcore candidate: {item.get('name', item.get('title', 'Unknown'))}")
         return merged[:target_count]
 
     cfg = BRAND_MAPPING.get(slug, {})
@@ -224,7 +228,7 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     return tile_container
 
 def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
-    """Ancre la grille dans un repère fixe au pixel près pour saturer le cadre."""
+    """Génère la nappe de tuiles centrée au pixel près pour un cadrage immuable."""
     shadow_padding = int(36 * scale)
     tile_width = int(TILE_W * scale)
     tile_height = int(TILE_H * scale)
@@ -234,14 +238,13 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     step_y = tile_height + gap
     stagger_y = step_y // 2
 
-    # Étape 1 : Création d'une boîte de travail géante invariable (3000x3000px)
+    # Canvas de travail géant invariable (3000x3000px de base)
     work_size = int(3000 * scale)
     work_layer = Image.new("RGBA", (work_size, work_size), (0, 0, 0, 0))
     tile_pool = itertools.cycle(tiles)
 
-    # Étape 2 : Centrage de notre bloc de posters à l'intérieur de la boîte
     total_grid_w = (COLS * step_x) - gap
-    total_grid_h = (ROWS * step_y) + stagger_y
+    total_grid_h = (ROWS * step_y) - gap + stagger_y
     
     start_x = (work_size - total_grid_w) // 2
     start_y = (work_size - total_grid_h) // 2
@@ -256,13 +259,14 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
             y = start_y + (row * step_y) + y_offset
             work_layer.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
 
-    # Étape 3 : Rotation SANS expansion (dimensions fixes, pas de boîte englobante folle)
+    # Rotation centrée stricte sans altération de taille globale
     rotated_work = work_layer.rotate(TILT_DEG, expand=False, resample=Image.BICUBIC)
 
-    # Étape 4 : Découpe mathématique calée sur la bordure droite
-    # On isole la fenêtre finale directement là où les affiches débordent de façon homogène
-    crop_x = (work_size // 2) - int(380 * scale)
-    crop_y = (work_size - canvas_height) // 2 + int(60 * scale)
+    # ALIGNEMENT CALCULÉ ÉLECTRONIQUEMENT :
+    # Calcule l'origine exacte du crop pour que le centre géométrique de la nappe rotated
+    # coïncide à la perfection avec (TARGET_CENTER_X, TARGET_CENTER_Y) sur le calque final.
+    crop_x = (work_size // 2) - int(TARGET_CENTER_X * scale)
+    crop_y = (work_size // 2) - int(TARGET_CENTER_Y * scale)
 
     final_canvas = rotated_work.crop((crop_x, crop_y, crop_x + canvas_width, crop_y + canvas_height))
     return final_canvas
@@ -306,7 +310,7 @@ def main():
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Compiling Fixed Pivot Sliced Layout V17 for: {args.label}")
+    print(f"Compiling Calibrated Coordinate Layout V18 for: {args.label}")
     unique_items = fetch_curated_titles(args.label, args.api_key, target_count=45)
     
     tile_images = []
@@ -337,7 +341,7 @@ def main():
     
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully rendered pristine V17 layout for {args.label}!")
+    print(f"Successfully rendered pristine V18 layout for {args.label}!")
 
 if __name__ == "__main__":
     try:
