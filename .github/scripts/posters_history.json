@@ -1,4 +1,89 @@
 {
+    "tv_3382": {
+        "title": "Charlie's Angels",
+        "genre": "action",
+        "date": "2026-06-17"
+    },
+    "tv_46260": {
+        "title": "Naruto",
+        "genre": "animation-japonaise",
+        "date": "2026-06-17"
+    },
+    "movie_1084244": {
+        "title": "Toy Story 5",
+        "genre": "animation",
+        "date": "2026-06-17"
+    },
+    "movie_671": {
+        "title": "Harry Potter and the Philosopher's Stone",
+        "genre": "aventure",
+        "date": "2026-06-17"
+    },
+    "movie_4258": {
+        "title": "Scary Movie 5",
+        "genre": "comedie",
+        "date": "2026-06-17"
+    },
+    "tv_790": {
+        "title": "Agatha Christie's Poirot",
+        "genre": "crime",
+        "date": "2026-06-17"
+    },
+    "tv_79744": {
+        "title": "The Rookie",
+        "genre": "drame",
+        "date": "2026-06-17"
+    },
+    "tv_40": {
+        "title": "Dallas",
+        "genre": "famille",
+        "date": "2026-06-17"
+    },
+    "tv_60735": {
+        "title": "The Flash",
+        "genre": "fantastique",
+        "date": "2026-06-17"
+    },
+    "movie_1318413": {
+        "title": "Pressure",
+        "genre": "guerre",
+        "date": "2026-06-17"
+    },
+    "tv_732": {
+        "title": "L.A. Law",
+        "genre": "histoire",
+        "date": "2026-06-17"
+    },
+    "movie_1480387": {
+        "title": "undertone",
+        "genre": "horreur",
+        "date": "2026-06-17"
+    },
+    "movie_1325734": {
+        "title": "The Drama",
+        "genre": "romance",
+        "date": "2026-06-17"
+    },
+    "tv_655": {
+        "title": "Star Trek: The Next Generation",
+        "genre": "science-fiction",
+        "date": "2026-06-17"
+    },
+    "movie_39254": {
+        "title": "Real Steel",
+        "genre": "sport",
+        "date": "2026-06-17"
+    },
+    "tv_1405": {
+        "title": "Dexter",
+        "genre": "thriller",
+        "date": "2026-06-17"
+    },
+    "tv_1781": {
+        "title": "Little House on the Prairie",
+        "genre": "western",
+        "date": "2026-06-17"
+    },
     "movie_155": {
         "title": "The Dark Knight",
         "genre": "action",
