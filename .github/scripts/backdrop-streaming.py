@@ -65,7 +65,8 @@ BRAND_PALETTES = {
     "netflix":      {"base": (8, 0, 2),       "mid": (80, 5, 10),     "light": (229, 9, 20)},
     "disneyplus":   {"base": (2, 6, 23),      "mid": (5, 30, 80),     "light": (0, 110, 153)},
     "hbomax":       {"base": (11, 3, 24),     "mid": (40, 15, 95),    "light": (107, 33, 224)},
-    "appletv":      {"base": (12, 12, 14),    "mid": (45, 45, 48),    "light": (145, 145, 150)},
+    # MISE À JOUR : Palette Apple TV modifiée pour le dégradé rose de l'image_0.png (Apple TV.webp)
+    "appletv":      {"base": (55, 0, 31),    "mid": (145, 0, 75),    "light": (230, 0, 115)},
     "crunchyroll":  {"base": (18, 8, 2),      "mid": (130, 40, 5),    "light": (244, 117, 33)},
     "hulu":         {"base": (0, 15, 7),      "mid": (10, 80, 45),    "light": (28, 231, 131)},
     "peacock":      {"base": (4, 8, 20),      "mid": (8, 45, 110),    "light": (0, 108, 225)},
