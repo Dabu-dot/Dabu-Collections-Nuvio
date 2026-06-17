@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - Strict Column Limit & Multi-Page Anti-Duplication (V20)
+Premium Backdrop Generator - Strict Column Limit & Multi-Page Anti-Duplication (V20-Fixed)
 Reduces column count to 4 for a cleaner layout and implements deep API pagination.
 Fixes Crunchyroll explicit keyword filters and rectifies the Shudder Network ID mapping.
 """
@@ -54,7 +54,7 @@ BRAND_MAPPING = {
     "peacock":      {"network": "3353", "company": "33"},        
     "primevideo":   {"network": "1024", "company": "20580"},     
     "paramount":    {"network": "4330", "company": "4"},         
-    "shudder":      {"network": "2949", "company": "60608"}      # ID Réseau corrigé à 2949 pour cibler le Shudder officiel
+    "shudder":      {"network": "2949", "company": "60608"}      
 }
 
 BRAND_PALETTES = {
@@ -70,7 +70,7 @@ BRAND_PALETTES = {
     "paramount":    {"base": (0, 8, 26),      "mid": (0, 50, 145),    "light": (0, 116, 228)}
 }
 
-# Ajout du mot-clé coupable Ecchi (195669) au catalogue d'exclusion de sécurité
+# Liste noire stricte incluant l'ID Ecchi (195669)
 BANNED_IDS = {12361, 219416, 156096, 12543, 193204, 230113, 195669}
 BANNED_WORDS = ["ecchi", "harem", "fan service", "fanservice", "soft-core", "suggestive", "sinful", "nudity", "erotic", "sensual"]
 
@@ -103,7 +103,9 @@ def is_clean_content(media_type, item, api_key):
         item_id = item["id"]
         endpoint = f"/tv/{item_id}/keywords" if media_type == "tv" else f"/movie/{item_id}/keywords"
         data = tmdb_get(endpoint, {}, api_key)
-        keywords = data.get("results", []) if media_type == "movie" else data.get("keywords", [])
+        
+        # CORRECTION : TMDB utilise "keywords" pour les films et "results" pour les séries TV
+        keywords = data.get("keywords", []) if media_type == "movie" else data.get("results", [])
         
         for kw in keywords:
             kw_id = kw.get("id")
@@ -174,7 +176,7 @@ def fetch_curated_titles(label, api_key, target_count=45):
                 print(f"TV Fetch Error Page {page}: {e}")
                 break
 
-    # 2. Collecte Movies de secours (ou principale pour Shudder) avec pagination si le quota n'est pas atteint
+    # 2. Collecte Movies de secours avec pagination si le quota n'est pas atteint
     if len(merged) < target_count and cfg.get("company"):
         page = 1
         while len(merged) < target_count and page <= 3:
@@ -194,6 +196,28 @@ def fetch_curated_titles(label, api_key, target_count=45):
                 page += 1
             except Exception as e:
                 print(f"Movie Fallback Error Page {page}: {e}")
+                break
+
+    # 3. Sécurité Anti-Duplication spécifique à Shudder : Injection de films d'horreur populaires si quota non atteint
+    if slug == "shudder" and len(merged) < target_count:
+        page = 1
+        while len(merged) < target_count and page <= 4:
+            params = dict(safe_params)
+            params["with_genres"] = "27"  # Genre Horreur strict
+            params["page"] = page
+            try:
+                fallback_data = tmdb_get("/discover/movie", params, api_key)
+                results = fallback_data.get("results", [])
+                if not results:
+                    break
+                for item in results:
+                    if item.get("poster_path") and item["id"] not in seen_ids:
+                        if is_clean_content("movie", item, api_key):
+                            seen_ids.add(item["id"])
+                            merged.append(item)
+                page += 1
+            except Exception as e:
+                print(f"Shudder Genre Fallback Error Page {page}: {e}")
                 break
 
     return merged[:target_count]
@@ -326,7 +350,7 @@ def main():
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Compiling Finalized Unique Grid V20 for: {args.label}")
+    print(f"Compiling Finalized Unique Grid V20-Fixed for: {args.label}")
     unique_items = fetch_curated_titles(args.label, args.api_key, target_count=45)
     
     tile_images = []
@@ -354,7 +378,7 @@ def main():
     
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully rendered pristine V20 layout for {args.label}!")
+    print(f"Successfully rendered pristine V20-Fixed layout for {args.label}!")
 
 if __name__ == "__main__":
     try:
