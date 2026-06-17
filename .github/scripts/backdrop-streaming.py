@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - Absolute Right Anchor & Refined Shadows (V12)
-Guarantees strict right-edge alignment using an oversized canvas crop strategy.
-Includes safe family-friendly metadata filtering and deep premium shadow rendering.
+Premium Backdrop Generator - Strict Right Edge Positioning & Vertical Centering (V13)
+Fixes the vertical sag and forces the grid layer to align flawlessly with the right boundary.
 """
 
 import argparse
@@ -27,15 +26,15 @@ QUALITY_PRESETS = {
     "compressed": {"quality": 95, "progressive": True, "subsampling": "4:2:0"}
 }
 
-# --- GÉOMÉTRIE FINALE AJUSTÉE (POSTERS SUBTILEMENT RÉDUITS & OMBRES ACCENTUÉES) ---
+# --- CONFIGURATION GÉOMÉTRIQUE VERROUILLÉE ---
 CARD_RADIUS = 22    
-TILE_W = 320        # Ajustement subtil parfait
-TILE_H = 480        # Format 2:3 strict
+TILE_W = 320        
+TILE_H = 480        
 GAP = 34            
 TILT_DEG = -20      
 
-COLS = 4            # Exactement 4 colonnes
-ROWS = 6            # Légèrement plus de lignes pour couvrir toute la hauteur suite au resize
+COLS = 4            
+ROWS = 5            # Repassage à 5 lignes bien centrées pour éviter l'effet "trop bas"
 
 SIZE_PRESETS = {
     "1080p": (1920, 1080, 1.0),
@@ -88,11 +87,10 @@ def fetch_curated_titles(label, api_key, target_count=40):
     seen_ids = set()
     slug = label.lower().replace(" ", "").replace("+", "plus")
 
-    # Base de paramètres sécurisés (Pas de contenu adulte/soft-core ou hors-sujet)
     safe_params = {
         "sort_by": "popularity.desc",
         "include_adult": "false",
-        "without_genres": "10749,18",  # Écarte Romance/Drame pur si trop suggestif en visuel sur les catalogues tiers
+        "without_genres": "10749,18",  
         "vote_count.gte": "20"
     }
 
@@ -174,7 +172,7 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     poster_card = Image.new("RGBA", (tile_width, tile_height), (0, 0, 0, 0))
     poster_card.paste(image, mask=mask)
     
-    # OMBRE PORTÉE PRÉCISE ET REHAUSSÉE (Plus sombre pour détachement premium)
+    # Ombre Portée Rehaussée V12 préservée
     shadow_padding = int(36 * scale)
     shadow_w = tile_width + (shadow_padding * 2)
     shadow_h = tile_height + (shadow_padding * 2)
@@ -184,19 +182,18 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     s_draw.rounded_rectangle(
         [shadow_padding, shadow_padding, shadow_padding + tile_width - 1, shadow_padding + tile_height - 1],
         radius=radius,
-        fill=(0, 0, 0, 210)  # Rehaussé de 180 à 210 pour donner de la profondeur
+        fill=(0, 0, 0, 210)  
     )
     shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(radius=int(14 * scale)))
     
     tile_container = Image.new("RGBA", (shadow_w, shadow_h), (0, 0, 0, 0))
-    # Léger décalage vertical de l'ombre pour la simulation de lumière haute
     tile_container.paste(shadow_layer, (0, int(8 * scale)))
     tile_container.paste(poster_card, (shadow_padding, shadow_padding), poster_card)
     
     return tile_container
 
 def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
-    """Méthode d'ancrage absolu par découpe sur canevas de travail géant."""
+    """Génère et plaque la grille de manière robuste contre la bordure droite."""
     shadow_padding = int(36 * scale)
     tile_width = int(TILE_W * scale)
     tile_height = int(TILE_H * scale)
@@ -206,38 +203,35 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     step_y = tile_height + gap
     stagger_y = step_y // 2
 
-    # Création d'un espace de travail géant pour éviter les pertes à la rotation
-    working_w = canvas_width * 2
-    working_h = canvas_height * 2
-    working_canvas = Image.new("RGBA", (working_w, working_h), (0, 0, 0, 0))
+    # Grille resserrée et prévisible avant rotation
+    grid_width = COLS * step_x + (shadow_padding * 2)
+    grid_height = ROWS * step_y + stagger_y + (shadow_padding * 2)
+    grid = Image.new("RGBA", (grid_width, grid_height), (0, 0, 0, 0))
 
     tile_pool = itertools.cycle(tiles)
 
-    # On dessine la grille à partir de la droite de l'espace de travail géant
-    start_x = working_w - (COLS * step_x) - shadow_padding
-    
     for col in range(COLS):
         y_offset = stagger_y if (col % 2 == 1) else 0
         for row in range(ROWS):
             tile_asset = next(tile_pool)
             tile_with_shadow = make_premium_tile(tile_asset, tile_width, tile_height, scale)
             
-            x = start_x + (col * step_x)
-            y = (row * step_y) + y_offset + (working_h // 4)
-            working_canvas.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
+            x = col * step_x + shadow_padding
+            y = row * step_y + y_offset + shadow_padding
+            grid.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
 
-    # Rotation de tout le plan de travail depuis son centre global
-    rotated = working_canvas.rotate(TILT_DEG, expand=False, resample=Image.BICUBIC)
+    # Pivotement propre
+    rotated = grid.rotate(TILT_DEG, expand=True, resample=Image.BICUBIC)
+    rot_w, rot_h = rotated.size
 
-    # CROP RECENTRÉ ROBUSTE : On découpe la zone utile directement calée sur la droite
-    # On ajoute un léger décalage (+80) pour mordre magnifiquement hors cadre à droite comme le modèle
-    crop_right = working_w - int(100 * scale)
-    crop_left = crop_right - canvas_width
-    crop_top = (working_h - canvas_height) // 2
-    crop_bottom = crop_top + canvas_height
+    # CALCUL DE POSITION IMMUABLE : Plaquage flanc droit et recentrage vertical strict
+    paste_x = int(canvas_width - rot_w + (120 * scale)) 
+    paste_y = int((canvas_height - rot_h) // 2)
 
-    final_layer = rotated.crop((crop_left, crop_top, crop_right, crop_bottom))
-    return final_layer
+    canvas = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
+    canvas.paste(rotated, (paste_x, paste_y), rotated)
+    
+    return canvas
 
 def generate_diagonal_gradient(width, height, label):
     slug = label.lower().replace(" ", "").replace("+", "plus")
@@ -278,7 +272,7 @@ def main():
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Compiling Pixel-Perfect Right Bound Layout V12 for: {args.label}")
+    print(f"Compiling Solid Anchored Layout V13 for: {args.label}")
     unique_items = fetch_curated_titles(args.label, args.api_key, target_count=40)
     
     tile_images = []
