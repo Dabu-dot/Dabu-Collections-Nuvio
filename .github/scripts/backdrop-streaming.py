@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - Strict Column Limit & Multi-Page Anti-Duplication (V21)
-Reduces column count to 4 for a cleaner layout and implements deep API pagination.
-Fixes Crunchyroll explicit keyword filters and rectifies the Shudder Network ID mapping.
-Includes support for Mubi, Canal+, and SkyShowtime streaming profiles.
+Premium Backdrop Generator - Strict Column Limit & Multi-Page Anti-Duplication (V22)
+Optimisation de la popularité via Watch Providers TMDB et persistance anti-repositionnement.
 """
 
 import argparse
@@ -14,7 +12,9 @@ import os
 import shutil
 import sys
 import time
+import json
 from pathlib import Path
+import random
 
 import requests
 from PIL import Image, ImageDraw, ImageFilter
@@ -28,15 +28,15 @@ QUALITY_PRESETS = {
     "compressed": {"quality": 95, "progressive": True, "subsampling": "4:2:0"}
 }
 
-# --- CONFIGURATION VISUELLE ET GÉOMÉTRIQUE ÉPURÉE ---
 CARD_RADIUS = 22    
 TILE_W = 320        
 TILE_H = 480        
 GAP = 34            
 TILT_DEG = -20      
 
-COLS = 4            # 4 colonnes pour supprimer la ligne verticale excédentaire
+COLS = 4            
 ROWS = 7            
+TOTAL_TILES = COLS * ROWS  # 28 emplacements requis
 
 TARGET_CENTER_X = 1350
 TARGET_CENTER_Y = 540
@@ -46,26 +46,27 @@ SIZE_PRESETS = {
     "4k": (3840, 2160, 2.0),
 }
 
-BRAND_MAPPING = {
-    "netflix":      {"network": "213",  "company": "60"},        
-    "disneyplus":   {"network": "2739", "company": "2|3|2165"},  
-    "hbomax":       {"network": "49",   "company": "174|429"},   
-    "appletv":      {"network": "2552", "company": "191065"},    
-    "hulu":         {"network": "453",  "company": "6113"},      
-    "peacock":      {"network": "3353", "company": "33"},        
-    "primevideo":   {"network": "1024", "company": "20580"},     
-    "paramount":    {"network": "4330", "company": "4"},         
-    "shudder":      {"network": "2949", "company": "60608"},
-    "mubi":         {"network": None,   "company": "21092"},     # Mubi (Focus Films Indépendants & Auteurs)
-    "canalplus":    {"network": "2603", "company": "104"},       # Canal+ (Séries Créations Originales + Cinéma)
-    "skyshowtime":  {"network": "5280", "company": "4"}          # SkyShowtime
+# Mapping mis à jour avec les ID de "Watch Providers" TMDB (Exemple pour la région FR)
+# Si tu constates des manques, ces ID s'alignent sur l'API /watch/providers
+BRAND_PROVIDERS = {
+    "netflix":      {"id": "8"},
+    "disneyplus":   {"id": "337"},
+    "hbomax":       {"id": "1899"}, # Max
+    "appletv":      {"id": "2"},    # Apple TV app / plus
+    "hulu":         {"id": "15"},   # Souvent lié à Disney+ en Europe, ajusté au provider US ou Star
+    "peacock":      {"id": "386"},
+    "primevideo":   {"id": "9"},
+    "paramount":    {"id": "531"},
+    "shudder":      {"id": "99"},
+    "mubi":         {"id": "11"},
+    "canalplus":    {"id": "381"},
+    "skyshowtime":  {"id": "1773"}
 }
 
 BRAND_PALETTES = {
     "netflix":      {"base": (8, 0, 2),       "mid": (80, 5, 10),     "light": (229, 9, 20)},
     "disneyplus":   {"base": (2, 6, 23),      "mid": (5, 30, 80),     "light": (0, 110, 153)},
     "hbomax":       {"base": (11, 3, 24),     "mid": (40, 15, 95),    "light": (107, 33, 224)},
-    # MISE À JOUR : Palette Apple TV modifiée pour le dégradé rose de l'image_0.png (Apple TV.webp)
     "appletv":      {"base": (55, 0, 31),    "mid": (145, 0, 75),    "light": (230, 0, 115)},
     "crunchyroll":  {"base": (18, 8, 2),      "mid": (130, 40, 5),    "light": (244, 117, 33)},
     "hulu":         {"base": (0, 15, 7),      "mid": (10, 80, 45),    "light": (28, 231, 131)},
@@ -78,7 +79,6 @@ BRAND_PALETTES = {
     "skyshowtime":  {"base": (14, 4, 32),     "mid": (45, 15, 90),    "light": (120, 30, 210)}
 }
 
-# Liste noire stricte incluant l'ID Ecchi (195669)
 BANNED_IDS = {12361, 219416, 156096, 12543, 193204, 230113, 195669}
 BANNED_WORDS = ["ecchi", "harem", "fan service", "fanservice", "soft-core", "suggestive", "sinful", "nudity", "erotic", "sensual"]
 
@@ -111,8 +111,6 @@ def is_clean_content(media_type, item, api_key):
         item_id = item["id"]
         endpoint = f"/tv/{item_id}/keywords" if media_type == "tv" else f"/movie/{item_id}/keywords"
         data = tmdb_get(endpoint, {}, api_key)
-        
-        # TMDB utilise "keywords" pour les films et "results" pour les séries TV
         keywords = data.get("keywords", []) if media_type == "movie" else data.get("results", [])
         
         for kw in keywords:
@@ -125,110 +123,66 @@ def is_clean_content(media_type, item, api_key):
     return True
 
 def fetch_curated_titles(label, api_key, target_count=45):
-    """Récupère les titres de façon séquentielle sur plusieurs pages pour éviter les doublons."""
     merged = []
     seen_ids = set()
-    slug = label.lower().replace(" ", "").replace("+", "plus").replace(" ", "")
+    slug = label.lower().replace(" ", "").replace("+", "plus")
 
     safe_params = {
         "sort_by": "popularity.desc",
         "include_adult": "false",
-        "without_genres": "10749,18",  
-        "vote_count.gte": "15"
+        "vote_count.gte": "10",
+        "watch_region": "FR"
     }
+
+    # Ajustement d'exclusion de genre (Mubi a cruellement besoin du genre Drame (18))
+    if slug != "mubi":
+        safe_params["without_genres"] = "10749,18"
+    else:
+        safe_params["without_genres"] = "10749" # On ne retire que la romance pure
 
     if slug == "crunchyroll":
         crunchy_params = dict(safe_params)
-        crunchy_params.update({
-            "with_genres": "16",
-            "with_original_language": "ja|ko"
-        })
-        
+        crunchy_params.update({"with_genres": "16", "with_original_language": "ja|ko"})
         for media_type in ["tv", "movie"]:
             page = 1
-            while len(merged) < target_count and page <= 3:
+            while len(merged) < target_count and page <= 5:
                 crunchy_params["page"] = page
                 data = tmdb_get(f"/discover/{media_type}", crunchy_params, api_key)
                 results = data.get("results", [])
-                if not results:
-                    break
+                if not results: break
                 for item in results:
                     if item.get("poster_path") and item["id"] not in seen_ids:
                         if is_clean_content(media_type, item, api_key):
                             seen_ids.add(item["id"])
+                            item["media_type"] = media_type
                             merged.append(item)
                 page += 1
         return merged[:target_count]
 
-    cfg = BRAND_MAPPING.get(slug, {})
-    if not cfg:
-        print(f"Warning: Configuration slug not found for '{slug}', using standard fallback filter.")
+    provider_cfg = BRAND_PROVIDERS.get(slug)
     
-    # 1. Collecte TV avec pagination active
-    if cfg.get("network"):
+    # Stratégie Discover unifiée via Watch Providers (Moins de fallbacks hazardeux)
+    for media_type in ["movie", "tv"]:
         page = 1
-        while len(merged) < target_count and page <= 3:
+        while len(merged) < target_count and page <= 6:
             params = dict(safe_params)
-            params["with_networks"] = cfg["network"]
+            if provider_cfg:
+                params["with_watch_providers"] = provider_cfg["id"]
             params["page"] = page
+            
             try:
-                tv_data = tmdb_get("/discover/tv", params, api_key)
-                results = tv_data.get("results", [])
-                if not results:
-                    break
+                data = tmdb_get(f"/discover/{media_type}", params, api_key)
+                results = data.get("results", [])
+                if not results: break
                 for item in results:
                     if item.get("poster_path") and item["id"] not in seen_ids:
-                        if is_clean_content("tv", item, api_key):
+                        if is_clean_content(media_type, item, api_key):
                             seen_ids.add(item["id"])
+                            item["media_type"] = media_type
                             merged.append(item)
                 page += 1
             except Exception as e:
-                print(f"TV Fetch Error Page {page}: {e}")
-                break
-
-    # 2. Collecte Movies de secours avec pagination si le quota n'est pas atteint
-    if len(merged) < target_count and cfg.get("company"):
-        page = 1
-        while len(merged) < target_count and page <= 3:
-            params = dict(safe_params)
-            params["with_companies"] = cfg["company"]
-            params["page"] = page
-            try:
-                movie_data = tmdb_get("/discover/movie", params, api_key)
-                results = movie_data.get("results", [])
-                if not results:
-                    break
-                for item in results:
-                    if item.get("poster_path") and item["id"] not in seen_ids:
-                        if is_clean_content("movie", item, api_key):
-                            seen_ids.add(item["id"])
-                            merged.append(item)
-                page += 1
-            except Exception as e:
-                print(f"Movie Fallback Error Page {page}: {e}")
-                break
-
-    # 3. Sécurité Anti-Duplication spécifique à Shudder & Mubi : Injection de genres liés si quota non atteint
-    if len(merged) < target_count and (slug == "shudder" or slug == "mubi"):
-        fallback_genre = "27" if slug == "shudder" else "9648|12|35"  # Horreur vs Mystère/Drame/Aventure
-        page = 1
-        while len(merged) < target_count and page <= 4:
-            params = dict(safe_params)
-            params["with_genres"] = fallback_genre
-            params["page"] = page
-            try:
-                fallback_data = tmdb_get("/discover/movie", params, api_key)
-                results = fallback_data.get("results", [])
-                if not results:
-                    break
-                for item in results:
-                    if item.get("poster_path") and item["id"] not in seen_ids:
-                        if is_clean_content("movie", item, api_key):
-                            seen_ids.add(item["id"])
-                            merged.append(item)
-                page += 1
-            except Exception as e:
-                print(f"Genre Fallback Safe Injector Error Page {page}: {e}")
+                print(f"Error fetching {media_type} for {label} page {page}: {e}")
                 break
 
     return merged[:target_count]
@@ -256,7 +210,6 @@ def make_premium_tile(image, tile_width, tile_height, scale):
         image = image.crop((0, top, src_w, top + new_h))
         
     image = image.resize((tile_width, tile_height), Image.LANCZOS)
-    
     radius = max(14, int(CARD_RADIUS * scale))
     mask = Image.new("L", (tile_width, tile_height), 0)
     draw = ImageDraw.Draw(mask)
@@ -284,6 +237,61 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     
     return tile_container
 
+def load_position_history(history_path):
+    if history_path.exists():
+        try:
+            with open(history_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+def save_position_history(history_path, history_data):
+    try:
+        with open(history_path, "w", encoding="utf-8") as f:
+            json.dump(history_data, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print(f"Error saving history: {e}")
+
+def organize_grid_anti_persistence(media_items, label, history_data):
+    """Organise la liste des médias pour qu'aucun ID ne se retrouve à la même position indexée."""
+    slug = label.lower().replace(" ", "").replace("+", "plus")
+    past_grid = history_data.get(slug, []) # Liste ordonnée de string/int ID de la dernière fois
+    
+    needed = TOTAL_TILES
+    available_items = media_items[:needed]
+    
+    # Si on manque de médias uniques, on complète par duplication simple en fin de liste
+    if len(available_items) < needed:
+        pool = itertools.cycle(media_items)
+        available_items = [next(pool) for _ in range(needed)]
+
+    # Algorithme de positionnement adaptatif sans collision directe d'index
+    final_grid = [None] * needed
+    unplaced = list(available_items)
+    
+    for i in range(needed):
+        past_id = past_grid[i] if i < len(past_grid) else None
+        
+        # Trouver le premier candidat qui ne correspond pas à l'ID historique de cette case
+        match_candidate = None
+        for candidate in unplaced:
+            if str(candidate["id"]) != str(past_id):
+                match_candidate = candidate
+                break
+        
+        # Secours : si tout le reste provoque une collision (rare), on prend le premier disponible
+        if not match_candidate and unplaced:
+            match_candidate = unplaced[0]
+            
+        final_grid[i] = match_candidate
+        if match_candidate in unplaced:
+            unplaced.remove(match_candidate)
+            
+    # Met à jour la structure historique pour la prochaine exécution
+    history_data[slug] = [str(item["id"]) for item in final_grid]
+    return final_grid
+
 def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     shadow_padding = int(36 * scale)
     tile_width = int(TILE_W * scale)
@@ -296,7 +304,6 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
 
     work_size = int(3000 * scale)
     work_layer = Image.new("RGBA", (work_size, work_size), (0, 0, 0, 0))
-    tile_pool = itertools.cycle(tiles)
 
     total_grid_w = (COLS * step_x) - gap
     total_grid_h = (ROWS * step_y) - gap + stagger_y
@@ -304,26 +311,26 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     start_x = (work_size - total_grid_w) // 2
     start_y = (work_size - total_grid_h) // 2
 
+    idx = 0
     for col in range(COLS):
         y_offset = stagger_y if (col % 2 == 1) else 0
         for row in range(ROWS):
-            tile_asset = next(tile_pool)
+            tile_asset = tiles[idx]
             tile_with_shadow = make_premium_tile(tile_asset, tile_width, tile_height, scale)
             
             x = start_x + (col * step_x)
             y = start_y + (row * step_y) + y_offset
             work_layer.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
+            idx += 1
 
     rotated_work = work_layer.rotate(TILT_DEG, expand=False, resample=Image.BICUBIC)
-
     crop_x = (work_size // 2) - int(TARGET_CENTER_X * scale)
     crop_y = (work_size // 2) - int(TARGET_CENTER_Y * scale)
 
-    final_canvas = rotated_work.crop((crop_x, crop_y, crop_x + canvas_width, crop_y + canvas_height))
-    return final_canvas
+    return rotated_work.crop((crop_x, crop_y, crop_x + canvas_width, crop_y + canvas_height))
 
 def generate_diagonal_gradient(width, height, label):
-    slug = label.lower().replace(" ", "").replace("+", "plus").replace(" ", "")
+    slug = label.lower().replace(" ", "").replace("+", "plus")
     palette = BRAND_PALETTES.get(slug, {"base": (10, 12, 16), "mid": (35, 40, 55), "light": (90, 100, 125)})
     
     c_dark = palette["base"]
@@ -337,7 +344,6 @@ def generate_diagonal_gradient(width, height, label):
         for x in range(width):
             factor = (x / width + (height - y) / height) / 2.0
             factor = max(0.0, min(1.0, factor))
-            
             if factor < 0.5:
                 t = factor * 2.0
                 r = int(c_light[0] + (c_mid[0] - c_light[0]) * t)
@@ -348,9 +354,7 @@ def generate_diagonal_gradient(width, height, label):
                 r = int(c_mid[0] + (c_dark[0] - c_mid[0]) * t)
                 g = int(c_mid[1] + (c_dark[1] - c_mid[1]) * t)
                 b = int(c_mid[2] + (c_dark[2] - c_mid[2]) * t)
-                
             pixels[x, y] = (r, g, b, 255)
-            
     return bg_gradient
 
 def main():
@@ -361,35 +365,41 @@ def main():
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Compiling Finalized Unique Grid V21 for: {args.label}")
-    unique_items = fetch_curated_titles(args.label, args.api_key, target_count=45)
+    out_path = Path(args.output)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    history_path = out_path.parent / "positions_history.json"
+
+    print(f"Compiling Finalized Unique Grid V22 for: {args.label}")
+    unique_items = fetch_curated_titles(args.label, args.api_key, target_count=50)
     
+    if len(unique_items) < TOTAL_TILES:
+        print(f"Warning: Only found {len(unique_items)} items for {args.label}.")
+
+    # Application du verrou anti-repositionnement séquentiel
+    history_data = load_position_history(history_path)
+    ordered_items = organize_grid_anti_persistence(unique_items, args.label, history_data)
+    save_position_history(history_path, history_data)
+
     tile_images = []
-    for item in unique_items:
+    for item in ordered_items:
         poster_path = item.get("poster_path")
         img = download_image_url(f"{TMDB_IMG_BASE}/{POSTER_SIZE}{poster_path}")
-        if img:
-            tile_images.append(img)
-
-    if not tile_images:
-        print("Error: No posters downloaded.")
-        sys.exit(1)
+        if not img:
+            # Fallback en cas d'erreur de téléchargement d'un poster pour ne pas casser l'index complet
+            img = Image.new("RGBA", (TILE_W, TILE_H), (20, 20, 20, 255))
+        tile_images.append(img)
 
     width, height, scale = SIZE_PRESETS[args.size]
-    
     background = generate_diagonal_gradient(width, height, args.label)
     posters_layer = build_tilted_grid(tile_images, width, height, scale=scale)
     final_canvas = Image.alpha_composite(background, posters_layer)
-
-    out_path = Path(args.output)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
     
     final = final_canvas.convert("RGB")
     settings = QUALITY_PRESETS["compressed"]
     
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully rendered pristine V21 layout for {args.label}!")
+    print(f"Successfully rendered pristine V22 layout for {args.label}!")
 
 if __name__ == "__main__":
     try:
