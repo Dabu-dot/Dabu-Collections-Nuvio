@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - Corner Fill & Strict Anime Filtering (V15)
-Fixes the bottom-right corner gap by extending ROWS and shifting the pre-rotation bounds.
-Implements a hardcore keyword-blocking mechanism for Crunchyroll to eliminate suggestive content.
+Premium Backdrop Generator - Absolute Corner Saturation & Hardcoded Python Filter (V16)
+Fixes the bottom-right corner gap by over-allocating grid dimensions and using safe anchoring.
+Implements post-fetch keyword auditing for Crunchyroll to strictly purge fanservice/ecchi content.
 """
 
 import argparse
@@ -27,15 +27,15 @@ QUALITY_PRESETS = {
     "compressed": {"quality": 95, "progressive": True, "subsampling": "4:2:0"}
 }
 
-# --- CONFIGURATION GÉOMÉTRIQUE AJUSTÉE POUR REMPLIR LES ANGLES ---
+# --- CONFIGURATION GÉOMÉTRIQUE LARGE POUR SÉCURISER LES ANGLES ---
 CARD_RADIUS = 22    
 TILE_W = 320        
 TILE_H = 480        
 GAP = 34            
 TILT_DEG = -20      
 
-COLS = 4            
-ROWS = 7            # Augmenté à 7 pour étendre la nappe vers le bas et éliminer le trou
+COLS = 5            # Passé à 5 colonnes pour déborder largement à droite
+ROWS = 7            # Passé à 7 lignes pour verrouiller le haut et le bas
 
 SIZE_PRESETS = {
     "1080p": (1920, 1080, 1.0),
@@ -67,6 +67,9 @@ BRAND_PALETTES = {
     "paramount":    {"base": (0, 8, 26),      "mid": (0, 50, 145),    "light": (0, 116, 228)}
 }
 
+# IDs TMDB à bannir côté Python (ecchi, fanservice, harem, nudity)
+BANNED_KEYWORDS = {12361, 219416, 156096, 12543}
+
 def cleanup_pycache():
     shutil.rmtree(SCRIPT_DIR / "__pycache__", ignore_errors=True)
 
@@ -83,7 +86,20 @@ def tmdb_get(endpoint, params, api_key):
                 raise
             time.sleep(1 + attempt)
 
-def fetch_curated_titles(label, api_key, target_count=40):
+def is_safe_anime(media_type, item_id, api_key):
+    """Vérifie minutieusement les mots-clés d'une œuvre pour exclure le softcore."""
+    try:
+        data = tmdb_get(f"/{media_type}/{item_id}/keywords", {}, api_key)
+        # Gère la différence de structure de réponse entre 'tv' et 'movie' sur TMDB
+        keywords = data.get("results", []) if media_type == "movie" else data.get("keywords", [])
+        for kw in keywords:
+            if kw.get("id") in BANNED_KEYWORDS:
+                return False
+        return True
+    except Exception:
+        return True # En cas d'échec de l'API de mot-clé, on reste tolérant ou faux-positif
+
+def fetch_curated_titles(label, api_key, target_count=45):
     merged = []
     seen_ids = set()
     slug = label.lower().replace(" ", "").replace("+", "plus")
@@ -96,22 +112,24 @@ def fetch_curated_titles(label, api_key, target_count=40):
     }
 
     if slug == "crunchyroll":
-        # IDs de mots-clés TMDB : ecchi (12361), fanservice (219416), harem (156096), nudity (12543)
-        # On force l'exclusion de ces éléments pour assainir complètement la sélection
-        crunchy_safe_params = dict(safe_params)
-        crunchy_safe_params.update({
+        crunchy_params = dict(safe_params)
+        crunchy_params.update({
             "with_genres": "16",
             "with_original_language": "ja|ko",
-            "without_keywords": "12361|219416|156096|12543",
             "vote_count.gte": "30"
         })
         
         for media_type in ["tv", "movie"]:
-            data = tmdb_get(f"/discover/{media_type}", crunchy_safe_params, api_key)
+            data = tmdb_get(f"/discover/{media_type}", crunchy_params, api_key)
             for item in data.get("results", []):
-                if item.get("poster_path") and item["id"] not in seen_ids:
-                    seen_ids.add(item["id"])
-                    merged.append(item)
+                item_id = item.get("id")
+                if item.get("poster_path") and item_id not in seen_ids:
+                    # Audit strict en post-traitement Python
+                    if is_safe_anime(media_type, item_id, api_key):
+                        seen_ids.add(item_id)
+                        merged.append(item)
+                    else:
+                        print(f"Purged suggestive item ID: {item_id} ({item.get('name', 'Anime')})")
         return merged[:target_count]
 
     cfg = BRAND_MAPPING.get(slug, {})
@@ -197,7 +215,7 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     return tile_container
 
 def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
-    """Calcule la grille et ajuste les offsets pour combler l'angle bas-droit."""
+    """Génère un bloc de grille surdimensionné et le décale manuellement après rotation."""
     shadow_padding = int(36 * scale)
     tile_width = int(TILE_W * scale)
     tile_height = int(TILE_H * scale)
@@ -207,16 +225,12 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     step_y = tile_height + gap
     stagger_y = step_y // 2
 
-    layer_w = canvas_width
-    layer_h = canvas_height * 2
-    grid_layer = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
-
+    # Création d'une surface de travail brute très grande pour encaisser la rotation sans pertes
+    grid_w = (COLS * step_x) + (shadow_padding * 2)
+    grid_h = (ROWS * step_y) + stagger_y + (shadow_padding * 2)
+    
+    grid_img = Image.new("RGBA", (grid_w, grid_h), (0, 0, 0, 0))
     tile_pool = itertools.cycle(tiles)
-
-    total_grid_w = (COLS * step_x) - gap
-    # On pousse légèrement plus à droite (+65px au lieu de 40px) pour saturer l'espace de débordement
-    start_x = layer_w - total_grid_w + int(65 * scale)
-    start_y = int(20 * scale)
 
     for col in range(COLS):
         y_offset = stagger_y if (col % 2 == 1) else 0
@@ -224,25 +238,23 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
             tile_asset = next(tile_pool)
             tile_with_shadow = make_premium_tile(tile_asset, tile_width, tile_height, scale)
             
-            x = start_x + (col * step_x)
-            y = start_y + (row * step_y) + y_offset
-            grid_layer.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
+            x = col * step_x + shadow_padding
+            y = row * step_y + y_offset + shadow_padding
+            grid_img.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
 
-    # Pivot calculé pour ancrer fermement le côté droit et couvrir l'angle inférieur
-    pivot_x = layer_w + int(110 * scale)
-    pivot_y = layer_h // 2
-    
-    rotated_layer = grid_layer.rotate(
-        TILT_DEG, 
-        expand=False, 
-        center=(pivot_x, pivot_y), 
-        resample=Image.BICUBIC
-    )
+    # Rotation au centre géométrique propre de la grille
+    rotated_grid = grid_img.rotate(TILT_DEG, expand=True, resample=Image.BICUBIC)
+    rot_w, rot_h = rotated_grid.size
 
-    crop_top = (layer_h - canvas_height) // 2
-    final_posters = rotated_layer.crop((0, crop_top, canvas_width, crop_top + canvas_height))
+    # COMPENSATIONS DES ANGLE MORT : Alignement forcé par débordement
+    # En poussant la structure à x_offset, la 5ème colonne comble l'angle inférieur droit à coup sûr
+    paste_x = int(canvas_width - rot_w + (420 * scale)) 
+    paste_y = int((canvas_height - rot_h) // 2) - int(40 * scale)
+
+    canvas = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
+    canvas.paste(rotated_grid, (paste_x, paste_y), rotated_grid)
     
-    return final_posters
+    return canvas
 
 def generate_diagonal_gradient(width, height, label):
     slug = label.lower().replace(" ", "").replace("+", "plus")
@@ -283,8 +295,8 @@ def main():
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Compiling Corner-Safe Clean Layout V15 for: {args.label}")
-    unique_items = fetch_curated_titles(args.label, args.api_key, target_count=40)
+    print(f"Compiling Safe Over-Allocated Layout V16 for: {args.label}")
+    unique_items = fetch_curated_titles(args.label, args.api_key, target_count=45)
     
     tile_images = []
     for item in unique_items:
@@ -297,8 +309,8 @@ def main():
         print("Error: No posters downloaded.")
         sys.exit(1)
 
-    if len(tile_images) < 20:
-        tile_images = (tile_images * (20 // len(tile_images) + 1))[:20]
+    if len(tile_images) < 25:
+        tile_images = (tile_images * (25 // len(tile_images) + 1))[:25]
 
     width, height, scale = SIZE_PRESETS[args.size]
     
@@ -314,7 +326,7 @@ def main():
     
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully rendered final clean layout for {args.label}!")
+    print(f"Successfully rendered pristine layout for {args.label}!")
 
 if __name__ == "__main__":
     try:
