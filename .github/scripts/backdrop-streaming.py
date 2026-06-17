@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - Strict Column Limit & Multi-Page Anti-Duplication (V20-Fixed)
+Premium Backdrop Generator - Strict Column Limit & Multi-Page Anti-Duplication (V21)
 Reduces column count to 4 for a cleaner layout and implements deep API pagination.
 Fixes Crunchyroll explicit keyword filters and rectifies the Shudder Network ID mapping.
+Includes support for Mubi, Canal+, and SkyShowtime streaming profiles.
 """
 
 import argparse
@@ -54,7 +55,10 @@ BRAND_MAPPING = {
     "peacock":      {"network": "3353", "company": "33"},        
     "primevideo":   {"network": "1024", "company": "20580"},     
     "paramount":    {"network": "4330", "company": "4"},         
-    "shudder":      {"network": "2949", "company": "60608"}      
+    "shudder":      {"network": "2949", "company": "60608"},
+    "mubi":         {"network": None,   "company": "21092"},     # Mubi (Focus Films Indépendants & Auteurs)
+    "canalplus":    {"network": "2603", "company": "104"},       # Canal+ (Séries Créations Originales + Cinéma)
+    "skyshowtime":  {"network": "5280", "company": "4"}          # SkyShowtime
 }
 
 BRAND_PALETTES = {
@@ -67,7 +71,10 @@ BRAND_PALETTES = {
     "peacock":      {"base": (4, 8, 20),      "mid": (8, 45, 110),    "light": (0, 108, 225)},
     "shudder":      {"base": (15, 2, 2),      "mid": (80, 0, 0),      "light": (195, 10, 10)},
     "primevideo":   {"base": (2, 14, 28),     "mid": (7, 65, 125),    "light": (26, 146, 244)},
-    "paramount":    {"base": (0, 8, 26),      "mid": (0, 50, 145),    "light": (0, 116, 228)}
+    "paramount":    {"base": (0, 8, 26),      "mid": (0, 50, 145),    "light": (0, 116, 228)},
+    "mubi":         {"base": (4, 12, 24),     "mid": (15, 35, 70),    "light": (35, 95, 185)},
+    "canalplus":    {"base": (10, 10, 12),    "mid": (30, 30, 34),    "light": (90, 90, 95)},
+    "skyshowtime":  {"base": (14, 4, 32),     "mid": (45, 15, 90),    "light": (120, 30, 210)}
 }
 
 # Liste noire stricte incluant l'ID Ecchi (195669)
@@ -104,7 +111,7 @@ def is_clean_content(media_type, item, api_key):
         endpoint = f"/tv/{item_id}/keywords" if media_type == "tv" else f"/movie/{item_id}/keywords"
         data = tmdb_get(endpoint, {}, api_key)
         
-        # CORRECTION : TMDB utilise "keywords" pour les films et "results" pour les séries TV
+        # TMDB utilise "keywords" pour les films et "results" pour les séries TV
         keywords = data.get("keywords", []) if media_type == "movie" else data.get("results", [])
         
         for kw in keywords:
@@ -120,7 +127,7 @@ def fetch_curated_titles(label, api_key, target_count=45):
     """Récupère les titres de façon séquentielle sur plusieurs pages pour éviter les doublons."""
     merged = []
     seen_ids = set()
-    slug = label.lower().replace(" ", "").replace("+", "plus")
+    slug = label.lower().replace(" ", "").replace("+", "plus").replace(" ", "")
 
     safe_params = {
         "sort_by": "popularity.desc",
@@ -153,6 +160,8 @@ def fetch_curated_titles(label, api_key, target_count=45):
         return merged[:target_count]
 
     cfg = BRAND_MAPPING.get(slug, {})
+    if not cfg:
+        print(f"Warning: Configuration slug not found for '{slug}', using standard fallback filter.")
     
     # 1. Collecte TV avec pagination active
     if cfg.get("network"):
@@ -198,12 +207,13 @@ def fetch_curated_titles(label, api_key, target_count=45):
                 print(f"Movie Fallback Error Page {page}: {e}")
                 break
 
-    # 3. Sécurité Anti-Duplication spécifique à Shudder : Injection de films d'horreur populaires si quota non atteint
-    if slug == "shudder" and len(merged) < target_count:
+    # 3. Sécurité Anti-Duplication spécifique à Shudder & Mubi : Injection de genres liés si quota non atteint
+    if len(merged) < target_count and (slug == "shudder" or slug == "mubi"):
+        fallback_genre = "27" if slug == "shudder" else "9648|12|35"  # Horreur vs Mystère/Drame/Aventure
         page = 1
         while len(merged) < target_count and page <= 4:
             params = dict(safe_params)
-            params["with_genres"] = "27"  # Genre Horreur strict
+            params["with_genres"] = fallback_genre
             params["page"] = page
             try:
                 fallback_data = tmdb_get("/discover/movie", params, api_key)
@@ -217,7 +227,7 @@ def fetch_curated_titles(label, api_key, target_count=45):
                             merged.append(item)
                 page += 1
             except Exception as e:
-                print(f"Shudder Genre Fallback Error Page {page}: {e}")
+                print(f"Genre Fallback Safe Injector Error Page {page}: {e}")
                 break
 
     return merged[:target_count]
@@ -312,7 +322,7 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     return final_canvas
 
 def generate_diagonal_gradient(width, height, label):
-    slug = label.lower().replace(" ", "").replace("+", "plus")
+    slug = label.lower().replace(" ", "").replace("+", "plus").replace(" ", "")
     palette = BRAND_PALETTES.get(slug, {"base": (10, 12, 16), "mid": (35, 40, 55), "light": (90, 100, 125)})
     
     c_dark = palette["base"]
@@ -350,7 +360,7 @@ def main():
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Compiling Finalized Unique Grid V20-Fixed for: {args.label}")
+    print(f"Compiling Finalized Unique Grid V21 for: {args.label}")
     unique_items = fetch_curated_titles(args.label, args.api_key, target_count=45)
     
     tile_images = []
@@ -378,7 +388,7 @@ def main():
     
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully rendered pristine V20-Fixed layout for {args.label}!")
+    print(f"Successfully rendered pristine V21 layout for {args.label}!")
 
 if __name__ == "__main__":
     try:
