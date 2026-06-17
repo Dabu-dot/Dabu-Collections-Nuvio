@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - Explicit Geometric Alignment & Hardened Content Filter (V18)
-Fixes the left/right shifting loop by locking the grid center to an absolute canvas coordinate.
-Guarantees full saturation of the right-hand canvas border and corners.
+Premium Backdrop Generator - Strict Column Limit & Multi-Page Anti-Duplication (V19)
+Reduces column count to 4 for a cleaner layout and implements deep API pagination
+to guarantee 100% unique posters with zero local repetition.
 """
 
 import argparse
@@ -27,18 +27,16 @@ QUALITY_PRESETS = {
     "compressed": {"quality": 95, "progressive": True, "subsampling": "4:2:0"}
 }
 
-# --- PARAMÈTRES GÉOMÉTRIQUES VERROUILLÉS ---
+# --- CONFIGURATION VISUELLE ET GÉOMÉTRIQUE ÉPURÉE ---
 CARD_RADIUS = 22    
 TILE_W = 320        
 TILE_H = 480        
 GAP = 34            
 TILT_DEG = -20      
 
-COLS = 5            
+COLS = 4            # Réduit de 5 à 4 pour supprimer la ligne verticale excédentaire
 ROWS = 7            
 
-# Positionnement cible du centre de la grille sur le canevas final (1920x1080)
-# Calé à 1350 pour saturer la moitié droite tout en laissant le dégradé respirer à gauche
 TARGET_CENTER_X = 1350
 TARGET_CENTER_Y = 540
 
@@ -72,7 +70,6 @@ BRAND_PALETTES = {
     "paramount":    {"base": (0, 8, 26),      "mid": (0, 50, 145),    "light": (0, 116, 228)}
 }
 
-# Filtrage strict de contenus matures / suggestifs (Crunchyroll / Anime)
 BANNED_IDS = {12361, 219416, 156096, 12543, 193204, 230113}
 BANNED_WORDS = ["ecchi", "harem", "fan service", "fanservice", "soft-core", "suggestive", "sinful", "nudity", "erotic", "sensual"]
 
@@ -93,7 +90,6 @@ def tmdb_get(endpoint, params, api_key):
             time.sleep(1 + attempt)
 
 def is_clean_content(media_type, item, api_key):
-    """Analyse textuelle locale combinée avec l'extraction des tags de mots-clés TMDB."""
     title = item.get("name", item.get("title", "") or "").lower()
     overview = item.get("overview", "") or ""
     overview = overview.lower()
@@ -118,6 +114,7 @@ def is_clean_content(media_type, item, api_key):
     return True
 
 def fetch_curated_titles(label, api_key, target_count=45):
+    """Récupère les titres de façon séquentielle sur plusieurs pages pour éviter les doublons."""
     merged = []
     seen_ids = set()
     slug = label.lower().replace(" ", "").replace("+", "plus")
@@ -126,7 +123,7 @@ def fetch_curated_titles(label, api_key, target_count=45):
         "sort_by": "popularity.desc",
         "include_adult": "false",
         "without_genres": "10749,18",  
-        "vote_count.gte": "25"
+        "vote_count.gte": "15"
     }
 
     if slug == "crunchyroll":
@@ -137,42 +134,64 @@ def fetch_curated_titles(label, api_key, target_count=45):
         })
         
         for media_type in ["tv", "movie"]:
-            data = tmdb_get(f"/discover/{media_type}", crunchy_params, api_key)
-            for item in data.get("results", []):
-                if item.get("poster_path") and item["id"] not in seen_ids:
-                    if is_clean_content(media_type, item, api_key):
-                        seen_ids.add(item["id"])
-                        merged.append(item)
-                    else:
-                        print(f"[-] Purged softcore candidate: {item.get('name', item.get('title', 'Unknown'))}")
+            page = 1
+            while len(merged) < target_count and page <= 3:
+                crunchy_params["page"] = page
+                data = tmdb_get(f"/discover/{media_type}", crunchy_params, api_key)
+                results = data.get("results", [])
+                if not results:
+                    break
+                for item in results:
+                    if item.get("poster_path") and item["id"] not in seen_ids:
+                        if is_clean_content(media_type, item, api_key):
+                            seen_ids.add(item["id"])
+                            merged.append(item)
+                page += 1
         return merged[:target_count]
 
     cfg = BRAND_MAPPING.get(slug, {})
+    
+    # 1. Collecte TV avec pagination active
     if cfg.get("network"):
-        try:
+        page = 1
+        while len(merged) < target_count and page <= 3:
             params = dict(safe_params)
             params["with_networks"] = cfg["network"]
-            tv_data = tmdb_get("/discover/tv", params, api_key)
-            for item in tv_data.get("results", []):
-                if item.get("poster_path") and item["id"] not in seen_ids:
-                    seen_ids.add(item["id"])
-                    merged.append(item)
-        except Exception as e:
-            print(f"TV Fetch Error: {e}")
+            params["page"] = page
+            try:
+                tv_data = tmdb_get("/discover/tv", params, api_key)
+                results = tv_data.get("results", [])
+                if not results:
+                    break
+                for item in results:
+                    if item.get("poster_path") and item["id"] not in seen_ids:
+                        seen_ids.add(item["id"])
+                        merged.append(item)
+                page += 1
+            except Exception as e:
+                print(f"TV Fetch Error Page {page}: {e}")
+                break
 
+    # 2. Collecte Movies de secours avec pagination si le quota n'est pas atteint
     if len(merged) < target_count and cfg.get("company"):
-        try:
+        page = 1
+        while len(merged) < target_count and page <= 3:
             params = dict(safe_params)
             params["with_companies"] = cfg["company"]
-            movie_data = tmdb_get("/discover/movie", params, api_key)
-            for item in movie_data.get("results", []):
-                if item.get("poster_path") and item["id"] not in seen_ids:
-                    seen_ids.add(item["id"])
-                    merged.append(item)
-                if len(merged) >= target_count:
+            params["page"] = page
+            try:
+                movie_data = tmdb_get("/discover/movie", params, api_key)
+                results = movie_data.get("results", [])
+                if not results:
                     break
-        except Exception as e:
-            print(f"Movie Fallback Error: {e}")
+                for item in results:
+                    if item.get("poster_path") and item["id"] not in seen_ids:
+                        seen_ids.add(item["id"])
+                        merged.append(item)
+                page += 1
+            except Exception as e:
+                print(f"Movie Fallback Error Page {page}: {e}")
+                break
 
     return merged[:target_count]
 
@@ -228,7 +247,6 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     return tile_container
 
 def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
-    """Génère la nappe de tuiles centrée au pixel près pour un cadrage immuable."""
     shadow_padding = int(36 * scale)
     tile_width = int(TILE_W * scale)
     tile_height = int(TILE_H * scale)
@@ -238,7 +256,6 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     step_y = tile_height + gap
     stagger_y = step_y // 2
 
-    # Canvas de travail géant invariable (3000x3000px de base)
     work_size = int(3000 * scale)
     work_layer = Image.new("RGBA", (work_size, work_size), (0, 0, 0, 0))
     tile_pool = itertools.cycle(tiles)
@@ -259,12 +276,8 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
             y = start_y + (row * step_y) + y_offset
             work_layer.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
 
-    # Rotation centrée stricte sans altération de taille globale
     rotated_work = work_layer.rotate(TILT_DEG, expand=False, resample=Image.BICUBIC)
 
-    # ALIGNEMENT CALCULÉ ÉLECTRONIQUEMENT :
-    # Calcule l'origine exacte du crop pour que le centre géométrique de la nappe rotated
-    # coïncide à la perfection avec (TARGET_CENTER_X, TARGET_CENTER_Y) sur le calque final.
     crop_x = (work_size // 2) - int(TARGET_CENTER_X * scale)
     crop_y = (work_size // 2) - int(TARGET_CENTER_Y * scale)
 
@@ -310,7 +323,7 @@ def main():
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Compiling Calibrated Coordinate Layout V18 for: {args.label}")
+    print(f"Compiling Finalized Unique Grid V19 for: {args.label}")
     unique_items = fetch_curated_titles(args.label, args.api_key, target_count=45)
     
     tile_images = []
@@ -323,9 +336,6 @@ def main():
     if not tile_images:
         print("Error: No posters downloaded.")
         sys.exit(1)
-
-    if len(tile_images) < 25:
-        tile_images = (tile_images * (25 // len(tile_images) + 1))[:25]
 
     width, height, scale = SIZE_PRESETS[args.size]
     
@@ -341,7 +351,7 @@ def main():
     
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully rendered pristine V18 layout for {args.label}!")
+    print(f"Successfully rendered pristine V19 layout for {args.label}!")
 
 if __name__ == "__main__":
     try:
