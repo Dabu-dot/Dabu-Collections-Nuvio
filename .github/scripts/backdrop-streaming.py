@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Premium Backdrop Generator - Strict Column Limit & Multi-Page Anti-Duplication (V22)
-Optimisation de la popularité via Watch Providers TMDB et persistance anti-repositionnement.
+Optimisation de la popularité via Watch Providers US et persistance anti-repositionnement JSON.
 """
 
 import argparse
@@ -28,6 +28,7 @@ QUALITY_PRESETS = {
     "compressed": {"quality": 95, "progressive": True, "subsampling": "4:2:0"}
 }
 
+# --- CONFIGURATION VISUELLE ET GÉOMÉTRIQUE ÉPURÉE ---
 CARD_RADIUS = 22    
 TILE_W = 320        
 TILE_H = 480        
@@ -46,21 +47,20 @@ SIZE_PRESETS = {
     "4k": (3840, 2160, 2.0),
 }
 
-# Mapping mis à jour avec les ID de "Watch Providers" TMDB (Exemple pour la région FR)
-# Si tu constates des manques, ces ID s'alignent sur l'API /watch/providers
+# Mapping officiel des Watch Providers TMDB (Région US)
 BRAND_PROVIDERS = {
     "netflix":      {"id": "8"},
     "disneyplus":   {"id": "337"},
     "hbomax":       {"id": "1899"}, # Max
-    "appletv":      {"id": "2"},    # Apple TV app / plus
-    "hulu":         {"id": "15"},   # Souvent lié à Disney+ en Europe, ajusté au provider US ou Star
+    "appletv":      {"id": "2"},    # Apple TV Plus
+    "hulu":         {"id": "15"},
     "peacock":      {"id": "386"},
     "primevideo":   {"id": "9"},
     "paramount":    {"id": "531"},
     "shudder":      {"id": "99"},
     "mubi":         {"id": "11"},
-    "canalplus":    {"id": "381"},
-    "skyshowtime":  {"id": "1773"}
+    "canalplus":    {"id": "381"},   # Conservé si besoin (principalement FR)
+    "skyshowtime":  {"id": "1773"}  # Europe
 }
 
 BRAND_PALETTES = {
@@ -131,14 +131,14 @@ def fetch_curated_titles(label, api_key, target_count=45):
         "sort_by": "popularity.desc",
         "include_adult": "false",
         "vote_count.gte": "10",
-        "watch_region": "FR"
+        "watch_region": "US"  # Utilisation de la région US pour maximiser la popularité globale
     }
 
-    # Ajustement d'exclusion de genre (Mubi a cruellement besoin du genre Drame (18))
+    # Ajustement d'exclusion de genre (Mubi a besoin du genre Drame (18))
     if slug != "mubi":
         safe_params["without_genres"] = "10749,18"
     else:
-        safe_params["without_genres"] = "10749" # On ne retire que la romance pure
+        safe_params["without_genres"] = "10749" 
 
     if slug == "crunchyroll":
         crunchy_params = dict(safe_params)
@@ -154,14 +154,12 @@ def fetch_curated_titles(label, api_key, target_count=45):
                     if item.get("poster_path") and item["id"] not in seen_ids:
                         if is_clean_content(media_type, item, api_key):
                             seen_ids.add(item["id"])
-                            item["media_type"] = media_type
                             merged.append(item)
                 page += 1
         return merged[:target_count]
 
     provider_cfg = BRAND_PROVIDERS.get(slug)
     
-    # Stratégie Discover unifiée via Watch Providers (Moins de fallbacks hazardeux)
     for media_type in ["movie", "tv"]:
         page = 1
         while len(merged) < target_count and page <= 6:
@@ -178,7 +176,6 @@ def fetch_curated_titles(label, api_key, target_count=45):
                     if item.get("poster_path") and item["id"] not in seen_ids:
                         if is_clean_content(media_type, item, api_key):
                             seen_ids.add(item["id"])
-                            item["media_type"] = media_type
                             merged.append(item)
                 page += 1
             except Exception as e:
@@ -256,31 +253,32 @@ def save_position_history(history_path, history_data):
 def organize_grid_anti_persistence(media_items, label, history_data):
     """Organise la liste des médias pour qu'aucun ID ne se retrouve à la même position indexée."""
     slug = label.lower().replace(" ", "").replace("+", "plus")
-    past_grid = history_data.get(slug, []) # Liste ordonnée de string/int ID de la dernière fois
+    past_grid = history_data.get(slug, [])
     
     needed = TOTAL_TILES
+    
+    # Sécurité anti-crash si la liste retournée par TMDB est vide
+    if not media_items:
+        media_items = [{"id": 0, "poster_path": None}]
+
     available_items = media_items[:needed]
     
-    # Si on manque de médias uniques, on complète par duplication simple en fin de liste
     if len(available_items) < needed:
         pool = itertools.cycle(media_items)
         available_items = [next(pool) for _ in range(needed)]
 
-    # Algorithme de positionnement adaptatif sans collision directe d'index
     final_grid = [None] * needed
     unplaced = list(available_items)
     
     for i in range(needed):
         past_id = past_grid[i] if i < len(past_grid) else None
         
-        # Trouver le premier candidat qui ne correspond pas à l'ID historique de cette case
         match_candidate = None
         for candidate in unplaced:
             if str(candidate["id"]) != str(past_id):
                 match_candidate = candidate
                 break
         
-        # Secours : si tout le reste provoque une collision (rare), on prend le premier disponible
         if not match_candidate and unplaced:
             match_candidate = unplaced[0]
             
@@ -288,7 +286,6 @@ def organize_grid_anti_persistence(media_items, label, history_data):
         if match_candidate in unplaced:
             unplaced.remove(match_candidate)
             
-    # Met à jour la structure historique pour la prochaine exécution
     history_data[slug] = [str(item["id"]) for item in final_grid]
     return final_grid
 
@@ -375,7 +372,6 @@ def main():
     if len(unique_items) < TOTAL_TILES:
         print(f"Warning: Only found {len(unique_items)} items for {args.label}.")
 
-    # Application du verrou anti-repositionnement séquentiel
     history_data = load_position_history(history_path)
     ordered_items = organize_grid_anti_persistence(unique_items, args.label, history_data)
     save_position_history(history_path, history_data)
@@ -383,9 +379,12 @@ def main():
     tile_images = []
     for item in ordered_items:
         poster_path = item.get("poster_path")
-        img = download_image_url(f"{TMDB_IMG_BASE}/{POSTER_SIZE}{poster_path}")
+        if poster_path:
+            img = download_image_url(f"{TMDB_IMG_BASE}/{POSTER_SIZE}{poster_path}")
+        else:
+            img = None
+            
         if not img:
-            # Fallback en cas d'erreur de téléchargement d'un poster pour ne pas casser l'index complet
             img = Image.new("RGBA", (TILE_W, TILE_H), (20, 20, 20, 255))
         tile_images.append(img)
 
@@ -406,3 +405,4 @@ if __name__ == "__main__":
         main()
     finally:
         cleanup_pycache()
+    
