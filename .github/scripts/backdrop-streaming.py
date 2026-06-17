@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - Absolute Corner Saturation & Hardcoded Python Filter (V16)
-Fixes the bottom-right corner gap by over-allocating grid dimensions and using safe anchoring.
-Implements post-fetch keyword auditing for Crunchyroll to strictly purge fanservice/ecchi content.
+Premium Backdrop Generator - Absolute Box Anchor & Multi-Layer Purge (V17)
+Uses a deterministic large-frame slicing method to eliminate the right-side gap.
+Features an aggressive hybrid keyword/text-matching safety filter for anime content.
 """
 
 import argparse
@@ -27,15 +27,15 @@ QUALITY_PRESETS = {
     "compressed": {"quality": 95, "progressive": True, "subsampling": "4:2:0"}
 }
 
-# --- CONFIGURATION GÉOMÉTRIQUE LARGE POUR SÉCURISER LES ANGLES ---
+# --- GÉOMÉTRIE VERROUILLÉE ---
 CARD_RADIUS = 22    
 TILE_W = 320        
 TILE_H = 480        
 GAP = 34            
 TILT_DEG = -20      
 
-COLS = 5            # Passé à 5 colonnes pour déborder largement à droite
-ROWS = 7            # Passé à 7 lignes pour verrouiller le haut et le bas
+COLS = 5            
+ROWS = 7            
 
 SIZE_PRESETS = {
     "1080p": (1920, 1080, 1.0),
@@ -67,8 +67,9 @@ BRAND_PALETTES = {
     "paramount":    {"base": (0, 8, 26),      "mid": (0, 50, 145),    "light": (0, 116, 228)}
 }
 
-# IDs TMDB à bannir côté Python (ecchi, fanservice, harem, nudity)
-BANNED_KEYWORDS = {12361, 219416, 156096, 12543}
+# Liste noire de mots-clés (textuels et IDs) pour Crunchyroll
+BANNED_IDS = {12361, 219416, 156096, 12543, 193204}
+BANNED_WORDS = ["ecchi", "harem", "fan service", "fanservice", "soft-core", "suggestive", "sinful", "nudity"]
 
 def cleanup_pycache():
     shutil.rmtree(SCRIPT_DIR / "__pycache__", ignore_errors=True)
@@ -86,18 +87,31 @@ def tmdb_get(endpoint, params, api_key):
                 raise
             time.sleep(1 + attempt)
 
-def is_safe_anime(media_type, item_id, api_key):
-    """Vérifie minutieusement les mots-clés d'une œuvre pour exclure le softcore."""
+def is_clean_content(media_type, item, api_key):
+    """Filtre hybride : Analyse l'overview et interroge les mots-clés de l'œuvre."""
+    title = item.get("name", item.get("title", "")).lower()
+    overview = item.get("overview", "").lower()
+    
+    # Étape 1 : Analyse rapide des métadonnées textuelles de base
+    for word in BANNED_WORDS:
+        if word in title or word in overview:
+            return False
+
+    # Étape 2 : Validation des mots-clés de l'API
     try:
-        data = tmdb_get(f"/{media_type}/{item_id}/keywords", {}, api_key)
-        # Gère la différence de structure de réponse entre 'tv' et 'movie' sur TMDB
+        item_id = item["id"]
+        endpoint = f"/tv/{item_id}/keywords" if media_type == "tv" else f"/movie/{item_id}/keywords"
+        data = tmdb_get(endpoint, {}, api_key)
         keywords = data.get("results", []) if media_type == "movie" else data.get("keywords", [])
+        
         for kw in keywords:
-            if kw.get("id") in BANNED_KEYWORDS:
+            kw_id = kw.get("id")
+            kw_name = kw.get("name", "").lower()
+            if kw_id in BANNED_IDS or any(w in kw_name for w in BANNED_WORDS):
                 return False
-        return True
     except Exception:
-        return True # En cas d'échec de l'API de mot-clé, on reste tolérant ou faux-positif
+        pass
+    return True
 
 def fetch_curated_titles(label, api_key, target_count=45):
     merged = []
@@ -108,32 +122,28 @@ def fetch_curated_titles(label, api_key, target_count=45):
         "sort_by": "popularity.desc",
         "include_adult": "false",
         "without_genres": "10749,18",  
-        "vote_count.gte": "20"
+        "vote_count.gte": "25"
     }
 
     if slug == "crunchyroll":
         crunchy_params = dict(safe_params)
         crunchy_params.update({
             "with_genres": "16",
-            "with_original_language": "ja|ko",
-            "vote_count.gte": "30"
+            "with_original_language": "ja|ko"
         })
         
         for media_type in ["tv", "movie"]:
             data = tmdb_get(f"/discover/{media_type}", crunchy_params, api_key)
             for item in data.get("results", []):
-                item_id = item.get("id")
-                if item.get("poster_path") and item_id not in seen_ids:
-                    # Audit strict en post-traitement Python
-                    if is_safe_anime(media_type, item_id, api_key):
-                        seen_ids.add(item_id)
+                if item.get("poster_path") and item["id"] not in seen_ids:
+                    if is_clean_content(media_type, item, api_key):
+                        seen_ids.add(item["id"])
                         merged.append(item)
                     else:
-                        print(f"Purged suggestive item ID: {item_id} ({item.get('name', 'Anime')})")
+                        print(f"[-] Filtered out: {item.get('name', item.get('title', 'Unknown'))}")
         return merged[:target_count]
 
     cfg = BRAND_MAPPING.get(slug, {})
-    
     if cfg.get("network"):
         try:
             params = dict(safe_params)
@@ -150,7 +160,6 @@ def fetch_curated_titles(label, api_key, target_count=45):
         try:
             params = dict(safe_params)
             params["with_companies"] = cfg["company"]
-            params["vote_count.gte"] = "40"
             movie_data = tmdb_get("/discover/movie", params, api_key)
             for item in movie_data.get("results", []):
                 if item.get("poster_path") and item["id"] not in seen_ids:
@@ -215,7 +224,7 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     return tile_container
 
 def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
-    """Génère un bloc de grille surdimensionné et le décale manuellement après rotation."""
+    """Ancre la grille dans un repère fixe au pixel près pour saturer le cadre."""
     shadow_padding = int(36 * scale)
     tile_width = int(TILE_W * scale)
     tile_height = int(TILE_H * scale)
@@ -225,12 +234,17 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     step_y = tile_height + gap
     stagger_y = step_y // 2
 
-    # Création d'une surface de travail brute très grande pour encaisser la rotation sans pertes
-    grid_w = (COLS * step_x) + (shadow_padding * 2)
-    grid_h = (ROWS * step_y) + stagger_y + (shadow_padding * 2)
-    
-    grid_img = Image.new("RGBA", (grid_w, grid_h), (0, 0, 0, 0))
+    # Étape 1 : Création d'une boîte de travail géante invariable (3000x3000px)
+    work_size = int(3000 * scale)
+    work_layer = Image.new("RGBA", (work_size, work_size), (0, 0, 0, 0))
     tile_pool = itertools.cycle(tiles)
+
+    # Étape 2 : Centrage de notre bloc de posters à l'intérieur de la boîte
+    total_grid_w = (COLS * step_x) - gap
+    total_grid_h = (ROWS * step_y) + stagger_y
+    
+    start_x = (work_size - total_grid_w) // 2
+    start_y = (work_size - total_grid_h) // 2
 
     for col in range(COLS):
         y_offset = stagger_y if (col % 2 == 1) else 0
@@ -238,23 +252,20 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
             tile_asset = next(tile_pool)
             tile_with_shadow = make_premium_tile(tile_asset, tile_width, tile_height, scale)
             
-            x = col * step_x + shadow_padding
-            y = row * step_y + y_offset + shadow_padding
-            grid_img.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
+            x = start_x + (col * step_x)
+            y = start_y + (row * step_y) + y_offset
+            work_layer.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
 
-    # Rotation au centre géométrique propre de la grille
-    rotated_grid = grid_img.rotate(TILT_DEG, expand=True, resample=Image.BICUBIC)
-    rot_w, rot_h = rotated_grid.size
+    # Étape 3 : Rotation SANS expansion (dimensions fixes, pas de boîte englobante folle)
+    rotated_work = work_layer.rotate(TILT_DEG, expand=False, resample=Image.BICUBIC)
 
-    # COMPENSATIONS DES ANGLE MORT : Alignement forcé par débordement
-    # En poussant la structure à x_offset, la 5ème colonne comble l'angle inférieur droit à coup sûr
-    paste_x = int(canvas_width - rot_w + (420 * scale)) 
-    paste_y = int((canvas_height - rot_h) // 2) - int(40 * scale)
+    # Étape 4 : Découpe mathématique calée sur la bordure droite
+    # On isole la fenêtre finale directement là où les affiches débordent de façon homogène
+    crop_x = (work_size // 2) - int(380 * scale)
+    crop_y = (work_size - canvas_height) // 2 + int(60 * scale)
 
-    canvas = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
-    canvas.paste(rotated_grid, (paste_x, paste_y), rotated_grid)
-    
-    return canvas
+    final_canvas = rotated_work.crop((crop_x, crop_y, crop_x + canvas_width, crop_y + canvas_height))
+    return final_canvas
 
 def generate_diagonal_gradient(width, height, label):
     slug = label.lower().replace(" ", "").replace("+", "plus")
@@ -295,7 +306,7 @@ def main():
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Compiling Safe Over-Allocated Layout V16 for: {args.label}")
+    print(f"Compiling Fixed Pivot Sliced Layout V17 for: {args.label}")
     unique_items = fetch_curated_titles(args.label, args.api_key, target_count=45)
     
     tile_images = []
@@ -326,7 +337,7 @@ def main():
     
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully rendered pristine layout for {args.label}!")
+    print(f"Successfully rendered pristine V17 layout for {args.label}!")
 
 if __name__ == "__main__":
     try:
