@@ -3,7 +3,7 @@ name: Weekly Streaming Backdrops
 
 on:
   schedule:
-    - cron: "0 5 * * 0" # Tous les dimanches à 4h00 UTC
+    - cron: "0 5 * * 0" # Tous les dimanches Ã  4h00 UTC
   workflow_dispatch:
 
 permissions:
@@ -85,13 +85,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # Ajoute tout le contenu du dossier, incluant les images et le fichier positions_history.json
           git add "Ressources/Collections Covers/Streaming Services/Backdrops/"
           
           if ! git diff --cached --exit-code --quiet; then
-            git commit -m "chore: auto-update premium streaming backdrops and grid history [skip ci]"
+            git commit -m "chore: auto-update premium streaming backdrops [skip ci]"
             git push origin main
           else
             echo "No changes detected in backdrops assets. Skipping commit."
           fi
-          
