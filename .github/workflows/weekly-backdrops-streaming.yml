@@ -3,7 +3,7 @@ name: Weekly Streaming Backdrops
 
 on:
   schedule:
-    - cron: "0 4 * * 0" # Tous les dimanches à 4h00 UTC
+    - cron: "0 5 * * 0" # Tous les dimanches à 4h00 UTC
   workflow_dispatch:
 
 permissions:
@@ -28,7 +28,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install Python dependencies
-        run: |
+        run: |\
           python -m pip install --upgrade pip
           python -m pip install pillow requests
 
@@ -43,19 +43,19 @@ jobs:
           # 2. AMAZON PRIME VIDEO
           python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Prime Video" --output "Ressources/Collections Covers/Streaming Services/Backdrops/primevideo.jpg"
 
-          # 3. DISNEY+
+          # 3. DISNEY PLUS
           python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Disney Plus" --output "Ressources/Collections Covers/Streaming Services/Backdrops/disneyplus.jpg"
 
-          # 4. APPLE TV+
-          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Apple TV" --output "Ressources/Collections Covers/Streaming Services/Backdrops/appletv.jpg"
-
-          # 5. CRUNCHYROLL
-          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Crunchyroll" --output "Ressources/Collections Covers/Streaming Services/Backdrops/crunchyroll.jpg"
-
-          # 6. HBO MAX / MAX
+          # 4. HBO MAX
           python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "HBO Max" --output "Ressources/Collections Covers/Streaming Services/Backdrops/hbomax.jpg"
 
-          # 7. PARAMOUNT+
+          # 5. APPLE TV
+          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Apple TV" --output "Ressources/Collections Covers/Streaming Services/Backdrops/appletv.jpg"
+
+          # 6. CRUNCHYROLL
+          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Crunchyroll" --output "Ressources/Collections Covers/Streaming Services/Backdrops/crunchyroll.jpg"
+
+          # 7. PARAMOUNT
           python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Paramount" --output "Ressources/Collections Covers/Streaming Services/Backdrops/paramount.jpg"
 
           # 8. HULU
@@ -67,20 +67,29 @@ jobs:
           # 10. SHUDDER
           python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Shudder" --output "Ressources/Collections Covers/Streaming Services/Backdrops/shudder.jpg"
 
+          # 11. MUBI
+          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Mubi" --output "Ressources/Collections Covers/Streaming Services/Backdrops/mubi.jpg"
+
+          # 12. CANAL+
+          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "Canal+" --output "Ressources/Collections Covers/Streaming Services/Backdrops/canalplus.jpg"
+
+          # 13. SKYSHOWTIME
+          python3 -B .github/scripts/backdrop-streaming.py --api-key "$TMDB_API_KEY" --label "SkyShowtime" --output "Ressources/Collections Covers/Streaming Services/Backdrops/skyshowtime.jpg"
+
       - name: Clean Python cache folders
         run: |
-          find . -type d -name "__pycache__" -prune -exec rm -rf {} +
+          find . -type d -name "__pycache__" -prune -exec rm -rf {} +\
 
       - name: Commit and push updated assets
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name \"github-actions[bot]\"
+          git config user.email \"41898282+github-actions[bot]@users.noreply.github.com\"
           
           git add "Ressources/Collections Covers/Streaming Services/Backdrops/"
           
           if ! git diff --cached --exit-code --quiet; then
-            git commit -m "chore: fixed grid continuity and angular brand gradients [skip ci]"
+            git commit -m "chore: auto-update premium streaming backdrops [skip ci]"
             git push origin main
           else
-            echo "No changes found. Skipping commit."
+            print "No changes detected in backdrops assets. Skipping commit."
           fi
