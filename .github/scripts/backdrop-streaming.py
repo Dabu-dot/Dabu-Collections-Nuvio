@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - Strict Column Limit & Multi-Page Anti-Duplication (V22)
-Optimisation de la popularité via Watch Providers US et persistance anti-repositionnement JSON.
+Premium Backdrop Generator - Strict Column Limit & Multi-Page Anti-Duplication (V23)
+Mécanisme intelligent de région par défaut (FR/EU) avec fallback automatique (US).
 """
 
 import argparse
@@ -47,20 +47,20 @@ SIZE_PRESETS = {
     "4k": (3840, 2160, 2.0),
 }
 
-# Mapping officiel des Watch Providers TMDB (Région US)
+# Cartographie double-région (Principale FR/EU vs Fallback US)
 BRAND_PROVIDERS = {
-    "netflix":      {"id": "8"},
-    "disneyplus":   {"id": "337"},
-    "hbomax":       {"id": "1899"}, # Max
-    "appletv":      {"id": "2"},    # Apple TV Plus
-    "hulu":         {"id": "15"},
-    "peacock":      {"id": "386"},
-    "primevideo":   {"id": "9"},
-    "paramount":    {"id": "531"},
-    "shudder":      {"id": "99"},
-    "mubi":         {"id": "11"},
-    "canalplus":    {"id": "381"},   # Conservé si besoin (principalement FR)
-    "skyshowtime":  {"id": "1773"}  # Europe
+    "netflix":      {"id": "8",    "region": "FR", "fallback_id": "8",    "fallback_region": "US"},
+    "disneyplus":   {"id": "337",  "region": "FR", "fallback_id": "337",  "fallback_region": "US"},
+    "hbomax":       {"id": "1899", "region": "FR", "fallback_id": "1899", "fallback_region": "US"}, # Max
+    "appletv":      {"id": "2",    "region": "FR", "fallback_id": "2",    "fallback_region": "US"}, # Apple TV Plus
+    "hulu":         {"id": "15",   "region": "US", "fallback_id": "15",   "fallback_region": "US"}, # Principal US car absent en FR
+    "peacock":      {"id": "386",  "region": "US", "fallback_id": "386",  "fallback_region": "US"}, # Principal US
+    "primevideo":   {"id": "9",    "region": "FR", "fallback_id": "9",    "fallback_region": "US"},
+    "paramount":    {"id": "531",  "region": "FR", "fallback_id": "531",  "fallback_region": "US"}, # Bascule auto si l'ID FR diverge
+    "shudder":      {"id": "99",   "region": "FR", "fallback_id": "99",   "fallback_region": "US"},
+    "mubi":         {"id": "11",   "region": "FR", "fallback_id": "11",   "fallback_region": "US"},
+    "canalplus":    {"id": "381",  "region": "FR", "fallback_id": "381",  "fallback_region": "FR"}, # Exclusivité FR
+    "skyshowtime":  {"id": "1773", "region": "ES", "fallback_id": "1773", "fallback_region": "ES"} # Europe (ES utilisé comme pivot fonctionnel)
 }
 
 BRAND_PALETTES = {
@@ -122,32 +122,59 @@ def is_clean_content(media_type, item, api_key):
         pass
     return True
 
+def _execute_discover(media_type, provider_id, region, api_key, target_count, seen_ids):
+    """Effectue la requête de découverte sur 6 pages maximum pour une région donnée."""
+    results_list = []
+    safe_params = {
+        "sort_by": "popularity.desc",
+        "include_adult": "false",
+        "vote_count.gte": "10",
+        "watch_region": region,
+        "with_watch_providers": provider_id
+    }
+    
+    page = 1
+    while len(results_list) < target_count and page <= 6:
+        params = dict(safe_params)
+        params["page"] = page
+        try:
+            data = tmdb_get(f"/discover/{media_type}", params, api_key)
+            results = data.get("results", [])
+            if not results: 
+                break
+            for item in results:
+                if item.get("poster_path") and item["id"] not in seen_ids:
+                    if is_clean_content(media_type, item, api_key):
+                        seen_ids.add(item["id"])
+                        results_list.append(item)
+            page += 1
+        except Exception as e:
+            print(f"Error executing discover for {media_type} ({region}) page {page}: {e}")
+            break
+            
+    return results_list
+
 def fetch_curated_titles(label, api_key, target_count=45):
     merged = []
     seen_ids = set()
     slug = label.lower().replace(" ", "").replace("+", "plus")
 
-    safe_params = {
-        "sort_by": "popularity.desc",
-        "include_adult": "false",
-        "vote_count.gte": "10",
-        "watch_region": "US"  # Utilisation de la région US pour maximiser la popularité globale
-    }
-
-    # Ajustement d'exclusion de genre (Mubi a besoin du genre Drame (18))
-    if slug != "mubi":
-        safe_params["without_genres"] = "10749,18"
-    else:
-        safe_params["without_genres"] = "10749" 
-
+    # Gestion de la configuration Crunchyroll (basée sur les genres, pas sur les providers)
     if slug == "crunchyroll":
-        crunchy_params = dict(safe_params)
-        crunchy_params.update({"with_genres": "16", "with_original_language": "ja|ko"})
+        safe_params = {
+            "sort_by": "popularity.desc",
+            "include_adult": "false",
+            "vote_count.gte": "10",
+            "watch_region": "FR",
+            "with_genres": "16",
+            "with_original_language": "ja|ko",
+            "without_genres": "10749,18"
+        }
         for media_type in ["tv", "movie"]:
             page = 1
             while len(merged) < target_count and page <= 5:
-                crunchy_params["page"] = page
-                data = tmdb_get(f"/discover/{media_type}", crunchy_params, api_key)
+                safe_params["page"] = page
+                data = tmdb_get(f"/discover/{media_type}", safe_params, api_key)
                 results = data.get("results", [])
                 if not results: break
                 for item in results:
@@ -159,28 +186,29 @@ def fetch_curated_titles(label, api_key, target_count=45):
         return merged[:target_count]
 
     provider_cfg = BRAND_PROVIDERS.get(slug)
-    
+    if not provider_cfg:
+        return []
+
+    # 1. ESSAI PRINCIPAL : Région Locale (FR ou EU)
+    primary_id = provider_cfg["id"]
+    primary_region = provider_cfg["region"]
+
     for media_type in ["movie", "tv"]:
-        page = 1
-        while len(merged) < target_count and page <= 6:
-            params = dict(safe_params)
-            if provider_cfg:
-                params["with_watch_providers"] = provider_cfg["id"]
-            params["page"] = page
-            
-            try:
-                data = tmdb_get(f"/discover/{media_type}", params, api_key)
-                results = data.get("results", [])
-                if not results: break
-                for item in results:
-                    if item.get("poster_path") and item["id"] not in seen_ids:
-                        if is_clean_content(media_type, item, api_key):
-                            seen_ids.add(item["id"])
-                            merged.append(item)
-                page += 1
-            except Exception as e:
-                print(f"Error fetching {media_type} for {label} page {page}: {e}")
+        media_results = _execute_discover(media_type, primary_id, primary_region, api_key, target_count // 2, seen_ids)
+        merged.extend(media_results)
+
+    # 2. STRATÉGIE FALLBACK : Si le catalogue cumulé est trop pauvre (< 28 items), bascule automatique sur les US
+    if len(merged) < TOTAL_TILES and primary_region != provider_cfg["fallback_region"]:
+        print(f" -> [{label}] Regional catalog too restricted ({len(merged)} items). Triggering automated US Fallback pipeline...")
+        fallback_id = provider_cfg["fallback_id"]
+        fallback_region = provider_cfg["fallback_region"]
+        
+        for media_type in ["movie", "tv"]:
+            needed_slots = target_count - len(merged)
+            if needed_slots <= 0: 
                 break
+            fallback_results = _execute_discover(media_type, fallback_id, fallback_region, api_key, needed_slots, seen_ids)
+            merged.extend(fallback_results)
 
     return merged[:target_count]
 
@@ -251,13 +279,11 @@ def save_position_history(history_path, history_data):
         print(f"Error saving history: {e}")
 
 def organize_grid_anti_persistence(media_items, label, history_data):
-    """Organise la liste des médias pour qu'aucun ID ne se retrouve à la même position indexée."""
     slug = label.lower().replace(" ", "").replace("+", "plus")
     past_grid = history_data.get(slug, [])
     
     needed = TOTAL_TILES
     
-    # Sécurité anti-crash si la liste retournée par TMDB est vide
     if not media_items:
         media_items = [{"id": 0, "poster_path": None}]
 
@@ -366,7 +392,7 @@ def main():
     out_path.parent.mkdir(parents=True, exist_ok=True)
     history_path = out_path.parent / "positions_history.json"
 
-    print(f"Compiling Finalized Unique Grid V22 for: {args.label}")
+    print(f"Compiling Finalized Unique Grid V23 for: {args.label}")
     unique_items = fetch_curated_titles(args.label, args.api_key, target_count=50)
     
     if len(unique_items) < TOTAL_TILES:
@@ -398,11 +424,10 @@ def main():
     
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully rendered pristine V22 layout for {args.label}!")
+    print(f"Successfully rendered pristine V23 layout for {args.label}!")
 
 if __name__ == "__main__":
     try:
         main()
     finally:
         cleanup_pycache()
-    
