@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - Clean Cut Hemisphere Engine (V8)
-Strictly renders exactly 4 columns of posters on the right side with 100% opacity.
-Calculates a geometric corner-to-corner background gradient vector.
+Premium Backdrop Generator - TV Priority & Dynamic Film Fallback (V10)
+Prioritizes TV networks, dynamically backfills with verified movie production studios.
+Maximizes poster scale and forces strict right-edge alignment.
 """
 
 import argparse
@@ -27,23 +27,34 @@ QUALITY_PRESETS = {
     "compressed": {"quality": 95, "progressive": True, "subsampling": "4:2:0"}
 }
 
-# --- CONFIGURATION GÉOMÉTRIQUE AJUSTÉE (4 COLONNES STRICTES) ---
-CARD_RADIUS = 22    
-TILE_W = 280        
-TILE_H = 420        
-GAP = 32            
+# --- CONFIGURATION GÉOMÉTRIQUE MAXIMISÉE AU PLUS PROCHE DES MODÈLES ---
+CARD_RADIUS = 26    
+TILE_W = 380        # Taille augmentée pour un impact visuel massif
+TILE_H = 570        
+GAP = 38            # Ajusté proportionnellement pour la nappe
 TILT_DEG = -20      
 
-# Nombre exact de colonnes visibles pour correspondre parfaitement aux modèles
-COLS = 4            
-ROWS = 6            
+COLS = 4            # 4 colonnes strictes
+ROWS = 5            
 
 SIZE_PRESETS = {
     "1080p": (1920, 1080, 1.0),
     "4k": (3840, 2160, 2.0),
 }
 
-# --- PALETTES OFFICIELLES ---
+# Mapping de curation strict (Networks TV & Compagnies Cinéma associées)
+BRAND_MAPPING = {
+    "netflix":      {"network": "213",  "company": "60"},        # Netflix Studios
+    "disneyplus":   {"network": "2739", "company": "2|3|2165"},  # Disney, Pixar, Marvel
+    "hbomax":       {"network": "49",   "company": "174|429"},   # HBO, Warner Bros., DC
+    "appletv":      {"network": "2552", "company": "191065"},    # Apple Studios
+    "hulu":         {"network": "453",  "company": "6113"},      # Hulu Distribution
+    "peacock":      {"network": "3353", "company": "33"},        # Universal Pictures
+    "primevideo":   {"network": "1024", "company": "20580"},     # Amazon MGM Studios
+    "paramount":    {"network": "4330", "company": "4"},         # Paramount Pictures
+    "shudder":      {"network": "2326", "company": "60608"}      # Shudder Films / AMC
+}
+
 BRAND_PALETTES = {
     "netflix":      {"base": (8, 0, 2),       "mid": (80, 5, 10),     "light": (229, 9, 20)},
     "disneyplus":   {"base": (2, 6, 23),      "mid": (5, 30, 80),     "light": (0, 110, 153)},
@@ -55,17 +66,6 @@ BRAND_PALETTES = {
     "shudder":      {"base": (15, 2, 2),      "mid": (80, 0, 0),      "light": (195, 10, 10)},
     "primevideo":   {"base": (2, 14, 28),     "mid": (7, 65, 125),    "light": (26, 146, 244)},
     "paramount":    {"base": (0, 8, 26),      "mid": (0, 50, 145),    "light": (0, 116, 228)}
-}
-
-STREAMING_NETWORKS = {
-    "netflix": {"networks": "213", "origin_country": "US"},
-    "disneyplus": {"networks": "2739", "origin_country": "US"},
-    "hbomax": {"networks": "49", "origin_country": "US"},
-    "appletv": {"networks": "2552", "origin_country": "US"},
-    "crunchyroll": {"networks": "1112|4343", "keywords": "210024|287501"},
-    "hulu": {"networks": "453", "origin_country": "US"},
-    "peacock": {"networks": "3353", "origin_country": "US"},
-    "shudder": {"networks": "2326"}
 }
 
 def cleanup_pycache():
@@ -84,42 +84,57 @@ def tmdb_get(endpoint, params, api_key):
                 raise
             time.sleep(1 + attempt)
 
-def fetch_premium_titles(label, api_key, count=40):
+def fetch_curated_titles(label, api_key, target_count=40):
     merged = []
+    seen_ids = set()
     slug = label.lower().replace(" ", "").replace("+", "plus")
-    net_config = STREAMING_NETWORKS.get(slug, {})
 
-    for media_type in ["tv", "movie"]:
-        endpoint = f"/discover/{media_type}"
-        base_params = {
-            "sort_by": "popularity.desc",
-            "vote_count.gte": "60",
-            "include_adult": "false",
-            "with_original_language": "en|ja" if slug == "crunchyroll" else "en"
-        }
-        
-        if "networks" in net_config and media_type == "tv":
-            base_params["with_networks"] = net_config["networks"]
-        elif "networks" in net_config and media_type == "movie" and slug == "disneyplus":
-            base_params["with_companies"] = "22"
-
-        try:
-            data = tmdb_get(endpoint, base_params, api_key)
+    # Traitement spécifique ultra-verrouillé pour Crunchyroll
+    if slug == "crunchyroll":
+        for media_type in ["tv", "movie"]:
+            params = {
+                "sort_by": "popularity.desc",
+                "with_genres": "16",
+                "with_original_language": "ja|ko",
+                "vote_count.gte": "30"
+            }
+            data = tmdb_get(f"/discover/{media_type}", params, api_key)
             for item in data.get("results", []):
-                if item.get("poster_path"):
+                if item.get("poster_path") and item["id"] not in seen_ids:
+                    seen_ids.add(item["id"])
+                    merged.append(item)
+        return merged[:target_count]
+
+    cfg = BRAND_MAPPING.get(slug, {})
+    
+    # 1. Requête PRIORITAIRE : Séries TV du Network
+    if cfg.get("network"):
+        try:
+            params = {"sort_by": "popularity.desc", "with_networks": cfg["network"], "vote_count.gte": "20"}
+            tv_data = tmdb_get("/discover/tv", params, api_key)
+            for item in tv_data.get("results", []):
+                if item.get("poster_path") and item["id"] not in seen_ids:
+                    seen_ids.add(item["id"])
                     merged.append(item)
         except Exception as e:
-            print(f"Warning: {e}")
+            print(f"TV Fetch Error for {slug}: {e}")
 
-    seen_ids = set()
-    unique = []
-    for item in merged:
-        if item["id"] not in seen_ids:
-            seen_ids.add(item["id"])
-            unique.append(item)
-            if len(unique) >= count:
-                break
-    return unique
+    # 2. Requête COMPLÉMENTAIRE : Films du studio si le quota n'est pas atteint
+    if len(merged) < target_count and cfg.get("company"):
+        try:
+            needed = target_count - len(merged)
+            params = {"sort_by": "popularity.desc", "with_companies": cfg["company"], "vote_count.gte": "30"}
+            movie_data = tmdb_get("/discover/movie", params, api_key)
+            for item in movie_data.get("results", []):
+                if item.get("poster_path") and item["id"] not in seen_ids:
+                    seen_ids.add(item["id"])
+                    merged.append(item)
+                if len(merged) >= target_count:
+                    break
+        except Exception as e:
+            print(f"Movie Fallback Error for {slug}: {e}")
+
+    return merged[:target_count]
 
 def download_image_url(url):
     try:
@@ -145,7 +160,7 @@ def make_premium_tile(image, tile_width, tile_height, scale):
         
     image = image.resize((tile_width, tile_height), Image.LANCZOS)
     
-    radius = max(12, int(CARD_RADIUS * scale))
+    radius = max(14, int(CARD_RADIUS * scale))
     mask = Image.new("L", (tile_width, tile_height), 0)
     draw = ImageDraw.Draw(mask)
     draw.rounded_rectangle([0, 0, tile_width - 1, tile_height - 1], radius=radius, fill=255)
@@ -153,8 +168,8 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     poster_card = Image.new("RGBA", (tile_width, tile_height), (0, 0, 0, 0))
     poster_card.paste(image, mask=mask)
     
-    # Ombre portée de la jaquette
-    shadow_padding = int(24 * scale)
+    # Ombre portée
+    shadow_padding = int(32 * scale)
     shadow_w = tile_width + (shadow_padding * 2)
     shadow_h = tile_height + (shadow_padding * 2)
     
@@ -163,19 +178,19 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     s_draw.rounded_rectangle(
         [shadow_padding, shadow_padding, shadow_padding + tile_width - 1, shadow_padding + tile_height - 1],
         radius=radius,
-        fill=(0, 0, 0, 160)
+        fill=(0, 0, 0, 180)
     )
-    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(radius=int(12 * scale)))
+    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(radius=int(16 * scale)))
     
     tile_container = Image.new("RGBA", (shadow_w, shadow_h), (0, 0, 0, 0))
-    tile_container.paste(shadow_layer, (0, int(4 * scale)))
+    tile_container.paste(shadow_layer, (0, int(6 * scale)))
     tile_container.paste(poster_card, (shadow_padding, shadow_padding), poster_card)
     
     return tile_container
 
 def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
-    """Construit une nappe de 4 colonnes strictes, sans dégradé d'opacité transparent."""
-    shadow_padding = int(24 * scale)
+    """Génère la grille à l'échelle maximale et la plaque contre l'extrême droite."""
+    shadow_padding = int(32 * scale)
     tile_width = int(TILE_W * scale)
     tile_height = int(TILE_H * scale)
     gap = int(GAP * scale)
@@ -200,13 +215,13 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
             y = row * step_y + y_offset + shadow_padding
             grid.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
 
-    # Pivotement de la nappe à -20°
+    # Rotation
     rotated = grid.rotate(TILT_DEG, expand=True, resample=Image.BICUBIC)
     rot_w, rot_h = rotated.size
 
-    # Alignement précis sur la moitié droite du cadre (Bords nets, pas de fondu)
-    paste_x = int(canvas_width * 1.05 - rot_w)
-    paste_y = int(canvas_height * 0.48 - (rot_h * 0.50))
+    # ANCRAGE PARFAIT : Pousse la grille vers le bord droit pour croiser la diagonale au bon endroit
+    paste_x = int(canvas_width - (rot_w * 0.98))
+    paste_y = int(canvas_height * 0.50 - (rot_h * 0.50))
 
     canvas = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
     canvas.paste(rotated, (paste_x, paste_y), rotated)
@@ -214,7 +229,7 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     return canvas
 
 def generate_diagonal_gradient(width, height, label):
-    """Calcule le dégradé absolu reliant le coin bas-gauche au coin haut-droit."""
+    """Calcule le dégradé rectiligne pur de l'angle bas-gauche à l'angle haut-droit."""
     slug = label.lower().replace(" ", "").replace("+", "plus")
     palette = BRAND_PALETTES.get(slug, {"base": (10, 12, 16), "mid": (35, 40, 55), "light": (90, 100, 125)})
     
@@ -225,12 +240,8 @@ def generate_diagonal_gradient(width, height, label):
     bg_gradient = Image.new("RGBA", (width, height))
     pixels = bg_gradient.load()
     
-    # Équation de la droite perpendiculaire passant par la diagonale 16:9
-    # Origine lumineuse à (0, height), fin à (width, 0)
     for y in range(height):
         for x in range(width):
-            # Normalisation linéaire sur la diagonale géométrique réelle
-            # Formule de projection de la distance Euclidienne orthogonale
             factor = (x / width + (height - y) / height) / 2.0
             factor = max(0.0, min(1.0, factor))
             
@@ -257,8 +268,8 @@ def main():
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Executing Hard Cut Hemisphere Grid for: {args.label}")
-    unique_items = fetch_premium_titles(args.label, args.api_key, count=40)
+    print(f"Compiling TV-First Curated Hybrid Grid for: {args.label}")
+    unique_items = fetch_curated_titles(args.label, args.api_key, target_count=40)
     
     tile_images = []
     for item in unique_items:
@@ -268,21 +279,17 @@ def main():
             tile_images.append(img)
 
     if not tile_images:
-        print(f"Error: No posters downloaded.")
+        print("Error: No posters were successfully fetched.")
         sys.exit(1)
 
-    if len(tile_images) < 24:
-        tile_images = (tile_images * (24 // len(tile_images) + 1))[:24]
+    # Sécurité si le pool total reste léger
+    if len(tile_images) < 16:
+        tile_images = (tile_images * (16 // len(tile_images) + 1))[:16]
 
     width, height, scale = SIZE_PRESETS[args.size]
     
-    # 1. Génération du fond dégradé linéaire absolu (Bas-Gauche -> Haut-Droit)
     background = generate_diagonal_gradient(width, height, args.label)
-    
-    # 2. Génération de la nappe 4 colonnes opaque au premier plan
     posters_layer = build_tilted_grid(tile_images, width, height, scale=scale)
-    
-    # 3. Superposition simple sans interaction de couche (les posters restent éclatants)
     final_canvas = Image.alpha_composite(background, posters_layer)
 
     out_path = Path(args.output)
@@ -293,7 +300,7 @@ def main():
     
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully rendered unified hard-cut backdrop for {args.label}!")
+    print(f"Successfully generated dynamic premium layout for {args.label}!")
 
 if __name__ == "__main__":
     try:
