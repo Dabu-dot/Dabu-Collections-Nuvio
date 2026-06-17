@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-#!/usr/bin/env python3
 """
-Premium Backdrop Generator - Fixed Right Pivot Rotation (V14)
-Eliminates dynamic bounding box issues by drawing directly on a frame-sized layer
-and forcing the rotation to pivot near the right edge.
+Premium Backdrop Generator - Corner Fill & Strict Anime Filtering (V15)
+Fixes the bottom-right corner gap by extending ROWS and shifting the pre-rotation bounds.
+Implements a hardcore keyword-blocking mechanism for Crunchyroll to eliminate suggestive content.
 """
 
 import argparse
@@ -28,7 +27,7 @@ QUALITY_PRESETS = {
     "compressed": {"quality": 95, "progressive": True, "subsampling": "4:2:0"}
 }
 
-# --- CONFIGURATION GÉOMÉTRIQUE STRICTE ---
+# --- CONFIGURATION GÉOMÉTRIQUE AJUSTÉE POUR REMPLIR LES ANGLES ---
 CARD_RADIUS = 22    
 TILE_W = 320        
 TILE_H = 480        
@@ -36,7 +35,7 @@ GAP = 34
 TILT_DEG = -20      
 
 COLS = 4            
-ROWS = 6            # 6 lignes pour s'assurer que le haut et le bas soient totalement remplis après inclinaison
+ROWS = 7            # Augmenté à 7 pour étendre la nappe vers le bas et éliminer le trou
 
 SIZE_PRESETS = {
     "1080p": (1920, 1080, 1.0),
@@ -97,14 +96,18 @@ def fetch_curated_titles(label, api_key, target_count=40):
     }
 
     if slug == "crunchyroll":
+        # IDs de mots-clés TMDB : ecchi (12361), fanservice (219416), harem (156096), nudity (12543)
+        # On force l'exclusion de ces éléments pour assainir complètement la sélection
+        crunchy_safe_params = dict(safe_params)
+        crunchy_safe_params.update({
+            "with_genres": "16",
+            "with_original_language": "ja|ko",
+            "without_keywords": "12361|219416|156096|12543",
+            "vote_count.gte": "30"
+        })
+        
         for media_type in ["tv", "movie"]:
-            params = dict(safe_params)
-            params.update({
-                "with_genres": "16",
-                "with_original_language": "ja|ko",
-                "vote_count.gte": "30"
-            })
-            data = tmdb_get(f"/discover/{media_type}", params, api_key)
+            data = tmdb_get(f"/discover/{media_type}", crunchy_safe_params, api_key)
             for item in data.get("results", []):
                 if item.get("poster_path") and item["id"] not in seen_ids:
                     seen_ids.add(item["id"])
@@ -174,7 +177,6 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     poster_card = Image.new("RGBA", (tile_width, tile_height), (0, 0, 0, 0))
     poster_card.paste(image, mask=mask)
     
-    # Ombres V12/V13 validées
     shadow_padding = int(36 * scale)
     shadow_w = tile_width + (shadow_padding * 2)
     shadow_h = tile_height + (shadow_padding * 2)
@@ -195,7 +197,7 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     return tile_container
 
 def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
-    """Calcule la grille sur un plan fixe et force le pivot de rotation sur l'arête droite."""
+    """Calcule la grille et ajuste les offsets pour combler l'angle bas-droit."""
     shadow_padding = int(36 * scale)
     tile_width = int(TILE_W * scale)
     tile_height = int(TILE_H * scale)
@@ -205,18 +207,16 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     step_y = tile_height + gap
     stagger_y = step_y // 2
 
-    # Étape 1 : On crée un calque temporaire de la taille exacte de l'image finale, étendu en hauteur pour la rotation
     layer_w = canvas_width
     layer_h = canvas_height * 2
     grid_layer = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
 
     tile_pool = itertools.cycle(tiles)
 
-    # Étape 2 : Alignement absolu pré-rotation sur le flanc droit du calque
-    # On laisse juste un débordement planifié de 40px pour mordre élégamment sur le vide
     total_grid_w = (COLS * step_x) - gap
-    start_x = layer_w - total_grid_w + int(40 * scale)
-    start_y = int(40 * scale)
+    # On pousse légèrement plus à droite (+65px au lieu de 40px) pour saturer l'espace de débordement
+    start_x = layer_w - total_grid_w + int(65 * scale)
+    start_y = int(20 * scale)
 
     for col in range(COLS):
         y_offset = stagger_y if (col % 2 == 1) else 0
@@ -228,9 +228,8 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
             y = start_y + (row * step_y) + y_offset
             grid_layer.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
 
-    # Étape 3 : Rotation SANS expansion, mais avec pivot fixé à droite !
-    # Le centre de rotation est placé vers le milieu vertical et calé sur l'arête droite du canevas
-    pivot_x = layer_w + int(80 * scale)
+    # Pivot calculé pour ancrer fermement le côté droit et couvrir l'angle inférieur
+    pivot_x = layer_w + int(110 * scale)
     pivot_y = layer_h // 2
     
     rotated_layer = grid_layer.rotate(
@@ -240,7 +239,6 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
         resample=Image.BICUBIC
     )
 
-    # Étape 4 : Découpe de la zone centrale utile pour retrouver notre format cible
     crop_top = (layer_h - canvas_height) // 2
     final_posters = rotated_layer.crop((0, crop_top, canvas_width, crop_top + canvas_height))
     
@@ -285,7 +283,7 @@ def main():
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Compiling Fixed Right Pivot Layout V14 for: {args.label}")
+    print(f"Compiling Corner-Safe Clean Layout V15 for: {args.label}")
     unique_items = fetch_curated_titles(args.label, args.api_key, target_count=40)
     
     tile_images = []
@@ -299,8 +297,8 @@ def main():
         print("Error: No posters downloaded.")
         sys.exit(1)
 
-    if len(tile_images) < 16:
-        tile_images = (tile_images * (16 // len(tile_images) + 1))[:16]
+    if len(tile_images) < 20:
+        tile_images = (tile_images * (20 // len(tile_images) + 1))[:20]
 
     width, height, scale = SIZE_PRESETS[args.size]
     
@@ -316,7 +314,7 @@ def main():
     
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully rendered fixed layout for {args.label}!")
+    print(f"Successfully rendered final clean layout for {args.label}!")
 
 if __name__ == "__main__":
     try:
