@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - Strict Column Limit & Multi-Page Anti-Duplication (V19)
-Reduces column count to 4 for a cleaner layout and implements deep API pagination
-to guarantee 100% unique posters with zero local repetition.
+Premium Backdrop Generator - Strict Column Limit & Multi-Page Anti-Duplication (V20)
+Reduces column count to 4 for a cleaner layout and implements deep API pagination.
+Fixes Crunchyroll explicit keyword filters and rectifies the Shudder Network ID mapping.
 """
 
 import argparse
@@ -34,7 +34,7 @@ TILE_H = 480
 GAP = 34            
 TILT_DEG = -20      
 
-COLS = 4            # Réduit de 5 à 4 pour supprimer la ligne verticale excédentaire
+COLS = 4            # 4 colonnes pour supprimer la ligne verticale excédentaire
 ROWS = 7            
 
 TARGET_CENTER_X = 1350
@@ -54,7 +54,7 @@ BRAND_MAPPING = {
     "peacock":      {"network": "3353", "company": "33"},        
     "primevideo":   {"network": "1024", "company": "20580"},     
     "paramount":    {"network": "4330", "company": "4"},         
-    "shudder":      {"network": "2326", "company": "60608"}      
+    "shudder":      {"network": "2949", "company": "60608"}      # ID Réseau corrigé à 2949 pour cibler le Shudder officiel
 }
 
 BRAND_PALETTES = {
@@ -70,7 +70,8 @@ BRAND_PALETTES = {
     "paramount":    {"base": (0, 8, 26),      "mid": (0, 50, 145),    "light": (0, 116, 228)}
 }
 
-BANNED_IDS = {12361, 219416, 156096, 12543, 193204, 230113}
+# Ajout du mot-clé coupable Ecchi (195669) au catalogue d'exclusion de sécurité
+BANNED_IDS = {12361, 219416, 156096, 12543, 193204, 230113, 195669}
 BANNED_WORDS = ["ecchi", "harem", "fan service", "fanservice", "soft-core", "suggestive", "sinful", "nudity", "erotic", "sensual"]
 
 def cleanup_pycache():
@@ -165,14 +166,15 @@ def fetch_curated_titles(label, api_key, target_count=45):
                     break
                 for item in results:
                     if item.get("poster_path") and item["id"] not in seen_ids:
-                        seen_ids.add(item["id"])
-                        merged.append(item)
+                        if is_clean_content("tv", item, api_key):
+                            seen_ids.add(item["id"])
+                            merged.append(item)
                 page += 1
             except Exception as e:
                 print(f"TV Fetch Error Page {page}: {e}")
                 break
 
-    # 2. Collecte Movies de secours avec pagination si le quota n'est pas atteint
+    # 2. Collecte Movies de secours (ou principale pour Shudder) avec pagination si le quota n'est pas atteint
     if len(merged) < target_count and cfg.get("company"):
         page = 1
         while len(merged) < target_count and page <= 3:
@@ -186,8 +188,9 @@ def fetch_curated_titles(label, api_key, target_count=45):
                     break
                 for item in results:
                     if item.get("poster_path") and item["id"] not in seen_ids:
-                        seen_ids.add(item["id"])
-                        merged.append(item)
+                        if is_clean_content("movie", item, api_key):
+                            seen_ids.add(item["id"])
+                            merged.append(item)
                 page += 1
             except Exception as e:
                 print(f"Movie Fallback Error Page {page}: {e}")
@@ -323,7 +326,7 @@ def main():
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Compiling Finalized Unique Grid V19 for: {args.label}")
+    print(f"Compiling Finalized Unique Grid V20 for: {args.label}")
     unique_items = fetch_curated_titles(args.label, args.api_key, target_count=45)
     
     tile_images = []
@@ -351,7 +354,7 @@ def main():
     
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully rendered pristine V19 layout for {args.label}!")
+    print(f"Successfully rendered pristine V20 layout for {args.label}!")
 
 if __name__ == "__main__":
     try:
