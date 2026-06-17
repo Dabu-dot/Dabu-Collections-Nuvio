@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - TV Priority & Dynamic Film Fallback (V10)
-Prioritizes TV networks, dynamically backfills with verified movie production studios.
-Maximizes poster scale and forces strict right-edge alignment.
+Premium Backdrop Generator - Strict Right Alignment & Adjusted Sizing (V11)
+Fixes the rotation bounding box overflow causing the grid to leak left.
+Slightly downscales posters to 345px and anchors cleanly to the right edge.
 """
 
 import argparse
@@ -27,14 +27,14 @@ QUALITY_PRESETS = {
     "compressed": {"quality": 95, "progressive": True, "subsampling": "4:2:0"}
 }
 
-# --- CONFIGURATION GÉOMÉTRIQUE MAXIMISÉE AU PLUS PROCHE DES MODÈLES ---
-CARD_RADIUS = 26    
-TILE_W = 380        # Taille augmentée pour un impact visuel massif
-TILE_H = 570        
-GAP = 38            # Ajusté proportionnellement pour la nappe
+# --- CONFIGURATION GÉOMÉTRIQUE AJUSTÉE (POSTERS SUBTILEMENT PLUS PETITS) ---
+CARD_RADIUS = 24    
+TILE_W = 345        # Ajustement parfait (Précédemment 380)
+TILE_H = 518        # Strict format 2:3
+GAP = 36            # Espacement équilibré
 TILT_DEG = -20      
 
-COLS = 4            # 4 colonnes strictes
+COLS = 4            # 4 colonnes strictes visibles à droite
 ROWS = 5            
 
 SIZE_PRESETS = {
@@ -42,17 +42,16 @@ SIZE_PRESETS = {
     "4k": (3840, 2160, 2.0),
 }
 
-# Mapping de curation strict (Networks TV & Compagnies Cinéma associées)
 BRAND_MAPPING = {
-    "netflix":      {"network": "213",  "company": "60"},        # Netflix Studios
-    "disneyplus":   {"network": "2739", "company": "2|3|2165"},  # Disney, Pixar, Marvel
-    "hbomax":       {"network": "49",   "company": "174|429"},   # HBO, Warner Bros., DC
-    "appletv":      {"network": "2552", "company": "191065"},    # Apple Studios
-    "hulu":         {"network": "453",  "company": "6113"},      # Hulu Distribution
-    "peacock":      {"network": "3353", "company": "33"},        # Universal Pictures
-    "primevideo":   {"network": "1024", "company": "20580"},     # Amazon MGM Studios
-    "paramount":    {"network": "4330", "company": "4"},         # Paramount Pictures
-    "shudder":      {"network": "2326", "company": "60608"}      # Shudder Films / AMC
+    "netflix":      {"network": "213",  "company": "60"},        
+    "disneyplus":   {"network": "2739", "company": "2|3|2165"},  
+    "hbomax":       {"network": "49",   "company": "174|429"},   
+    "appletv":      {"network": "2552", "company": "191065"},    
+    "hulu":         {"network": "453",  "company": "6113"},      
+    "peacock":      {"network": "3353", "company": "33"},        
+    "primevideo":   {"network": "1024", "company": "20580"},     
+    "paramount":    {"network": "4330", "company": "4"},         
+    "shudder":      {"network": "2326", "company": "60608"}      
 }
 
 BRAND_PALETTES = {
@@ -89,7 +88,6 @@ def fetch_curated_titles(label, api_key, target_count=40):
     seen_ids = set()
     slug = label.lower().replace(" ", "").replace("+", "plus")
 
-    # Traitement spécifique ultra-verrouillé pour Crunchyroll
     if slug == "crunchyroll":
         for media_type in ["tv", "movie"]:
             params = {
@@ -107,7 +105,6 @@ def fetch_curated_titles(label, api_key, target_count=40):
 
     cfg = BRAND_MAPPING.get(slug, {})
     
-    # 1. Requête PRIORITAIRE : Séries TV du Network
     if cfg.get("network"):
         try:
             params = {"sort_by": "popularity.desc", "with_networks": cfg["network"], "vote_count.gte": "20"}
@@ -117,12 +114,10 @@ def fetch_curated_titles(label, api_key, target_count=40):
                     seen_ids.add(item["id"])
                     merged.append(item)
         except Exception as e:
-            print(f"TV Fetch Error for {slug}: {e}")
+            print(f"TV Fetch Error: {e}")
 
-    # 2. Requête COMPLÉMENTAIRE : Films du studio si le quota n'est pas atteint
     if len(merged) < target_count and cfg.get("company"):
         try:
-            needed = target_count - len(merged)
             params = {"sort_by": "popularity.desc", "with_companies": cfg["company"], "vote_count.gte": "30"}
             movie_data = tmdb_get("/discover/movie", params, api_key)
             for item in movie_data.get("results", []):
@@ -132,7 +127,7 @@ def fetch_curated_titles(label, api_key, target_count=40):
                 if len(merged) >= target_count:
                     break
         except Exception as e:
-            print(f"Movie Fallback Error for {slug}: {e}")
+            print(f"Movie Fallback Error: {e}")
 
     return merged[:target_count]
 
@@ -169,7 +164,7 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     poster_card.paste(image, mask=mask)
     
     # Ombre portée
-    shadow_padding = int(32 * scale)
+    shadow_padding = int(30 * scale)
     shadow_w = tile_width + (shadow_padding * 2)
     shadow_h = tile_height + (shadow_padding * 2)
     
@@ -180,17 +175,17 @@ def make_premium_tile(image, tile_width, tile_height, scale):
         radius=radius,
         fill=(0, 0, 0, 180)
     )
-    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(radius=int(16 * scale)))
+    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(radius=int(15 * scale)))
     
     tile_container = Image.new("RGBA", (shadow_w, shadow_h), (0, 0, 0, 0))
-    tile_container.paste(shadow_layer, (0, int(6 * scale)))
+    tile_container.paste(shadow_layer, (0, int(5 * scale)))
     tile_container.paste(poster_card, (shadow_padding, shadow_padding), poster_card)
     
     return tile_container
 
 def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
-    """Génère la grille à l'échelle maximale et la plaque contre l'extrême droite."""
-    shadow_padding = int(32 * scale)
+    """Génère la grille et applique un ancrage absolu sur le bord droit."""
+    shadow_padding = int(30 * scale)
     tile_width = int(TILE_W * scale)
     tile_height = int(TILE_H * scale)
     gap = int(GAP * scale)
@@ -219,8 +214,9 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     rotated = grid.rotate(TILT_DEG, expand=True, resample=Image.BICUBIC)
     rot_w, rot_h = rotated.size
 
-    # ANCRAGE PARFAIT : Pousse la grille vers le bord droit pour croiser la diagonale au bon endroit
-    paste_x = int(canvas_width - (rot_w * 0.98))
+    # ANCRAGE DROIT CORRIGÉ : On calcule le décalage à partir du bord droit du canevas
+    # Le coin droit de la nappe va mordre légèrement hors de l'écran pour garder l'effet immersif continu
+    paste_x = int(canvas_width - rot_w + (180 * scale)) 
     paste_y = int(canvas_height * 0.50 - (rot_h * 0.50))
 
     canvas = Image.new("RGBA", (canvas_width, canvas_height), (0, 0, 0, 0))
@@ -229,7 +225,6 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     return canvas
 
 def generate_diagonal_gradient(width, height, label):
-    """Calcule le dégradé rectiligne pur de l'angle bas-gauche à l'angle haut-droit."""
     slug = label.lower().replace(" ", "").replace("+", "plus")
     palette = BRAND_PALETTES.get(slug, {"base": (10, 12, 16), "mid": (35, 40, 55), "light": (90, 100, 125)})
     
@@ -268,7 +263,7 @@ def main():
     parser.add_argument("--size", default="1080p", help="Output size dimension preset")
     args = parser.parse_args()
 
-    print(f"Compiling TV-First Curated Hybrid Grid for: {args.label}")
+    print(f"Compiling Final Grid V11 for: {args.label}")
     unique_items = fetch_curated_titles(args.label, args.api_key, target_count=40)
     
     tile_images = []
@@ -279,10 +274,9 @@ def main():
             tile_images.append(img)
 
     if not tile_images:
-        print("Error: No posters were successfully fetched.")
+        print("Error: No posters downloaded.")
         sys.exit(1)
 
-    # Sécurité si le pool total reste léger
     if len(tile_images) < 16:
         tile_images = (tile_images * (16 // len(tile_images) + 1))[:16]
 
@@ -300,7 +294,7 @@ def main():
     
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully generated dynamic premium layout for {args.label}!")
+    print(f"Successfully rendered final layout for {args.label}!")
 
 if __name__ == "__main__":
     try:
