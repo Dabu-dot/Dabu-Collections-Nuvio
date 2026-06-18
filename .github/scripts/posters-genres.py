@@ -2,13 +2,13 @@ import os
 import sys
 import time
 import json
+import random
 import requests
 from datetime import datetime, timedelta
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageOps, ImageFilter
 
-# ==============================================================================
-# CONFIGURATION GLOBALE & SÉCURITÉS
-# ==============================================================================
+# Configuration TMDB
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 TMDB_BASE = "https://api.themoviedb.org/3"
 
@@ -16,101 +16,53 @@ if not TMDB_API_KEY:
     print("Erreur : La variable TMDB_API_KEY n'est pas définie.")
     sys.exit(1)
 
+# Dossiers et Fichiers cibles
 OUTPUT_DIR = "Ressources/Collections Covers/Genres/Static Covers"
 HISTORY_FILE = ".github/scripts/posters_history.json"
 
-# IDs TMDB de mots-clés adultes / érotiques / softcore à bannir définitivement
-BANNED_KEYWORDS = {155716, 190340, 156201, 291195, 180549, 210113} 
-
-# IDs TMDB des genres TV de flux (News, Reality, Talk, Soap) à exclure
-BANNED_TV_GENRES = {10763, 10764, 10767, 10766}
-
-# Catalogue étendu des langues autorisées
+# Catalogue global des langues autorisées (Inclusion Asie pour gestion fine via score)
 ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it", "ja", "ko", "zh"}
 
-RUN_PROCESSED_IDS = set()
+# Langues occidentales prioritaires (Système de fallback)
+WESTERN_LANGUAGES = {"fr", "en", "es", "de", "it"}
 
-# ==============================================================================
-# CARTOGRAPHIE DES GENRES
-# ==============================================================================
-GENRES_CONFIG = {
-    "action": {
-        "label": "Action", "color": (210, 40, 45), "movie_genre": 28, "tv_genre": 10759, 
-        "type": "live-action", "scoring_keywords": [779, 9715, 1721, 1419, 3713, 322496, 14643, 12371, 14955, 192913]
-    },
-    "animation": {
-        "label": "Animation", "color": (0, 150, 210), "movie_genre": 16, "tv_genre": 16, 
-        "type": "animation-occidentale", "scoring_keywords": [10121, 297442, 6513, 278823, 161919, 197065, 10159, 234662]
-    },
-    "animation-japonaise": {
-        "label": "Animation Japonaise", "color": (140, 45, 210), "movie_genre": 16, "tv_genre": 16, 
-        "type": "animation-asiatique", "scoring_keywords": [210024, 13141, 222243]
-    },
-    "aventure": {
-        "label": "Aventure", "color": (20, 130, 70), "movie_genre": 12, "tv_genre": 10759, 
-        "type": "live-action", "scoring_keywords": [10349, 2041, 189092, 3593, 322942, 1454, 6956, 1963, 175428]
-    },
-    "comedie": {
-        "label": "Comédie", "color": (220, 110, 10), "movie_genre": 35, "tv_genre": 35, 
-        "type": "live-action", "scoring_keywords": [322268, 9716, 8201, 9755, 9253, 320420, 169086, 167541, 11514, 328540]
-    },
-    "crime": {
-        "label": "Crime", "color": (70, 85, 105), "movie_genre": 80, "tv_genre": 80, 
-        "type": "live-action", "scoring_keywords": [9826, 6149, 1930, 703, 3149, 642, 10391, 323114, 33722, 10051, 1812, 207046, 10291, 15090, 155790, 8015, 161982, 158927, 15167]
-    },
-    "documentaire": {
-        "label": "Documentaire", "color": (20, 140, 60), "movie_genre": 99, "tv_genre": 99, 
-        "type": "live-action", "scoring_keywords": [9672, 282080, 221355, 5565, 18330, 18165, 272851, 270, 9902, 305903, 5968, 252105, 211505, 284176, 160330, 9882]
-    },
-    "drame": {
-        "label": "Drame", "color": (30, 90, 170), "movie_genre": 18, "tv_genre": 18, 
-        "type": "live-action", "scoring_keywords": [34079, 316421, 14964, 9672, 378, 9872, 1326, 9957, 894, 931, 12279, 311315, 697, 41329, 417, 10085, 15160, 12987, 10163, 10614, 2754, 4232]
-    },
-    "famille": {
-        "label": "Famille", "color": (170, 25, 150), "movie_genre": 10751, "tv_genre": 10751, 
-        "type": "flexible", "scoring_keywords": [10683, 18035, 6054, 970, 2343, 10235, 15101, 11093, 159947, 197349, 18187]
-    },
-    "fantastique": {
-        "label": "Fantastique", "color": (110, 30, 190), "movie_genre": 14, "tv_genre": 10765, 
-        "type": "live-action", "scoring_keywords": [2343, 3205, 12554, 2035, 179411, 177912, 236458, 2710, 234213, 4152, 5457, 227686, 5147]
-    },
-    "guerre": {
-        "label": "Guerre", "color": (90, 80, 70), "movie_genre": 10752, "tv_genre": 10768, 
-        "type": "live-action", "scoring_keywords": [1956, 2504, 13065, 6092, 2957, 836, 4595]
-    },
-    "histoire": {
-        "label": "Histoire", "color": (140, 70, 30), "movie_genre": 36, "tv_genre": 10768, 
-        "type": "live-action", "scoring_keywords": [207928, 282633, 192772, 15126, 6165, 160279, 207941, 161257, 41406, 12995, 285398, 9920, 5049, 208244, 280999, 157894, 10506, 1405, 159289]
-    },
-    "horreur": {
-        "label": "Horreur", "color": (180, 20, 20), "movie_genre": 27, "tv_genre": 27, 
-        "type": "live-action", "scoring_keywords": [162846, 10714, 3133, 12339, 12377, 1299, 15001, 3358, 10541, 9712, 13073, 14999, 284439, 161261, 230191]
-    },
-    "romance": {
-        "label": "Romance", "color": (180, 35, 90), "movie_genre": 10749, "tv_genre": 10749, 
-        "type": "live-action", "scoring_keywords": [9673, 9840, 6038, 128, 13027, 324429, 14720, 157303]
-    },
-    "science-fiction": {
-        "label": "Science-Fiction", "color": (15, 60, 160), "movie_genre": 878, "tv_genre": 10765, 
-        "type": "live-action", "scoring_keywords": [4379, 4565, 310, 281358, 2964, 14544, 1576, 12190, 161176, 803, 252937]
-    },
-    "sport": {
-        "label": "Sport", "color": (235, 170, 0), "movie_genre": None, "tv_genre": None, 
-        "type": "live-action", "is_pseudo_genre": True, "scoring_keywords": [6075, 13042, 209476, 6496, 333328, 10039]
-    },
-    "thriller": {
-        "label": "Thriller", "color": (15, 100, 85), "movie_genre": 53, "tv_genre": 80, 
-        "type": "live-action", "scoring_keywords": [12565, 1930, 5340, 316362, 288394, 316332, 10410, 314730, 321464, 272553, 207046, 316832]
-    },
-    "western": {
-        "label": "Western", "color": (160, 60, 15), "movie_genre": 37, "tv_genre": 37, 
-        "type": "live-action", "scoring_keywords": [2673, 18034, 1556, 156212, 2752, 798, 155291, 9503, 305941, 801, 1582]
-    }
+# IDs TMDB de mots-clés adultes / NSFW / Érotiques à bannir définitivement
+BANNED_KEYWORDS = {
+    195669,  # ecchi
+    155477,  # softcore
+    198385,  # hentai
+    256466,  # erotic
+    155716,  # erotic movie
+    190340,  # softcore pornography
+    156201,  # softcore erotica
+    291195,  # adult animation
 }
 
-# ==============================================================================
-# UTILS SYSTEM
-# ==============================================================================
+# Variable globale pour suivre les médias traités pendant l'exécution
+RUN_PROCESSED_IDS = set()
+
+# Configuration chirurgicale des genres - Palette Apple TV Premium optimisée
+GENRES_CONFIG = {
+    "action": {"label": "Action", "color": (210, 40, 45), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [3930, 6054, 12993, 9951, 8440, 188955, 226499, 83, 312, 779, 4565, 14955, 853, 9665, 10044]},
+    "animation-japonaise": {"label": "Animation Japonaise", "color": (140, 45, 210), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True, "override_lang": True, "scoring_keywords": [210024, 13141, 207826]},
+    "animation": {"label": "Animation", "color": (0, 150, 210), "movie_genre": 16, "tv_genre": 16, "extra": "&without_genres=99&without_original_language=ja|ko|zh&without_keywords=210024|287513", "min_popularity": 80, "scoring_keywords": [272909, 7376, 278823, 234183, 179411, 234662, 290589, 297442, 339048, 366485]},
+    "aventure": {"label": "Aventure", "color": (20, 130, 70), "movie_genre": 12, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [195114, 161176, 818, 4152, 170362, 210246, 10364, 41586, 6956, 269233]},
+    "comedie": {"label": "Comédie", "color": (220, 110, 10), "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16", "scoring_keywords": [8201, 9755, 9964, 375047, 6241, 9253]},
+    "crime": {"label": "Crime", "color": (70, 85, 105), "movie_genre": 80, "tv_genre": 80, "extra": "&without_genres=16", "scoring_keywords": [2095, 9748, 181644, 157241, 206958, 268067, 703, 5340, 6149, 9826, 155790, 207046]},
+    "documentaire": {"label": "Documentaire", "color": (20, 140, 60), "movie_genre": 99, "tv_genre": 99, "extra": "&with_keywords=210002|283115|6432|209250|9714", "scoring_keywords": [210002, 283115, 6432, 209250, 9714]},
+    "drame": {"label": "Drame", "color": (30, 90, 170), "movie_genre": 18, "tv_genre": 18, "extra": "&without_genres=16", "scoring_keywords": []},
+    "famille": {"label": "Famille", "color": (170, 25, 150), "movie_genre": 10751, "tv_genre": 10751, "extra": "&without_genres=16", "scoring_keywords": []},
+    "fantastique": {"label": "Fantastique", "color": (110, 30, 190), "movie_genre": 14, "tv_genre": 10765, "extra": "&without_genres=16", "scoring_keywords": []},
+    "guerre": {"label": "Guerre", "color": (90, 80, 70), "movie_genre": 10752, "tv_genre": 10768, "extra": "&without_genres=16", "scoring_keywords": []},
+    "histoire": {"label": "Histoire", "color": (140, 70, 30), "movie_genre": 36, "tv_genre": 10768, "extra": "&without_genres=16", "scoring_keywords": []},
+    "horreur": {"label": "Horreur", "color": (180, 20, 20), "movie_genre": 27, "tv_genre": 27, "extra": "&without_genres=16&with_keywords=3358|9748|6152", "scoring_keywords": []},
+    "romance": {"label": "Romance", "color": (180, 35, 90), "movie_genre": 10749, "tv_genre": 10749, "extra": "&without_genres=16&without_original_language=ko|ja|zh", "scoring_keywords": []},
+    "science-fiction": {"label": "Science-Fiction", "color": (15, 60, 160), "movie_genre": 878, "tv_genre": 10765, "extra": "&without_genres=16&with_keywords=4565|9882", "scoring_keywords": []},
+    "sport": {"label": "Sport", "color": (235, 170, 0), "movie_genre": 18, "tv_genre": 73, "extra": "&with_keywords=6075|9262|1515|2903|5565|10543", "scoring_keywords": [6075, 9262, 1515, 2903, 5565, 10543]},
+    "thriller": {"label": "Thriller", "color": (15, 100, 85), "movie_genre": 53, "tv_genre": 80, "extra": "&without_genres=16&with_keywords=9826|10123", "scoring_keywords": []},
+    "western": {"label": "Western", "color": (160, 60, 15), "movie_genre": 37, "tv_genre": 37, "extra": "&without_genres=16", "scoring_keywords": []}
+}
+
 def tmdb_api_call(endpoint, params=None):
     if params is None: params = {}
     params["api_key"] = TMDB_API_KEY
@@ -138,6 +90,31 @@ def load_and_clean_history():
         except Exception: continue
     return cleaned_history
 
+def get_trending_media_for_genre(config, excluded_keys):
+    movie_pool, tv_pool = [], []
+    for page in range(1, 4):
+        try:
+            res = tmdb_api_call(f"/discover/movie?sort_by=popularity.desc&with_genres={config['movie_genre']}{config.get('extra', '')}&page={page}&include_adult=false")
+            for item in res.get("results", []):
+                if item.get("backdrop_path"): item["media_type"] = "movie"; movie_pool.append(item)
+        except: break
+    for page in range(1, 4):
+        try:
+            res = tmdb_api_call(f"/discover/tv?sort_by=popularity.desc&with_genres={config['tv_genre']}{config.get('extra', '')}&page={page}&include_adult=false")
+            for item in res.get("results", []):
+                if item.get("backdrop_path"): item["media_type"] = "tv"; tv_pool.append(item)
+        except: break
+    combined = tv_pool + movie_pool if config.get("prefer_tv", False) else movie_pool + tv_pool
+    filtered = []
+    min_pop = config.get("min_popularity", 25)
+    for item in combined:
+        composite_key = f"{item['media_type']}_{item['id']}"
+        if item.get("adult") or item.get("popularity", 0) < min_pop: continue
+        if not config.get("override_lang", False) and item.get("original_language", "") not in ALLOWED_LANGUAGES: continue
+        if composite_key in excluded_keys or composite_key in RUN_PROCESSED_IDS: continue
+        filtered.append(item)
+    return filtered
+
 def get_media_keywords(media_type, media_id):
     try:
         res = tmdb_api_call(f"/{media_type}/{media_id}/keywords")
@@ -145,113 +122,20 @@ def get_media_keywords(media_type, media_id):
         return {k["id"] for k in kw if "id" in k}
     except: return set()
 
-# ==============================================================================
-# ENGINE DE RECHERCHE PURIFIÉ ET DICTIONNAIRE DE PARAMÈTRES
-# ==============================================================================
-def get_trending_media_for_genre(genre_name, config, excluded_keys):
-    movie_pool, tv_pool = [], []
-    
-    # 1. MOISSONNAGE DU CATALOGUE CINÉMA
-    if config["movie_genre"] or config.get("is_pseudo_genre"):
-        params = {"sort_by": "popularity.desc", "include_adult": "false"}
-        
-        if config["type"] == "live-action":
-            params["without_genres"] = "16"
-        elif config["type"] in {"animation-occidentale", "animation-asiatique"}:
-            params["with_genres"] = "16"
-
-        if config.get("is_pseudo_genre"):
-            params["with_keywords"] = "|".join(str(k) for k in config["scoring_keywords"])
-        elif config["movie_genre"]:
-            params["with_genres"] = str(config["movie_genre"])
-
-        for page in range(1, 4):
-            params["page"] = page
-            try:
-                res = tmdb_api_call("/discover/movie", params)
-                for item in res.get("results", []):
-                    if item.get("backdrop_path"): 
-                        item["media_type"] = "movie"
-                        movie_pool.append(item)
-            except: break
-
-    # 2. MOISSONNAGE DU CATALOGUE SÉRIES
-    if config["tv_genre"] or config.get("is_pseudo_genre"):
-        params = {"sort_by": "popularity.desc", "include_adult": "false"}
-        
-        if config["type"] == "live-action":
-            params["without_genres"] = "16"
-        elif config["type"] in {"animation-occidentale", "animation-asiatique"}:
-            params["with_genres"] = "16"
-
-        if config.get("is_pseudo_genre"):
-            params["with_keywords"] = "|".join(str(k) for k in config["scoring_keywords"])
-        elif config["tv_genre"]:
-            params["with_genres"] = str(config["tv_genre"])
-
-        for page in range(1, 4):
-            params["page"] = page
-            try:
-                res = tmdb_api_call("/discover/tv", params)
-                for item in res.get("results", []):
-                    if item.get("backdrop_path"): 
-                        item["media_type"] = "tv"
-                        tv_pool.append(item)
-            except: break
-
-    # 3. FILTRAGE CENTRALISÉ ET ADAPTATIF EN PYTHON
-    combined = movie_pool + tv_pool
-    filtered = []
-    
-    for item in combined:
-        composite_key = f"{item['media_type']}_{item['id']}"
-        orig_lang = item.get("original_language", "")
-        
-        if composite_key in excluded_keys or composite_key in RUN_PROCESSED_IDS: 
-            continue
-            
-        if orig_lang not in ALLOWED_LANGUAGES:
-            continue
-            
-        # CLASSIFICATION ACTION : Exclusion du cinéma asiatique
-        if genre_name == "action" and orig_lang in {"ja", "ko", "zh"}:
-            continue
-            
-        # DIRECTIVES D'ANIMATION CIBLÉES
-        if config["type"] == "animation-occidentale":
-            if orig_lang in {"ja", "ko", "zh"}: continue
-        elif config["type"] == "animation-asiatique":
-            if orig_lang not in {"ja", "ko", "zh"}: continue
-        
-        if item["media_type"] == "tv":
-            genre_ids = set(item.get("genre_ids", []))
-            if genre_ids.intersection(BANNED_TV_GENRES):
-                continue
-        
-        if orig_lang in {"ja", "ko", "zh"} and config["type"] == "live-action":
-            try:
-                trans = tmdb_api_call(f"/{item['media_type']}/{item['id']}/translations")
-                has_fr = any(t.get("iso_639_1") == "fr" for t in trans.get("translations", []))
-                if not has_fr: continue
-            except: continue
-            
-        filtered.append(item)
-        
-    return filtered
-
-# ==============================================================================
-# FILTRE AVANCÉ DES VISUELS CONTRE LES IMPUFIÉS ET LES LOGOS PROMO
-# ==============================================================================
 def get_best_textless_backdrops(media_type, media_id, fallback_path):
     try:
         res = tmdb_api_call(f"/{media_type}/{media_id}/images", {"include_image_language": "null"})
         bd = res.get("backdrops", [])
-        if not bd: return [{"file_path": fallback_path, "width": 1920, "vote_count": 5}]
+        if not bd: return [{"file_path": fallback_path, "width": 1920, "vote_count": 5, "vote_average": 5.0}]
         
-        safe_bd = [b for b in bd if b.get("vote_average", 5) >= 3.0]
+        safe_bd = []
+        for b in bd:
+            if b.get("vote_average", 5.0) < 3.0: continue
+            safe_bd.append(b)
+            
         if not safe_bd: safe_bd = bd
         return safe_bd[:15]
-    except: return [{"file_path": fallback_path, "width": 1920, "vote_count": 5}]
+    except: return [{"file_path": fallback_path, "width": 1920, "vote_count": 5, "vote_average": 5.0}]
 
 def score_and_select_backdrop(backdrops):
     scored_images = []
@@ -259,55 +143,62 @@ def score_and_select_backdrop(backdrops):
         width = bg.get("width", 0)
         height = bg.get("height", 0)
         votes = bg.get("vote_count", 0)
+        vote_avg = bg.get("vote_average", 5.0)
         
-        # Les votes de la communauté repoussent fortement les images promotionnelles polluées
-        base_score = votes * 10
+        # Base organique liée aux votes communautaires pour privilégier la propreté textless
+        base_score = (votes * 4) + (vote_avg * 15)
         
-        # Pénalisation des faux-backdrops (ex: affiches tronquées) hors format 16:9 ciné
+        # Élimination des formats publicitaires, bannières carrées et verticales (Cible format Cinéma 16:9)
         aspect_ratio = width / height if height > 0 else 0
-        if abs(aspect_ratio - 1.777) > 0.03:
-            base_score -= 150
+        if abs(aspect_ratio - 1.777) > 0.04:
+            base_score -= 250
         
-        # Primes légères de netteté sans écraser le vote organique
-        if width >= 1920 and height >= 1080: base_score += 30
-        if width >= 3840 and height >= 2160: base_score += 20  
+        # Restauration de la valorisation de la haute résolution (Primes 4K et 2K)
+        if width >= 3840 or height >= 2160:
+            base_score += 600  # Prime majeure 4K
+        elif width >= 2560 or height >= 1440:
+            base_score += 350  # Prime majeure 2K
+        elif width >= 1920 or height >= 1080:
+            base_score += 100  # Standard Full HD
+        else:
+            base_score -= 200  
             
         scored_images.append((base_score, bg))
         
     scored_images.sort(key=lambda x: x[0], reverse=True)
     return scored_images[0][1] if scored_images else backdrops[0]
 
-# ==============================================================================
-# CHARTE ET TRAITEMENT GRAPHIQUE
-# ==============================================================================
 def apply_premium_duotone(img, base_color):
     img_gray = img.convert("L")
     stat = img_gray.histogram()
     pixels_lumineux = sum(stat[200:]) / sum(stat)
     
     if pixels_lumineux > 0.25:
-        img = ImageEnhance.Brightness(img).enhance(0.85)
-        img = ImageEnhance.Contrast(img).enhance(1.18)
+        img = ImageEnhance.Brightness(img).enhance(0.88)
+        img = ImageEnhance.Contrast(img).enhance(1.15)
     else:
         img = ImageEnhance.Contrast(img).enhance(1.05)
         
     color_layer = Image.new("RGB", img.size, base_color)
+    
     img_ycbcr = img.convert("YCbCr")
     color_ycbcr = color_layer.convert("YCbCr")
     
     y_img, _, _ = img_ycbcr.split()
     _, cb_color, cr_color = color_ycbcr.split()
     
-    y_img = ImageEnhance.Brightness(y_img).enhance(0.95)
+    y_img = ImageEnhance.Brightness(y_img).enhance(0.96)
+    
     final_ycbcr = Image.merge("YCbCr", (y_img, cb_color, cr_color))
     final_rgb = final_ycbcr.convert("RGB")
     
-    final_rgb = ImageEnhance.Color(final_rgb).enhance(1.15)
+    final_rgb = ImageEnhance.Color(final_rgb).enhance(1.12)
     return final_rgb.filter(ImageFilter.SHARPEN)
 
 def finalize_landscape_banner(img, label, color):
     img = ImageOps.fit(img, (1920, 1080), method=Image.Resampling.LANCZOS)
     img = apply_premium_duotone(img, color)
+    
     img_rgba = img.convert("RGBA")
     
     gradient = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
@@ -356,42 +247,36 @@ def finalize_landscape_banner(img, label, color):
     
     return final_img.convert("RGB")
 
-# ==============================================================================
-# ORCHESTRATEUR GENERAL
-# ==============================================================================
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     history = load_and_clean_history()
     excluded_keys = set(history.keys())
-    current_year = datetime.now().year
 
     for genre_name, config in GENRES_CONFIG.items():
         print(f"\n--- Analyse Algorithmique : {config['label']} ---")
-        candidates = get_trending_media_for_genre(genre_name, config, excluded_keys)
-        if not candidates:
-            print(" -> Aucun candidat éligible trouvé après filtrage géographique.")
-            continue
+        candidates = get_trending_media_for_genre(config, excluded_keys)
+        if not candidates: continue
         
         scoring_keywords = set(config.get("scoring_keywords", []))
         scored_candidates = []
         
         for item in candidates:
             media_keywords = get_media_keywords(item["media_type"], item["id"])
+            
+            # FILTRE DE SÉCURITÉ : Exclusion immédiate si tag adulte/suggestif présent (ex: Overflow)
             if media_keywords.intersection(BANNED_KEYWORDS):
                 continue
+            
+            # Calcul du score thématique de base via les mots-clés
+            kw_score = len(media_keywords.intersection(scoring_keywords)) * 35
+            pop_score = min(item.get("popularity", 0) / 3, 120)
+            
+            total_score = kw_score + pop_score
+            
+            # FILTRE GÉOGRAPHIQUE PAR LE SCORE : Prime aux productions occidentales pour contrer le biais asiatique
+            if genre_name != "animation-japonaise" and item.get("original_language", "") in WESTERN_LANGUAGES:
+                total_score += 75  # Bonus pour replacer le cinéma US/EU en tête, tout en préservant l'Asie en fallback
                 
-            # Les points mots-clés sont prioritaires (x60) pour capturer l'essence pure du genre (ex: Comédie)
-            keyword_bonus = len(media_keywords.intersection(scoring_keywords)) * 60
-            popularity_bonus = min(item.get("popularity", 0) / 3, 120)
-            
-            total_score = keyword_bonus + popularity_bonus
-            
-            # BONUS DE FRAÎCHEUR : Bonus temporel substantiel si le contenu a moins de 10 ans (>= 2016)
-            air_date = item.get("release_date") or item.get("first_air_date") or ""
-            if air_date and len(air_date) >= 4 and air_date[:4].isdigit():
-                if int(air_date[:4]) >= (current_year - 10):
-                    total_score += 40
-            
             scored_candidates.append({"item": item, "score": total_score})
             
         scored_candidates.sort(key=lambda x: x["score"], reverse=True)
@@ -400,6 +285,7 @@ def main():
         for candidate in scored_candidates:
             media = candidate["item"]
             backdrops = get_best_textless_backdrops(media["media_type"], media["id"], media["backdrop_path"])
+            
             best_bg = score_and_select_backdrop(backdrops)
             
             try:
@@ -408,7 +294,6 @@ def main():
                     raw_img = Image.open(res.raw).convert("RGB")
                     media_title = media.get('title') or media.get('name')
                     print(f" -> Sélectionné ({best_bg.get('width')}x{best_bg.get('height')} - Score: {candidate['score']:.1f}) : {media_title}")
-                    
                     final_banner = finalize_landscape_banner(raw_img, config["label"], config["color"])
                     
                     final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=94)
@@ -416,15 +301,11 @@ def main():
                     
                     composite_key = f"{media['media_type']}_{media['id']}"
                     RUN_PROCESSED_IDS.add(composite_key)
-                    history[composite_key] = {
-                        "title": media_title, 
-                        "genre": genre_name, 
-                        "date": datetime.now().strftime("%Y-%m-%d")
-                    }
+                    history[composite_key] = {"title": media_title, "genre": genre_name, "date": datetime.now().strftime("%Y-%m-%d")}
                     success_genre = True
                     break
             except Exception as e:
-                print(f" Échec d'application de la charte graphique : {e}")
+                print(f" Échec de traitement pour l'image : {e}")
                 continue
                 
         if not success_genre:
