@@ -85,11 +85,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # L'ajout du dossier capture récursivement les images générées ainsi que le fichier masqué de l'historique des positions (.backdrop_history.json)
           git add "Ressources/Collections Covers/Streaming Services/Backdrops/"
           
           if ! git diff --cached --exit-code --quiet; then
-            git commit -m "chore: auto-update premium streaming backdrops and grid history [skip ci]"
+            git commit -m "chore: auto-update premium exclusive streaming backdrops [skip ci]"
             git push origin main
           else
             echo "No changes detected in backdrops assets. Skipping commit."
