@@ -2,8 +2,8 @@ name: Weekly Backdrops
 
 on:
   schedule:
-    - cron: "0 4 * * 0" # Exécution automatique tous les dimanches à 4h00 UTC
-  workflow_dispatch: # Déclenchement manuel
+    - cron: "0 4 * * 0" # Automatisation complète chaque dimanche à 4h00 UTC
+  workflow_dispatch: # Permet de forcer manuellement le run depuis GitHub
 
 permissions:
   contents: write
@@ -29,23 +29,22 @@ jobs:
       - name: Generate Genres Backdrops
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-          PYTHONUNBUFFERED: "1" # Force l'affichage immédiat des prints Python dans les logs
+          PYTHONUNBUFFERED: "1" # Évite la duplication ou le blocage des logs de sortie
         run: |
-          echo "=== [START] Lancement du script de génération globale ==="
+          echo "=== [START] Lancement de la matrice des backdrops de genres ==="
           python3 .github/scripts/backdrop.py
-          echo "=== [END] Fin d'exécution du script Python ==="
+          echo "=== [END] Fin de la génération ==="
 
       - name: Commit and push updated assets
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # Cible le dossier configuré dans le script backdrop.py
           git add "Ressources/Collections Covers/Genres/Weekly Backdrops/*"
           
           if ! git diff --cached --exit-code --quiet; then
-            git commit -m "chore: refresh weekly genres backdrops [skip ci]"
+            git commit -m "chore: refresh weekly tilted genres backdrops [skip ci]"
             git push origin main
           else
-            echo "Aucune modification détectée dans les images."
+            echo "Aucun changement détecté dans la structure graphique."
           fi
