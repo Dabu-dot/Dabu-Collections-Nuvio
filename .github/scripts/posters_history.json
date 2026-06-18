@@ -1,4 +1,84 @@
 {
+    "movie_1275779": {
+        "title": "Disclosure Day",
+        "genre": "action",
+        "date": "2026-06-18"
+    },
+    "tv_276880": {
+        "title": "Please Put Them On, Takamine-san",
+        "genre": "animation-japonaise",
+        "date": "2026-06-18"
+    },
+    "tv_456": {
+        "title": "The Simpsons",
+        "genre": "animation",
+        "date": "2026-06-18"
+    },
+    "movie_120": {
+        "title": "The Lord of the Rings: The Fellowship of the Ring",
+        "genre": "aventure",
+        "date": "2026-06-18"
+    },
+    "movie_4248": {
+        "title": "Scary Movie 2",
+        "genre": "comedie",
+        "date": "2026-06-18"
+    },
+    "tv_1431": {
+        "title": "CSI: Crime Scene Investigation",
+        "genre": "crime",
+        "date": "2026-06-18"
+    },
+    "tv_549": {
+        "title": "Law & Order",
+        "genre": "drame",
+        "date": "2026-06-18"
+    },
+    "tv_1508": {
+        "title": "Dancing with the Stars",
+        "genre": "famille",
+        "date": "2026-06-18"
+    },
+    "tv_4604": {
+        "title": "Smallville",
+        "genre": "fantastique",
+        "date": "2026-06-18"
+    },
+    "tv_4068": {
+        "title": "Hogan's Heroes",
+        "genre": "guerre",
+        "date": "2026-06-18"
+    },
+    "movie_1207162": {
+        "title": "Rise of the Conqueror",
+        "genre": "histoire",
+        "date": "2026-06-18"
+    },
+    "movie_1477317": {
+        "title": "Your Fault: London",
+        "genre": "romance",
+        "date": "2026-06-18"
+    },
+    "tv_121": {
+        "title": "Doctor Who",
+        "genre": "science-fiction",
+        "date": "2026-06-18"
+    },
+    "movie_911430": {
+        "title": "F1",
+        "genre": "sport",
+        "date": "2026-06-18"
+    },
+    "tv_60574": {
+        "title": "Peaky Blinders",
+        "genre": "thriller",
+        "date": "2026-06-18"
+    },
+    "tv_13859": {
+        "title": "The Rifleman",
+        "genre": "western",
+        "date": "2026-06-18"
+    },
     "tv_3382": {
         "title": "Charlie's Angels",
         "genre": "action",
