@@ -67,7 +67,8 @@
     "movie_911430": {
         "title": "F1",
         "genre": "sport",
-        "date": "2026-06-18"
+        "date": "2026-06-18",
+        "backdrop_path": "/rZWkXnIyTLzUJpHSUpOb7vgB0BL.jpg"
     },
     "tv_60574": {
         "title": "Peaky Blinders",
@@ -117,7 +118,8 @@
     "tv_14951": {
         "title": "Nature",
         "genre": "documentaire",
-        "date": "2026-06-18"
+        "date": "2026-06-18",
+        "backdrop_path": "/j6aCSIjK4N7SpkSPBBNv7vbDvJo.jpg"
     },
     "tv_1416": {
         "title": "Grey's Anatomy",
@@ -428,6 +430,102 @@
         "title": "1923",
         "genre": "western",
         "date": "2026-06-18"
+    },
+    "movie_1613798": {
+        "title": "Vengeance",
+        "genre": "action",
+        "date": "2026-06-18",
+        "backdrop_path": "/xyW8rJO3rwG2EGcTO6eaUEa8b9d.jpg"
+    },
+    "tv_245842": {
+        "title": "Wistoria: Wand and Sword",
+        "genre": "animation-japonaise",
+        "date": "2026-06-18",
+        "backdrop_path": "/n4VljCX22hbw3RwfxaY8FX8eLzN.jpg"
+    },
+    "tv_60625": {
+        "title": "Rick and Morty",
+        "genre": "animation",
+        "date": "2026-06-18",
+        "backdrop_path": "/uGy4DCmM33I7l86W7iCskNkvmLD.jpg"
+    },
+    "movie_693134": {
+        "title": "Dune: Part Two",
+        "genre": "aventure",
+        "date": "2026-06-18",
+        "backdrop_path": "/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg"
+    },
+    "tv_284725": {
+        "title": "Not Suitable for Work",
+        "genre": "comedie",
+        "date": "2026-06-18",
+        "backdrop_path": "/ysYPo1JqzHiHoIHpW9wXCtvY1LW.jpg"
+    },
+    "tv_71790": {
+        "title": "S.W.A.T.",
+        "genre": "crime",
+        "date": "2026-06-18",
+        "backdrop_path": "/jD7rNZDOrTP0ESP7S7Lmq6zYSAP.jpg"
+    },
+    "tv_85552": {
+        "title": "Euphoria",
+        "genre": "drame",
+        "date": "2026-06-18",
+        "backdrop_path": "/9KnIzPCv9XpWA0MqmwiKBZvV1Sj.jpg"
+    },
+    "tv_82452": {
+        "title": "Avatar the Last Airbender",
+        "genre": "famille",
+        "date": "2026-06-18",
+        "backdrop_path": "/imlTCObfzISogbvcwB1dokoXAIc.jpg"
+    },
+    "tv_82856": {
+        "title": "The Mandalorian",
+        "genre": "fantastique",
+        "date": "2026-06-18",
+        "backdrop_path": "/o7qi2v4uWQ8bZ1tW3KI0Ztn2epk.jpg"
+    },
+    "movie_16869": {
+        "title": "Inglourious Basterds",
+        "genre": "guerre",
+        "date": "2026-06-18",
+        "backdrop_path": "/bMJxwgLyD47CDQ6BFCT2AMMlID7.jpg"
+    },
+    "movie_872585": {
+        "title": "Oppenheimer",
+        "genre": "histoire",
+        "date": "2026-06-18",
+        "backdrop_path": "/ycnO0cjsAROSGJKuMODgRtWsHQw.jpg"
+    },
+    "movie_1083381": {
+        "title": "Backrooms",
+        "genre": "horreur",
+        "date": "2026-06-18",
+        "backdrop_path": "/mCpwRayjXMFzKHbjbzc5JRKfq1O.jpg"
+    },
+    "movie_1246049": {
+        "title": "Dracula",
+        "genre": "romance",
+        "date": "2026-06-18",
+        "backdrop_path": "/be5SIsRGMckO8tU9lrLcIik70Dy.jpg"
+    },
+    "movie_1081003": {
+        "title": "Supergirl",
+        "genre": "science-fiction",
+        "date": "2026-06-18",
+        "backdrop_path": "/6nlqYWDUpNem3v2bDCxQNSg41aY.jpg"
+    },
+    "movie_933260": {
+        "title": "The Substance",
+        "genre": "thriller",
+        "date": "2026-06-18",
+        "backdrop_path": "/7h6TqPB3ESmjuVbxCxAeB1c9OB1.jpg"
+    },
+    "tv_6081": {
+        "title": "Wagon Train",
+        "genre": "western",
+        "date": "2026-06-18",
+        "backdrop_path": "/1Rzdd9VjqXOE7rzMlaMdwHOTmkr.jpg"
     },
     "tv_3382": {
         "title": "Charlie's Angels",
