@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import math
 import requests
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageOps, ImageFilter
@@ -17,7 +18,12 @@ if not TMDB_API_KEY:
 
 OUTPUT_DIR = "Ressources/Collections Covers/Genres/Weekly Backdrops"
 
-# Périmètres linguistiques & Sécurités
+# Paramètres de style de la charte graphique Streaming
+TILT_ANGLE = -10      # Inclinaison de la grille de vignettes
+CARD_GAP = 24         # Espacement prononcé entre les cartes
+CORNER_RADIUS = 12    # Angles arrondis des cartes paysage
+
+# Sécurités et filtres de contenu
 ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it", "ja", "ko", "zh"}
 WESTERN_LANGUAGES = {"fr", "en", "es", "de", "it"}
 
@@ -26,11 +32,10 @@ BANNED_KEYWORDS = {
     242216, 33998, 190370, 186107, 10053, 910, 348517, 9835, 18321, 
     267122, 356759
 }
-
 FAMILY_BANNED_KEYWORDS = {3036, 11001, 192947, 273060, 282071, 243261, 279473}
 
 # ==============================================================================
-# ARCHITECTURE DES GENRES (Alignée sur posters-genres.py)
+# ARCHITECTURE DES GENRES
 # ==============================================================================
 GENRES_CONFIG = {
     "action": {"label": "Action", "color": (210, 40, 45), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [3930, 6054, 12993, 9951, 8440, 188955, 226499, 83, 312, 779, 4565, 14955, 853, 9665, 10044]},
@@ -61,24 +66,24 @@ def tmdb_api_call(endpoint, params=None):
             res = requests.get(f"{TMDB_BASE}{endpoint}", params=params, timeout=15)
             res.raise_for_status()
             return res.json()
-        except Exception:
+        except:
             if attempt == 2: raise
             time.sleep(1.5 + attempt)
 
-def get_trending_media_for_genre(config):
+def get_trending_media(config):
     movie_pool, tv_pool = [], []
-    movie_genre_param = f"&with_genres={config['movie_genre']}" if config.get('movie_genre') else ""
-    tv_genre_param = f"&with_genres={config['tv_genre']}" if config.get('tv_genre') else ""
+    m_genre = f"&with_genres={config['movie_genre']}" if config.get('movie_genre') else ""
+    t_genre = f"&with_genres={config['tv_genre']}" if config.get('tv_genre') else ""
 
     for page in range(1, 4):
         try:
-            res = tmdb_api_call(f"/discover/movie?sort_by=popularity.desc{movie_genre_param}{config.get('extra', '')}&page={page}&include_adult=false")
+            res = tmdb_api_call(f"/discover/movie?sort_by=popularity.desc{m_genre}{config.get('extra', '')}&page={page}&include_adult=false")
             for item in res.get("results", []):
                 if item.get("backdrop_path"): item["media_type"] = "movie"; movie_pool.append(item)
         except: break
     for page in range(1, 4):
         try:
-            res = tmdb_api_call(f"/discover/tv?sort_by=popularity.desc{tv_genre_param}{config.get('extra', '')}&page={page}&include_adult=false")
+            res = tmdb_api_call(f"/discover/tv?sort_by=popularity.desc{t_genre}{config.get('extra', '')}&page={page}&include_adult=false")
             for item in res.get("results", []):
                 if item.get("backdrop_path"): item["media_type"] = "tv"; tv_pool.append(item)
         except: break
@@ -103,14 +108,14 @@ def get_textless_backdrop(media_type, media_id, fallback_path):
     return fallback_path
 
 def create_premium_gradient(width, height, base_color):
-    """Génère un fond dégradé premium fluide sans banding (interpolation bilinéaire)"""
+    """Génère le fond en dégradé premium linéaire fluide de la charte streaming"""
     small_grad = Image.new("RGB", (4, 4))
     r, g, b = base_color
     
     c_top_right = (int(r * 0.55), int(g * 0.55), int(b * 0.55))
     c_top_left = (int(r * 0.20), int(g * 0.20), int(b * 0.20))
-    c_bottom_right = (int(r * 0.12), int(g * 0.12), int(b * 0.12))
-    c_bottom_left = (12, 12, 16)
+    c_bottom_right = (int(r * 0.10), int(g * 0.10), int(b * 0.10))
+    c_bottom_left = (10, 10, 14)
     
     pixels = [
         c_top_left, c_top_left, c_top_right, c_top_right,
@@ -133,7 +138,7 @@ def generate_grid_backdrop(genre_name, config):
     canvas_w, canvas_h = 1920, 1080
     background = create_premium_gradient(canvas_w, canvas_h, config["color"])
     
-    raw_candidates = get_trending_media_for_genre(config)
+    raw_candidates = get_trending_media(config)
     scoring_keywords = set(config.get("scoring_keywords", []))
     current_year = datetime.now().year
     
@@ -165,18 +170,19 @@ def generate_grid_backdrop(genre_name, config):
         seen_ids.add(composite_key)
         
     processed_candidates.sort(key=lambda x: x[0], reverse=True)
-    vignettes_needed = 35  # Grille équilibrée : 5 lignes x 7 colonnes
     
-    # Paramètres de la grille aérée
-    cols, rows = 7, 5
-    gap = 24
-    start_x = 41
-    start_y = 45
-    cell_w, cell_h = 242, 136  # Format paysage 16:9 impeccable
+    # Construction de la grille surdimensionnée inclinée (Tilted Mosaic Architecture)
+    # Taille augmentée pour couvrir l'espace complet lors de la rotation à -10°
+    grid_w, grid_h = 2600, 1600
+    grid_layer = Image.new("RGBA", (grid_w, grid_h), (0, 0, 0, 0))
+    
+    cell_w, cell_h = 266, 150  # Format paysage 16:9 cinématographique
+    cols, rows = 9, 8
+    max_vignettes = cols * rows
     
     count = 0
     for score, item in processed_candidates:
-        if count >= vignettes_needed: break
+        if count >= max_vignettes: break
         
         backdrop_path = get_textless_backdrop(item["media_type"], item["id"], item["backdrop_path"])
         url = f"https://image.tmdb.org/t/p/w500{backdrop_path}"
@@ -187,34 +193,44 @@ def generate_grid_backdrop(genre_name, config):
                 vignette = Image.open(res.raw).convert("RGB")
                 vignette = ImageOps.fit(vignette, (cell_w, cell_h), method=Image.Resampling.LANCZOS)
                 
-                # Assombrissement des vignettes pour fondre la grille dans le dégradé premium
-                vignette = ImageEnhance.Brightness(vignette).enhance(0.72)
-                vignette = add_rounded_corners(vignette, radius=14)
+                # Effet d'atténuation streaming pour intégrer la grille dans le dégradé coloré
+                vignette = ImageEnhance.Brightness(vignette).enhance(0.58)
+                vignette = add_rounded_corners(vignette, radius=CORNER_RADIUS)
                 
-                # Calcul des coordonnées sur la matrice de la grille
                 r_idx = count // cols
                 c_idx = count % cols
-                x = start_x + (c_idx * (cell_w + gap))
-                y = start_y + (r_idx * (cell_h + gap))
                 
-                background.paste(vignette, (x, y), vignette)
+                x = c_idx * (cell_w + CARD_GAP) + 30
+                y = r_idx * (cell_h + CARD_GAP) + 30
+                
+                grid_layer.paste(vignette, (x, y), vignette)
                 count += 1
-        except Exception as e:
-            print(f" Échec vignette {item.get('id')}: {e}")
+        except:
             continue
 
-    print(f" -> Grille complétée avec {count}/{vignettes_needed} visuels.")
+    print(f" -> Grille construite : {count} visuels assemblés.")
     
-    # Masque dégradé noir global pour l'intégration de la typographie
+    # Application de la rotation à -10° (Bilinear pour conserver le lissage des arrondis)
+    rotated_grid = grid_layer.rotate(TILT_ANGLE, resample=Image.Resampling.BILINEAR, expand=False)
+    
+    # Centrage et fusion de la grille inclinée sur le fond dégradé principal
+    offset_x = (grid_w - canvas_w) // 2
+    offset_y = (grid_h - canvas_h) // 2
+    crop_box = (offset_x, offset_y, offset_x + canvas_w, offset_y + canvas_h)
+    final_grid_cropped = rotated_grid.crop(crop_box)
+    
+    background.paste(final_grid_cropped, (0, 0), final_grid_cropped)
+    
+    # Masque dégradé linéaire noir (vignette) pour l'intégration du texte
     gradient_overlay = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
     g_draw = ImageDraw.Draw(gradient_overlay)
     for y in range(250, canvas_h):
-        alpha = int(((y - 250) / 830) ** 1.5 * 255)
+        alpha = int(((y - 250) / 830) ** 1.6 * 255)
         g_draw.line([(0, y), (canvas_w, y)], fill=(0, 0, 0, alpha))
         
     final_img = Image.alpha_composite(background.convert("RGBA"), gradient_overlay)
     
-    # Gestion de la typographie (Identique à la charte graphique de posters-genres.py)
+    # Typographie premium (Alignée sur la charte posters-genres.py)
     text_layer = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
     shadow_layer = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
     t_draw = ImageDraw.Draw(text_layer)
@@ -251,7 +267,7 @@ def generate_grid_backdrop(genre_name, config):
     final_output = Image.alpha_composite(final_img, shadow_layer)
     final_output = Image.alpha_composite(final_output, text_layer).convert("RGB")
     
-    # Sauvegardes multi-formats
+    # Sauvegarde des fichiers finaux
     final_output.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=94)
     final_output.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=94)
 
@@ -260,7 +276,7 @@ def main():
     for genre_name, config in GENRES_CONFIG.items():
         print(f"\n--- Génération Hebdomadaire Backdrops : {config['label']} ---")
         generate_grid_backdrop(genre_name, config)
-    print("\n[SUCCESS] Vos backdrops hebdomadaires en grille aérée sont générés avec succès.")
+    print("\n[SUCCESS] Tous vos backdrops hebdomadaires inclinés style streaming sont prêts.")
 
 if __name__ == "__main__":
     main()
