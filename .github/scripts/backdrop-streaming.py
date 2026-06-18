@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
-Premium Backdrop Generator - Region Dynamic & JSON Grid Anti-Duplication (V22)
-Reduces column count to 4 for a cleaner layout and implements deep API pagination.
-Fixes Crunchyroll explicit keyword filters and rectifies the Shudder Network ID mapping.
-Includes support for Mubi, Canal+, and SkyShowtime streaming profiles.
+Premium Backdrop Generator - Strict Column Limit & Multi-Page Anti-Duplication (V22)
+Prioritizes exclusive and proprietary streaming originals, interleaving TV & Movies,
+and uses the general platform catalog purely as a fallback filling mechanism.
 """
 
 import argparse
@@ -11,7 +10,6 @@ import io
 import itertools
 import math
 import os
-import json
 import shutil
 import sys
 import time
@@ -47,21 +45,21 @@ SIZE_PRESETS = {
     "4k": (3840, 2160, 2.0),
 }
 
-# Configuration avancée avec ciblage géographique natif (V22)
+# Cartographie double : Identification propriétaire (Network/Company) + Remplissage (Provider/Region)
 BRAND_MAPPING = {
-    "netflix":      {"provider": "8",    "region": "FR"},        
-    "disneyplus":   {"provider": "337",  "region": "FR"},  
-    "hbomax":       {"provider": "1899", "region": "FR"}, # Max (Europe/FR)
-    "appletv":      {"provider": "350",  "region": "FR"},    
-    "hulu":         {"provider": "15",   "region": "US"}, # Exclusivité US
-    "peacock":      {"provider": "386",  "region": "US"}, # Exclusivité US      
-    "primevideo":   {"provider": "119",  "region": "FR"},     
-    "paramount":    {"provider": "531",  "region": "FR"},         
-    "shudder":      {"provider": "97",   "region": "US"}, # Catalogue historique US infiniment plus riche
-    "mubi":         {"provider": "11",   "region": "FR", "fallback_region": "US"},     
-    "canalplus":    {"provider": "381",  "region": "FR"}, # Exclusivité FR (Pas de fallback US)       
-    "skyshowtime":  {"provider": "1773", "region": "ES"}, # Forcé sur l'Espagne (ES) où le catalogue est complet
-    "crunchyroll":  {"provider": "283",  "region": "FR"}
+    "netflix":      {"network": "213",      "company": "60|143163",    "provider": "8",    "region": "FR"},        
+    "disneyplus":   {"network": "2739",     "company": "2|3|2165|142127", "provider": "337",  "region": "FR"},  
+    "hbomax":       {"network": "49|3186",  "company": "174|429",      "provider": "1899", "region": "FR"}, # Max
+    "appletv":      {"network": "2552",     "company": "191065",       "provider": "350",  "region": "FR"},    
+    "hulu":         {"network": "453",      "company": "6113",         "provider": "15",   "region": "US"},      
+    "peacock":      {"network": "3353",     "company": "33",           "provider": "386",  "region": "US"},        
+    "primevideo":   {"network": "1024",     "company": "20580",        "provider": "119",  "region": "FR"},     
+    "paramount":    {"network": "4330",     "company": "4|114421",     "provider": "531",  "region": "FR"},         
+    "shudder":      {"network": "2949",     "company": "60608",        "provider": "97",   "region": "US"},
+    "mubi":         {"network": None,       "company": "21092",        "provider": "11",   "region": "FR"},     
+    "canalplus":    {"network": "2603",     "company": "104|12075",    "provider": "381",  "region": "FR"},       
+    "skyshowtime":  {"network": "5280",     "company": "4",            "provider": "1773", "region": "ES"},
+    "crunchyroll":  {"network": "283",      "company": None,           "provider": "283",  "region": "FR"}
 }
 
 BRAND_PALETTES = {
@@ -113,7 +111,6 @@ def is_clean_content(media_type, item, api_key):
         item_id = item["id"]
         endpoint = f"/tv/{item_id}/keywords" if media_type == "tv" else f"/movie/{item_id}/keywords"
         data = tmdb_get(endpoint, {}, api_key)
-        
         keywords = data.get("keywords", []) if media_type == "movie" else data.get("results", [])
         
         for kw in keywords:
@@ -125,9 +122,11 @@ def is_clean_content(media_type, item, api_key):
         pass
     return True
 
-def fetch_curated_titles(label, api_key, target_count=50):
-    """Récupère les médias populaires avec gestion dynamique de la région (watch_region)."""
-    merged = []
+def fetch_curated_titles(label, api_key, target_count=45):
+    """Récupère et priorise les contenus exclusifs/propriétaires, puis complète avec le catalogue général."""
+    exclusive_tv = []
+    exclusive_movies = []
+    fallback_items = []
     seen_ids = set()
     slug = label.lower().replace(" ", "").replace("+", "plus")
 
@@ -135,7 +134,7 @@ def fetch_curated_titles(label, api_key, target_count=50):
         "sort_by": "popularity.desc",
         "include_adult": "false",
         "without_genres": "10749,18",  
-        "vote_count.gte": "10"
+        "vote_count.gte": "15"
     }
 
     cfg = BRAND_MAPPING.get(slug, {})
@@ -143,102 +142,63 @@ def fetch_curated_titles(label, api_key, target_count=50):
         print(f"Warning: Configuration slug not found for '{slug}', using standard fallback filter.")
         return []
 
-    primary_region = cfg.get("region", "FR")
-
-    def run_discover(region_code):
-        results_list = []
-        local_seen = set()
-        
-        if slug == "crunchyroll":
-            crunchy_params = dict(safe_params)
-            crunchy_params.update({
-                "with_genres": "16",
-                "with_original_language": "ja|ko"
-            })
-            if cfg.get("provider"):
-                crunchy_params["with_watch_providers"] = cfg["provider"]
-                crunchy_params["watch_region"] = region_code
-                crunchy_params["with_watch_monetization_types"] = "flatrate"
-
-            for media_type in ["tv", "movie"]:
-                page = 1
-                while len(results_list) < target_count and page <= 3:
-                    crunchy_params["page"] = page
-                    try:
-                        data = tmdb_get(f"/discover/{media_type}", crunchy_params, api_key)
-                        results = data.get("results", [])
-                        if not results:
-                            break
-                        for item in results:
-                            if item.get("poster_path") and item["id"] not in local_seen:
-                                if is_clean_content(media_type, item, api_key):
-                                    local_seen.add(item["id"])
-                                    item["media_type"] = media_type
-                                    results_list.append(item)
-                        page += 1
-                    except Exception as e:
-                        print(f"Crunchyroll Error {media_type} Page {page}: {e}")
-                        break
-            return results_list
-
-        for media_type in ["movie", "tv"]:
+    # Cas particulier : Algorithme Crunchyroll (Focalisé Anime / Japon)
+    if slug == "crunchyroll":
+        crunchy_params = dict(safe_params)
+        crunchy_params.update({"with_genres": "16", "with_original_language": "ja|ko"})
+        for media_type in ["tv", "movie"]:
             page = 1
-            while page <= 3:
-                params = dict(safe_params)
-                params.update({
-                    "watch_region": region_code,
-                    "page": page
-                })
-                if cfg.get("provider"):
+            while len(exclusive_tv) < target_count and page <= 4:
+                params = dict(crunchy_params)
+                params["page"] = page
+                if cfg.get("network") and media_type == "tv":
+                    params["with_networks"] = cfg["network"]
+                elif cfg.get("provider"):
                     params["with_watch_providers"] = cfg["provider"]
+                    params["watch_region"] = cfg.get("region", "FR")
                     params["with_watch_monetization_types"] = "flatrate"
-
                 try:
                     data = tmdb_get(f"/discover/{media_type}", params, api_key)
                     results = data.get("results", [])
                     if not results:
                         break
                     for item in results:
-                        if item.get("poster_path") and item["id"] not in local_seen:
+                        if item.get("poster_path") and item["id"] not in seen_ids:
                             if is_clean_content(media_type, item, api_key):
-                                local_seen.add(item["id"])
-                                item["media_type"] = media_type
-                                results_list.append(item)
+                                seen_ids.add(item["id"])
+                                exclusive_tv.append(item)
                     page += 1
-                except Exception as e:
-                    print(f"Discover Error {media_type} Region {region_code} Page {page}: {e}")
+                except Exception:
                     break
-        return results_list
+        return exclusive_tv[:target_count]
 
-    # 1. Premier essai sur la région préférentielle
-    print(f" -> Tentative d'extraction pour {label} sur la région cible : {primary_region}")
-    fetched = run_discover(primary_region)
-    for item in fetched:
-        if item["id"] not in seen_ids:
-            seen_ids.add(item["id"])
-            merged.append(item)
-
-    # 2. Vérification du seuil critique (Si catalogue vide ou restreint pour la grille)
-    if len(merged) < 20 and cfg.get("fallback_region"):
-        fallback = cfg["fallback_region"]
-        print(f" -> [!] Catalogue insuffisant pour {label} en {primary_region} ({len(merged)} items). Bascule automatique sur la région : {fallback}")
-        fetched_fallback = run_discover(fallback)
-        for item in fetched_fallback:
-            if item["id"] not in seen_ids:
-                seen_ids.add(item["id"])
-                merged.append(item)
-
-    # 3. Ultime recours thématique par genres si quota non atteint
-    if len(merged) < target_count:
-        fallback_genre = "27" if slug == "shudder" else "9648|12|35"
-        print(f" -> [!] Catalogue encore sous le quota ({len(merged)}/{target_count}). Injection de secours avec genre {fallback_genre}")
-        page = 1
-        while len(merged) < target_count and page <= 3:
+    # --- ÉTAPE 1 : EXTRACTION DES CONTENUS ORIGINAUX ET PROPRIÉTAIRES (RECHERCHE PROFONDE) ---
+    # Séries TV Propriétaires (Ex: Stranger Things, The Boys, Severance...)
+    if cfg.get("network"):
+        for page in range(1, 5): 
             params = dict(safe_params)
-            params.update({
-                "with_genres": fallback_genre,
-                "page": page
-            })
+            params["with_networks"] = cfg["network"]
+            params["page"] = page
+            try:
+                data = tmdb_get("/discover/tv", params, api_key)
+                results = data.get("results", [])
+                if not results:
+                    break
+                for item in results:
+                    if item.get("poster_path") and item["id"] not in seen_ids:
+                        if is_clean_content("tv", item, api_key):
+                            seen_ids.add(item["id"])
+                            exclusive_tv.append(item)
+            except Exception as e:
+                print(f"TV Originals Error Page {page}: {e}")
+                break
+
+    # Films Propriétaires / Studios Identifiés (Ex: Netflix Studios, Walt Disney Pictures...)
+    if cfg.get("company"):
+        for page in range(1, 5):
+            params = dict(safe_params)
+            params["with_companies"] = cfg["company"]
+            params["page"] = page
             try:
                 data = tmdb_get("/discover/movie", params, api_key)
                 results = data.get("results", [])
@@ -248,14 +208,77 @@ def fetch_curated_titles(label, api_key, target_count=50):
                     if item.get("poster_path") and item["id"] not in seen_ids:
                         if is_clean_content("movie", item, api_key):
                             seen_ids.add(item["id"])
-                            item["media_type"] = "movie"
-                            merged.append(item)
-                page += 1
+                            exclusive_movies.append(item)
             except Exception as e:
-                print(f"Ultime fallback Error Page {page}: {e}")
+                print(f"Movie Originals Studios Error Page {page}: {e}")
                 break
 
-    return merged[:target_count]
+    # Tri individuel par popularité historique pour pousser les blockbusters iconiques en haut
+    exclusive_tv.sort(key=lambda x: x.get("popularity", 0), reverse=True)
+    exclusive_movies.sort(key=lambda x: x.get("popularity", 0), reverse=True)
+
+    # Entrelacement alterné dynamique (Série, Film, Série, Film) pour un visuel hétérogène parfait
+    proprietary_pool = []
+    for tv, movie in itertools.zip_longest(exclusive_tv, exclusive_movies):
+        if tv: proprietary_pool.append(tv)
+        if movie: proprietary_pool.append(movie)
+
+    # --- ÉTAPE 2 : REMPLISSAGE DE SÉCURITÉ VIA LE CATALOGUE FLATE-RATE GÉNÉRAL ---
+    if len(proprietary_pool) < target_count and cfg.get("provider"):
+        region = cfg.get("region", "FR")
+        print(f" -> Pool propriétaire partiel ({len(proprietary_pool)}/{target_count}) pour {label}. Remplissage via le catalogue {region}...")
+        
+        for media_type in ["tv", "movie"]:
+            if len(proprietary_pool) + len(fallback_items) >= target_count:
+                break
+            for page in range(1, 4):
+                if len(proprietary_pool) + len(fallback_items) >= target_count:
+                    break
+                params = dict(safe_params)
+                params.update({
+                    "with_watch_providers": cfg["provider"],
+                    "watch_region": region,
+                    "with_watch_monetization_types": "flatrate",
+                    "page": page
+                })
+                try:
+                    data = tmdb_get(f"/discover/{media_type}", params, api_key)
+                    results = data.get("results", [])
+                    if not results:
+                        break
+                    for item in results:
+                        if item.get("poster_path") and item["id"] not in seen_ids:
+                            if is_clean_content(media_type, item, api_key):
+                                seen_ids.add(item["id"])
+                                fallback_items.append(item)
+                except Exception as e:
+                    print(f"General Catalog Fallback Error {media_type} Page {page}: {e}")
+                    break
+
+    # --- ÉTAPE 3 : ULTIME INJECTION THÉMATIQUE (Pour Shudder / Mubi si le catalogue est trop restreint) ---
+    if len(proprietary_pool) + len(fallback_items) < target_count and (slug == "shudder" or slug == "mubi"):
+        fallback_genre = "27" if slug == "shudder" else "9648|12|35"
+        for page in range(1, 4):
+            if len(proprietary_pool) + len(fallback_items) >= target_count:
+                break
+            params = dict(safe_params)
+            params.update({"with_genres": fallback_genre, "page": page})
+            try:
+                data = tmdb_get("/discover/movie", params, api_key)
+                results = data.get("results", [])
+                if not results:
+                    break
+                for item in results:
+                    if item.get("poster_path") and item["id"] not in seen_ids:
+                        if is_clean_content("movie", item, api_key):
+                            seen_ids.add(item["id"])
+                            fallback_items.append(item)
+            except Exception as e:
+                print(f"Ultimate Genre Safe Injector Error Page {page}: {e}")
+                break
+
+    final_pool = proprietary_pool + fallback_items
+    return final_pool[:target_count]
 
 def download_image_url(url):
     try:
@@ -308,7 +331,7 @@ def make_premium_tile(image, tile_width, tile_height, scale):
     
     return tile_container
 
-def build_tilted_grid(tiles, canvas_width, canvas_height, output_dir, label, scale=1.0):
+def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0):
     shadow_padding = int(36 * scale)
     tile_width = int(TILE_W * scale)
     tile_height = int(TILE_H * scale)
@@ -320,20 +343,7 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, output_dir, label, sca
 
     work_size = int(3000 * scale)
     work_layer = Image.new("RGBA", (work_size, work_size), (0, 0, 0, 0))
-
-    # Chargement du fichier d'historique de positionnement global
-    history_file = Path(output_dir) / ".backdrop_history.json"
-    history = {}
-    if history_file.exists():
-        try:
-            with open(history_file, "r", encoding="utf-8") as f:
-                history = json.load(f)
-        except Exception:
-            history = {}
-
-    slug = label.lower().replace(" ", "").replace("+", "plus")
-    brand_history = history.get(slug, {})
-    new_brand_history = {}
+    tile_pool = itertools.cycle(tiles)
 
     total_grid_w = (COLS * step_x) - gap
     total_grid_h = (ROWS * step_y) - gap + stagger_y
@@ -341,45 +351,15 @@ def build_tilted_grid(tiles, canvas_width, canvas_height, output_dir, label, sca
     start_x = (work_size - total_grid_w) // 2
     start_y = (work_size - total_grid_h) // 2
 
-    available_tiles = list(tiles)
-
     for col in range(COLS):
         y_offset = stagger_y if (col % 2 == 1) else 0
         for row in range(ROWS):
-            grid_key = f"{col}_{row}"
-            last_id = brand_history.get(grid_key)
-
-            # Recherche d'une image n'étant pas à cet emplacement lors de l'exécution précédente
-            chosen_idx = 0
-            if last_id and len(available_tiles) > 1:
-                for idx, t_img in enumerate(available_tiles):
-                    if t_img.info.get("tmdb_id") != last_id:
-                        chosen_idx = idx
-                        break
-
-            if available_tiles:
-                tile_asset = available_tiles.pop(chosen_idx)
-            else:
-                # Secours si le pool est totalement épuisé
-                tile_asset = tiles[(col * ROWS + row) % len(tiles)]
-
-            # Sauvegarde de la position pour la prochaine exécution
-            if "tmdb_id" in tile_asset.info:
-                new_brand_history[grid_key] = tile_asset.info["tmdb_id"]
-
+            tile_asset = next(tile_pool)
             tile_with_shadow = make_premium_tile(tile_asset, tile_width, tile_height, scale)
             
             x = start_x + (col * step_x)
             y = start_y + (row * step_y) + y_offset
             work_layer.paste(tile_with_shadow, (x - shadow_padding, y - shadow_padding), tile_with_shadow)
-
-    # Écriture de l'état actuel mis à jour
-    history[slug] = new_brand_history
-    try:
-        with open(history_file, "w", encoding="utf-8") as f:
-            json.dump(history, f, indent=2, ensure_ascii=False)
-    except Exception as e:
-        print(f"Warning: Impossible d'écrire l'historique des grilles : {e}")
 
     rotated_work = work_layer.rotate(TILT_DEG, expand=False, resample=Image.BICUBIC)
 
@@ -429,14 +409,13 @@ def main():
     args = parser.parse_args()
 
     print(f"Compiling Finalized Unique Grid V22 for: {args.label}")
-    unique_items = fetch_curated_titles(args.label, args.api_key, target_count=50)
+    unique_items = fetch_curated_titles(args.label, args.api_key, target_count=45)
     
     tile_images = []
     for item in unique_items:
         poster_path = item.get("poster_path")
         img = download_image_url(f"{TMDB_IMG_BASE}/{POSTER_SIZE}{poster_path}")
         if img:
-            img.info["tmdb_id"] = item.get("id")
             tile_images.append(img)
 
     if not tile_images:
@@ -445,27 +424,26 @@ def main():
 
     width, height, scale = SIZE_PRESETS[args.size]
     
-    out_path = Path(args.output)
-    output_dir = out_path.parent
-    output_dir.mkdir(parents=True, exist_ok=True)
-    
     background = generate_diagonal_gradient(width, height, args.label)
-    posters_layer = build_tilted_grid(tile_images, width, height, output_dir, args.label, scale=scale)
+    posters_layer = build_tilted_grid(tile_images, width, height, scale=scale)
     
-    # Composition finale de l'image (Opaque)
+    # Composition Native RGBA de sécurité
     final_canvas = Image.alpha_composite(background, posters_layer)
+
+    out_path = Path(args.output)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     
-    # Conversion sécurisée vers RGB pour éliminer le canal alpha avant encodage JPEG
+    # CORRECTION CRITIQUE : Conversion RGB explicite pour tuer le KeyError RGBA à l'encodage JPEG
     final = final_canvas.convert("RGB")
     settings = QUALITY_PRESETS["compressed"]
     
-    # Sauvegardes
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
     final.save(out_path.with_suffix(".webp"), "WEBP", quality=settings["quality"], method=6)
-    print(f"Successfully rendered pristine V22 layout for {args.label}!")
+    print(f"Successfully rendered pristine V22 exclusive layout for {args.label}!")
 
 if __name__ == "__main__":
     try:
         main()
     finally:
         cleanup_pycache()
+            
