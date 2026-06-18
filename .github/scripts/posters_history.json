@@ -264,6 +264,81 @@
         "genre": "western",
         "date": "2026-06-18"
     },
+    "tv_4616": {
+        "title": "Xena: Warrior Princess",
+        "genre": "action",
+        "date": "2026-06-18"
+    },
+    "tv_209867": {
+        "title": "Frieren: Beyond Journey's End",
+        "genre": "animation-japonaise",
+        "date": "2026-06-18"
+    },
+    "tv_1434": {
+        "title": "Family Guy",
+        "genre": "animation",
+        "date": "2026-06-18"
+    },
+    "movie_1228710": {
+        "title": "The Mandalorian and Grogu",
+        "genre": "aventure",
+        "date": "2026-06-18"
+    },
+    "tv_59941": {
+        "title": "The Tonight Show Starring Jimmy Fallon",
+        "genre": "comedie",
+        "date": "2026-06-18"
+    },
+    "tv_1419": {
+        "title": "Castle",
+        "genre": "crime",
+        "date": "2026-06-18"
+    },
+    "tv_5920": {
+        "title": "The Mentalist",
+        "genre": "drame",
+        "date": "2026-06-18"
+    },
+    "tv_26663": {
+        "title": "What's My Line?",
+        "genre": "famille",
+        "date": "2026-06-18"
+    },
+    "movie_83533": {
+        "title": "Avatar: Fire and Ash",
+        "genre": "fantastique",
+        "date": "2026-06-18"
+    },
+    "tv_61378": {
+        "title": "Madam Secretary",
+        "genre": "guerre",
+        "date": "2026-06-18"
+    },
+    "tv_4316": {
+        "title": "Combat!",
+        "genre": "histoire",
+        "date": "2026-06-18"
+    },
+    "movie_48650": {
+        "title": "Room in Rome",
+        "genre": "romance",
+        "date": "2026-06-18"
+    },
+    "movie_299536": {
+        "title": "Avengers: Infinity War",
+        "genre": "science-fiction",
+        "date": "2026-06-18"
+    },
+    "tv_60059": {
+        "title": "Better Call Saul",
+        "genre": "thriller",
+        "date": "2026-06-18"
+    },
+    "tv_953": {
+        "title": "Maverick",
+        "genre": "western",
+        "date": "2026-06-18"
+    },
     "tv_3382": {
         "title": "Charlie's Angels",
         "genre": "action",
