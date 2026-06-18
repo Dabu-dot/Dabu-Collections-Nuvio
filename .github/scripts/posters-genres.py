@@ -19,19 +19,19 @@ if not TMDB_API_KEY:
 OUTPUT_DIR = "Ressources/Collections Covers/Genres/Static Covers"
 HISTORY_FILE = ".github/scripts/posters_history.json"
 
-# IDs TMDB de mots-clés adultes / érotiques / softcore à bannir définitivement 
+# IDs TMDB de mots-clés adultes / érotiques / softcore à bannir définitivement
 BANNED_KEYWORDS = {155716, 190340, 156201, 291195, 180549, 210113} 
 
-# IDs TMDB des genres TV de flux (News, Reality, Talk, Soap) à exclure pour éviter les émissions de plateau
+# IDs TMDB des genres TV de flux (News, Reality, Talk, Soap) à exclure
 BANNED_TV_GENRES = {10763, 10764, 10767, 10766}
 
-# Langues globales autorisées (Inclusion du Japon / Corée / Chine selon tes directives) 
+# Langues globales autorisées (Filtre appliqué en Python)
 ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it", "ja", "ko", "zh"}
 
 RUN_PROCESSED_IDS = set()
 
 # ==============================================================================
-# CARTOGRAPHIE DE TA MINE D'OR DE TAGS [cite: 9, 11]
+# CARTOGRAPHIE DES GENRES
 # ==============================================================================
 GENRES_CONFIG = {
     "action": {
@@ -146,23 +146,20 @@ def get_media_keywords(media_type, media_id):
     except: return set()
 
 # ==============================================================================
-# ALGORITHME DE RECHERCHE ET DE FILTRAGE QUALITATIF
+# ALGORITHME DE RECHERCHE CORRIGÉ
 # ==============================================================================
 def get_trending_media_for_genre(config, excluded_keys):
     movie_pool, tv_pool = [], []
     
-    # Paramètres de base blindés géographiquement 
-    base_params = "&include_adult=false&with_original_language=fr|en|es|de|it|ja|ko|zh"
+    # Paramètres d'API épurés (Pas de filtrage linguistique ici pour éviter de casser l'API)
+    base_params = "&include_adult=false"
     
-    # Règle d'isolation Live-Action vs Animations [cite: 3, 4, 5]
+    # Séparation stricte Animation / Live-Action au niveau macro-API
     if config["type"] == "live-action":
         base_params += "&without_genres=16"
-    elif config["type"] == "animation-occidentale":
-        base_params += "&with_genres=16&without_original_language=ja|ko|zh"
-    elif config["type"] == "animation-asiatique":
-        base_params += "&with_genres=16&with_original_language=ja|ko|zh"
+    elif config["type"] in {"animation-occidentale", "animation-asiatique"}:
+        base_params += "&with_genres=16"
 
-    # Traitement du pseudo-genre Sport (uniquement par mots-clés) 
     if config.get("is_pseudo_genre"):
         kw_string = "|".join(str(k) for k in config["scoring_keywords"])
         base_params += f"&with_keywords={kw_string}"
@@ -170,7 +167,7 @@ def get_trending_media_for_genre(config, excluded_keys):
         if config["movie_genre"]: base_params += f"&with_genres={config['movie_genre']}"
         if config["tv_genre"]: base_params += f"&with_genres={config['tv_genre']}"
 
-    # Collecte sur les 3 premières pages de TMDB pour extraire la crème de la crème 
+    # Collecte de la crème du catalogue (Pages 1 à 3)
     for page in range(1, 4):
         try:
             if config["movie_genre"] or config.get("is_pseudo_genre"):
@@ -198,17 +195,27 @@ def get_trending_media_for_genre(config, excluded_keys):
         composite_key = f"{item['media_type']}_{item['id']}"
         orig_lang = item.get("original_language", "")
         
-        # Sécurité anti-doublons
+        # 1. Protection historique glissant
         if composite_key in excluded_keys or composite_key in RUN_PROCESSED_IDS: 
             continue
             
-        # SÉCURITÉ ANTI-FLUX : Bannir les émissions de flux/plateaux TV (Reality, News, Talk, Soap)
+        # 2. APPLICATION DU FILTRE GÉOGRAPHIQUE EN PYTHON (Ultra robuste)
+        if orig_lang not in ALLOWED_LANGUAGES:
+            continue
+            
+        # 3. RESPECT DES DIRECTIVES D'ANIMATION CIBLÉES
+        if config["type"] == "animation-occidentale":
+            if orig_lang in {"ja", "ko", "zh"}: continue # Pas d'Asie ici
+        elif config["type"] == "animation-asiatique":
+            if orig_lang not in {"ja", "ko", "zh"}: continue # Uniquement l'Asie ici
+        
+        # 4. SÉCURITÉ ANTI-FLUX TV
         if item["media_type"] == "tv":
             genre_ids = set(item.get("genre_ids", []))
             if genre_ids.intersection(BANNED_TV_GENRES):
                 continue
         
-        # FILTRE DE VÉRIFICATION DE TRADUCTION FRANÇAISE (Pour les œuvres asiatiques hors animation) 
+        # 5. VÉRIFICATION TRADUCTION FRANÇAISE POUR LE CINÉMA ASIATIQUE LIVE-ACTION
         if orig_lang in {"ja", "ko", "zh"} and config["type"] == "live-action":
             try:
                 trans = tmdb_api_call(f"/{item['media_type']}/{item['id']}/translations")
@@ -329,7 +336,7 @@ def finalize_landscape_banner(img, label, color):
     return final_img.convert("RGB")
 
 # ==============================================================================
-# ORCHESTRATEUR DE SCORING ET EXÉCUTION
+# ORCHESTRATEUR GENERAL
 # ==============================================================================
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -349,20 +356,15 @@ def main():
         for item in candidates:
             media_keywords = get_media_keywords(item["media_type"], item["id"])
             
-            # FILTRE ABSOLU SÉCURITÉ : Exclusion immédiate si tag Adulte/NSFW 
             if media_keywords.intersection(BANNED_KEYWORDS):
-                print(f" -> [SÉCURITÉ] {item.get('title') or item.get('name')} banni immédiatement pour mots-clés inadéquats.")
                 continue
                 
-            # FORMULE DE SCORING MULTI-CRITÈRES 
-            # Forte valeur ajoutée aux tags de ton fichier (+30 pts par tag) combiné à la popularité globale
             keyword_bonus = len(media_keywords.intersection(scoring_keywords)) * 30
             popularity_bonus = min(item.get("popularity", 0) / 4, 150)
             
             total_score = keyword_bonus + popularity_bonus
             scored_candidates.append({"item": item, "score": total_score})
             
-        # Tri mathématique des candidats du meilleur au moins bon 
         scored_candidates.sort(key=lambda x: x["score"], reverse=True)
         
         success_genre = False
@@ -380,7 +382,6 @@ def main():
                     
                     final_banner = finalize_landscape_banner(raw_img, config["label"], config["color"])
                     
-                    # Sauvegardes optimales
                     final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=94)
                     final_banner.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=94)
                     
@@ -402,7 +403,7 @@ def main():
 
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(dict(sorted(history.items(), key=lambda x: x[1]['date'], reverse=True)), f, ensure_ascii=False, indent=4)
-    print("\n[SUCCESS] Génération journalière terminée, stabilisée et purifiée des émissions TV.")
+    print("\n[SUCCESS] Génération journalière terminée, stabilisée et purifiée.")
 
 if __name__ == "__main__":
     main()
