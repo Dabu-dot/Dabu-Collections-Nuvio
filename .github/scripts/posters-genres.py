@@ -146,48 +146,58 @@ def get_media_keywords(media_type, media_id):
     except: return set()
 
 # ==============================================================================
-# ALGORITHME DE RECHERCHE CORRIGÉ
+# ALGORITHME DE RECHERCHE CORRIGÉ ET ISOLÉ
 # ==============================================================================
 def get_trending_media_for_genre(config, excluded_keys):
     movie_pool, tv_pool = [], []
     
-    # Paramètres d'API épurés (Pas de filtrage linguistique ici pour éviter de casser l'API)
-    base_params = "&include_adult=false"
-    
-    # Séparation stricte Animation / Live-Action au niveau macro-API
-    if config["type"] == "live-action":
-        base_params += "&without_genres=16"
-    elif config["type"] in {"animation-occidentale", "animation-asiatique"}:
-        base_params += "&with_genres=16"
+    # 1. MOISSONNAGE DU CATALOGUE CINÉMA (Uniquement si éligible)
+    if config["movie_genre"] or config.get("is_pseudo_genre"):
+        movie_params = "&include_adult=false"
+        if config["type"] == "live-action":
+            movie_params += "&without_genres=16"
+        elif config["type"] in {"animation-occidentale", "animation-asiatique"}:
+            movie_params += "&with_genres=16"
 
-    if config.get("is_pseudo_genre"):
-        kw_string = "|".join(str(k) for k in config["scoring_keywords"])
-        base_params += f"&with_keywords={kw_string}"
-    else:
-        if config["movie_genre"]: base_params += f"&with_genres={config['movie_genre']}"
-        if config["tv_genre"]: base_params += f"&with_genres={config['tv_genre']}"
+        if config.get("is_pseudo_genre"):
+            kw_string = "|".join(str(k) for k in config["scoring_keywords"])
+            movie_params += f"&with_keywords={kw_string}"
+        elif config["movie_genre"]:
+            movie_params += f"&with_genres={config['movie_genre']}"
 
-    # Collecte de la crème du catalogue (Pages 1 à 3)
-    for page in range(1, 4):
-        try:
-            if config["movie_genre"] or config.get("is_pseudo_genre"):
-                res = tmdb_api_call(f"/discover/movie?sort_by=popularity.desc{base_params}&page={page}")
+        for page in range(1, 4):
+            try:
+                res = tmdb_api_call(f"/discover/movie?sort_by=popularity.desc{movie_params}&page={page}")
                 for item in res.get("results", []):
                     if item.get("backdrop_path"): 
                         item["media_type"] = "movie"
                         movie_pool.append(item)
-        except: break
-        
-    for page in range(1, 4):
-        try:
-            if config["tv_genre"] or config.get("is_pseudo_genre"):
-                res = tmdb_api_call(f"/discover/tv?sort_by=popularity.desc{base_params}&page={page}")
+            except: break
+
+    # 2. MOISSONNAGE DU CATALOGUE SÉRIES (Uniquement si éligible)
+    if config["tv_genre"] or config.get("is_pseudo_genre"):
+        tv_params = "&include_adult=false"
+        if config["type"] == "live-action":
+            tv_params += "&without_genres=16"
+        elif config["type"] in {"animation-occidentale", "animation-asiatique"}:
+            tv_params += "&with_genres=16"
+
+        if config.get("is_pseudo_genre"):
+            kw_string = "|".join(str(k) for k in config["scoring_keywords"])
+            tv_params += f"&with_keywords={kw_string}"
+        elif config["tv_genre"]:
+            tv_params += f"&with_genres={config['tv_genre']}"
+
+        for page in range(1, 4):
+            try:
+                res = tmdb_api_call(f"/discover/tv?sort_by=popularity.desc{tv_params}&page={page}")
                 for item in res.get("results", []):
                     if item.get("backdrop_path"): 
                         item["media_type"] = "tv"
                         tv_pool.append(item)
-        except: break
+            except: break
 
+    # 3. FILTRAGE PYTHON CENTRALISÉ (Filtre Géo / Langue)
     combined = movie_pool + tv_pool
     filtered = []
     
@@ -195,27 +205,27 @@ def get_trending_media_for_genre(config, excluded_keys):
         composite_key = f"{item['media_type']}_{item['id']}"
         orig_lang = item.get("original_language", "")
         
-        # 1. Protection historique glissant
+        # Protection historique glissant
         if composite_key in excluded_keys or composite_key in RUN_PROCESSED_IDS: 
             continue
             
-        # 2. APPLICATION DU FILTRE GÉOGRAPHIQUE EN PYTHON (Ultra robuste)
+        # APPLICATION DU FILTRE GÉOGRAPHIQUE EN PYTHON
         if orig_lang not in ALLOWED_LANGUAGES:
             continue
             
-        # 3. RESPECT DES DIRECTIVES D'ANIMATION CIBLÉES
+        # RESPECT DES DIRECTIVES D'ANIMATION CIBLÉES
         if config["type"] == "animation-occidentale":
-            if orig_lang in {"ja", "ko", "zh"}: continue # Pas d'Asie ici
+            if orig_lang in {"ja", "ko", "zh"}: continue
         elif config["type"] == "animation-asiatique":
-            if orig_lang not in {"ja", "ko", "zh"}: continue # Uniquement l'Asie ici
+            if orig_lang not in {"ja", "ko", "zh"}: continue
         
-        # 4. SÉCURITÉ ANTI-FLUX TV
+        # SÉCURITÉ ANTI-FLUX TV
         if item["media_type"] == "tv":
             genre_ids = set(item.get("genre_ids", []))
             if genre_ids.intersection(BANNED_TV_GENRES):
                 continue
         
-        # 5. VÉRIFICATION TRADUCTION FRANÇAISE POUR LE CINÉMA ASIATIQUE LIVE-ACTION
+        # VÉRIFICATION TRADUCTION FRANÇAISE POUR LE LIVE-ACTION ASIATIQUE
         if orig_lang in {"ja", "ko", "zh"} and config["type"] == "live-action":
             try:
                 trans = tmdb_api_call(f"/{item['media_type']}/{item['id']}/translations")
