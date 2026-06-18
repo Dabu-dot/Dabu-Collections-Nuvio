@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageOps, ImageFilter
 
 # ==============================================================================
-# CONFIGURATION GLOBALE & SÉCURITÉS
+# CONFIGURATION GLOBALE & SÉCURITÉS MULTI-NIVEAUX
 # ==============================================================================
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 TMDB_BASE = "https://api.themoviedb.org/3"
@@ -19,11 +19,11 @@ if not TMDB_API_KEY:
 OUTPUT_DIR = "Ressources/Collections Covers/Genres/Static Covers"
 HISTORY_FILE = ".github/scripts/posters_history.json"
 
-# Catalogue global des langues autorisées
+# Périmètres linguistiques
 ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it", "ja", "ko", "zh"}
 WESTERN_LANGUAGES = {"fr", "en", "es", "de", "it"}
 
-# LISTE NOIRE STRICTE : Contenus Adultes, Érotiques, Sexploitation et Talk-Shows
+# BANNED_KEYWORDS : Protection absolue contre le contenu adulte, NSFW et Talk-Shows
 BANNED_KEYWORDS = {
     195669,  # ecchi
     155477,  # softcore
@@ -33,29 +33,43 @@ BANNED_KEYWORDS = {
     190340,  # softcore pornography
     156201,  # softcore erotica
     291195,  # adult animation
-    242216,  # late night show / talk-show (Point 1)
-    33998,   # lesbian sex (Point 6)
-    190370,  # erotic movie alt (Point 6)
-    186107,  # sexual exploration (Point 6)
-    10053,   # sexploitation (Point 6)
-    910,     # bondage (Point 6)
-    348517,  # roman porno (Point 6)
-    9835,    # sexual fantasy (Point 6)
+    242216,  # late night show / talk-show
+    33998,   # lesbian sex
+    190370,  # erotic movie alt
+    186107,  # sexual exploration
+    10053,   # sexploitation
+    910,     # bondage
+    348517,  # roman porno
+    9835,    # sexual fantasy
+    18321,   # porn industry (Point 2)
+    267122,  # sex (Point 2)
+    356759,  # porn (Point 2)
+}
+
+# FAMILY_BANNED_KEYWORDS : Exclusion des dynamiques religieuses/bibliques du genre Famille (Point 3)
+FAMILY_BANNED_KEYWORDS = {
+    3036,    # bible
+    11001,   # religion
+    192947,  # religious film
+    273060,  # christian faith
+    282071,  # biblical
+    243261,  # new testament
+    279473,  # jews
 }
 
 RUN_PROCESSED_IDS = set()
 
 # ==============================================================================
-# CONFIGURATION DES GENRES (Filtres API assouplis, Scoring Python renforcé)
+# ARCHITECTURE DES GENRES
 # ==============================================================================
 GENRES_CONFIG = {
     "action": {"label": "Action", "color": (210, 40, 45), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [3930, 6054, 12993, 9951, 8440, 188955, 226499, 83, 312, 779, 4565, 14955, 853, 9665, 10044]},
-    "animation-japonaise": {"label": "Animation Japonaise", "color": (140, 45, 210), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja", "prefer_tv": True, "override_lang": True, "scoring_keywords": [210024, 13141, 207826]},
-    "animation": {"label": "Animation", "color": (0, 150, 210), "movie_genre": 16, "tv_genre": 16, "extra": "&without_genres=99&without_original_language=ja|ko|zh&without_keywords=210024|287513", "min_popularity": 80, "scoring_keywords": [272909, 7376, 278823, 234183, 179411, 234662, 290589, 297442, 339048, 366485]},
+    "animation-japonaise": {"label": "Animation Japonaise", "color": (140, 45, 210), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja|ko|zh", "prefer_tv": True, "override_lang": True, "scoring_keywords": [210024, 13141, 207826]},
+    "animation": {"label": "Animation", "color": (0, 150, 210), "movie_genre": 16, "tv_genre": 16, "extra": "&without_genres=99", "min_popularity": 80, "scoring_keywords": [272909, 7376, 278823, 234183, 179411, 234662, 290589, 297442, 339048, 366485]},
     "aventure": {"label": "Aventure", "color": (20, 130, 70), "movie_genre": 12, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [195114, 161176, 818, 4152, 170362, 210246, 10364, 41586, 6956, 269233]},
     "comedie": {"label": "Comédie", "color": (220, 110, 10), "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16", "scoring_keywords": [8201, 9755, 9964, 375047, 6241, 9253]},
     "crime": {"label": "Crime", "color": (70, 85, 105), "movie_genre": 80, "tv_genre": 80, "extra": "&without_genres=16", "scoring_keywords": [2095, 9748, 181644, 157241, 206958, 268067, 703, 5340, 6149, 9826, 155790, 207046]},
-    "documentaire": {"label": "Documentaire", "color": (20, 140, 60), "movie_genre": 99, "tv_genre": 99, "extra": "&without_genres=16", "scoring_keywords": [210002, 283115, 6432, 209250, 9714]},
+    "documentaire": {"label": "Documentaire", "color": (20, 140, 60), "movie_genre": 99, "tv_genre": 99, "extra": "&without_genres=16", "scoring_keywords": [210002, 283115, 6432, 209250, 9714, 9672, 221355, 18330, 18165, 272851, 270, 9902, 305903, 252105, 211505, 284176, 160330, 9882]},
     "drame": {"label": "Drame", "color": (30, 90, 170), "movie_genre": 18, "tv_genre": 18, "extra": "&without_genres=16", "scoring_keywords": []},
     "famille": {"label": "Famille", "color": (170, 25, 150), "movie_genre": 10751, "tv_genre": 10751, "extra": "&without_genres=16", "scoring_keywords": []},
     "fantastique": {"label": "Fantastique", "color": (110, 30, 190), "movie_genre": 14, "tv_genre": 10765, "extra": "&without_genres=16", "scoring_keywords": []},
@@ -64,7 +78,8 @@ GENRES_CONFIG = {
     "horreur": {"label": "Horreur", "color": (180, 20, 20), "movie_genre": 27, "tv_genre": 27, "extra": "&without_genres=16", "scoring_keywords": [3358, 9748, 6152]},
     "romance": {"label": "Romance", "color": (180, 35, 90), "movie_genre": 10749, "tv_genre": 10749, "extra": "&without_genres=16&without_original_language=ko|ja|zh", "scoring_keywords": []},
     "science-fiction": {"label": "Science-Fiction", "color": (15, 60, 160), "movie_genre": 878, "tv_genre": 10765, "extra": "&without_genres=16", "scoring_keywords": [4565, 9882]},
-    "sport": {"label": "Sport", "color": (235, 170, 0), "movie_genre": 18, "tv_genre": 73, "extra": "&without_genres=16", "scoring_keywords": [6075, 9262, 1515, 2903, 5565, 10543]},
+    # Sport (Point 4) : Extraction chirurgicale directe par mots-clés, sans passer par l'ID genre Drama
+    "sport": {"label": "Sport", "color": (235, 170, 0), "movie_genre": None, "tv_genre": None, "extra": "&with_keywords=6075|13042|209476|6496|333328|10039&without_genres=16", "scoring_keywords": [6075, 13042, 209476, 6496, 333328, 10039, 9262, 1515, 2903, 5565, 10543]},
     "thriller": {"label": "Thriller", "color": (15, 100, 85), "movie_genre": 53, "tv_genre": 80, "extra": "&without_genres=16", "scoring_keywords": [9826, 10123]},
     "western": {"label": "Western", "color": (160, 60, 15), "movie_genre": 37, "tv_genre": 37, "extra": "&without_genres=16", "scoring_keywords": []}
 }
@@ -96,17 +111,21 @@ def load_and_clean_history():
         except Exception: continue
     return cleaned_history
 
-def get_trending_media_for_genre(config, excluded_keys):
+def get_trending_media_for_genre(genre_name, config, excluded_keys):
     movie_pool, tv_pool = [], []
+    
+    movie_genre_param = f"&with_genres={config['movie_genre']}" if config.get('movie_genre') else ""
+    tv_genre_param = f"&with_genres={config['tv_genre']}" if config.get('tv_genre') else ""
+
     for page in range(1, 4):
         try:
-            res = tmdb_api_call(f"/discover/movie?sort_by=popularity.desc&with_genres={config['movie_genre']}{config.get('extra', '')}&page={page}&include_adult=false")
+            res = tmdb_api_call(f"/discover/movie?sort_by=popularity.desc{movie_genre_param}{config.get('extra', '')}&page={page}&include_adult=false")
             for item in res.get("results", []):
                 if item.get("backdrop_path"): item["media_type"] = "movie"; movie_pool.append(item)
         except: break
     for page in range(1, 4):
         try:
-            res = tmdb_api_call(f"/discover/tv?sort_by=popularity.desc&with_genres={config['tv_genre']}{config.get('extra', '')}&page={page}&include_adult=false")
+            res = tmdb_api_call(f"/discover/tv?sort_by=popularity.desc{tv_genre_param}{config.get('extra', '')}&page={page}&include_adult=false")
             for item in res.get("results", []):
                 if item.get("backdrop_path"): item["media_type"] = "tv"; tv_pool.append(item)
         except: break
@@ -119,7 +138,12 @@ def get_trending_media_for_genre(config, excluded_keys):
         composite_key = f"{item['media_type']}_{item['id']}"
         if item.get("adult") or item.get("popularity", 0) < min_pop: continue
         if not config.get("override_lang", False) and item.get("original_language", "") not in ALLOWED_LANGUAGES: continue
-        if composite_key in excluded_keys or composite_key in RUN_PROCESSED_IDS: continue
+        
+        # Clause de Dérogation Historique (Points 2 & 4) : Documentaire et Sport contournent le lock des 14 jours
+        if genre_name not in ["documentaire", "sport"]:
+            if composite_key in excluded_keys: continue
+            
+        if composite_key in RUN_PROCESSED_IDS: continue
         filtered.append(item)
     return filtered
 
@@ -151,12 +175,10 @@ def score_and_select_backdrop(backdrops):
         
         base_score = (votes * 4) + (vote_avg * 15)
         
-        # Validation géométrique stricte du format Cinéma 16:9
         aspect_ratio = width / height if height > 0 else 0
         if abs(aspect_ratio - 1.777) > 0.04:
             base_score -= 250
         
-        # Indexation premium de la haute résolution globale
         if width >= 3840 or height >= 2160:
             base_score += 600  
         elif width >= 2560 or height >= 1440:
@@ -191,9 +213,7 @@ def apply_premium_duotone(img, base_color):
     
     y_img = ImageEnhance.Brightness(y_img).enhance(0.96)
     final_ycbcr = Image.merge("YCbCr", (y_img, cb_color, cr_color))
-    final_rgb = final_ycbcr.convert("RGB")
-    
-    return final_rgb.filter(ImageFilter.SHARPEN)
+    return final_ycbcr.convert("RGB").filter(ImageFilter.SHARPEN)
 
 def finalize_landscape_banner(img, label, color):
     img = ImageOps.fit(img, (1920, 1080), method=Image.Resampling.LANCZOS)
@@ -242,49 +262,54 @@ def finalize_landscape_banner(img, label, color):
 
     shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(12))
     final_img = Image.alpha_composite(img_with_gradient, shadow_layer)
-    final_img = Image.alpha_composite(final_img, text_layer)
-    
-    return final_img.convert("RGB")
+    return Image.alpha_composite(final_img, text_layer).convert("RGB")
 
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     history = load_and_clean_history()
     excluded_keys = set(history.keys())
+    
+    # Cartographie de sécurité des images déjà exploitées
+    excluded_backdrops = {data["backdrop_path"] for data in history.values() if "backdrop_path" in data}
     current_year = datetime.now().year
 
     for genre_name, config in GENRES_CONFIG.items():
         print(f"\n--- Analyse Algorithmique : {config['label']} ---")
-        candidates = get_trending_media_for_genre(config, excluded_keys)
-        if not candidates:
-            print(" -> Aucun candidat éligible dans le flux API.")
-            continue
+        candidates = get_trending_media_for_genre(genre_name, config, excluded_keys)
+        if not candidates: continue
         
         scoring_keywords = set(config.get("scoring_keywords", []))
         scored_candidates = []
         
         for item in candidates:
+            # SÉCURITÉ ANIMATION (Point 1) : Exclusion implacable de l'Asie hors de son genre dédié
+            if genre_name == "animation" and item.get("original_language", "") not in WESTERN_LANGUAGES:
+                continue
+                
             media_keywords = get_media_keywords(item["media_type"], item["id"])
             
-            # FILTRE DE PROTECTION ANTI-ADULTE ET ANTI-TALKSHOW
+            # FILTRE SANITAIRE GLOBAL ADULTE / TALK-SHOW (Point 2)
             if media_keywords.intersection(BANNED_KEYWORDS):
+                continue
+            
+            # FILTRE SÉCURITÉ FAMILLE RELIGION (Point 3)
+            if genre_name == "famille" and media_keywords.intersection(FAMILY_BANNED_KEYWORDS):
                 continue
             
             kw_score = len(media_keywords.intersection(scoring_keywords)) * 55
             pop_score = min(item.get("popularity", 0) / 2.5, 140)
             total_score = kw_score + pop_score
             
-            # FILTRE CHRONOLOGIQUE MANDATOIRE (Points 3, 4, 7)
+            # FILTRE CHRONOLOGIQUE MANDATOIRE (Moins de 10 ans)
             release_date_str = item.get("release_date") or item.get("first_air_date") or ""
             if release_date_str and len(release_date_str) >= 4 and release_date_str[:4].isdigit():
-                release_year = int(release_date_str[:4])
-                if release_year >= (current_year - 10):
-                    total_score += 150  # Bonus massif contenu moderne (< 10 ans)
+                if int(release_date_str[:4]) >= (current_year - 10):
+                    total_score += 150  
                 else:
-                    total_score -= 100  # Pénalisation destructive pour le contenu vintage
+                    total_score -= 100  
             else:
                 total_score -= 50
             
-            # PRÉFÉRENCE OCCIDENTALE (Sauf Genre Dédié)
             if genre_name != "animation-japonaise" and item.get("original_language", "") in WESTERN_LANGUAGES:
                 total_score += 75  
                 
@@ -296,7 +321,12 @@ def main():
         for candidate in scored_candidates:
             media = candidate["item"]
             backdrops = get_best_textless_backdrops(media["media_type"], media["id"], media["backdrop_path"])
-            best_bg = score_and_select_backdrop(backdrops)
+            
+            # FILTRE ANTI-REDONDANCE VISUELLE (Points 2 & 4) : Extraction des backdrops jamais affichés
+            fresh_backdrops = [b for b in backdrops if b["file_path"] not in excluded_backdrops]
+            final_backdrops_pool = fresh_backdrops if fresh_backdrops else backdrops
+            
+            best_bg = score_and_select_backdrop(final_backdrops_pool)
             
             try:
                 res = requests.get(f"https://image.tmdb.org/t/p/original{best_bg['file_path']}", stream=True, timeout=10)
@@ -311,11 +341,18 @@ def main():
                     
                     composite_key = f"{media['media_type']}_{media['id']}"
                     RUN_PROCESSED_IDS.add(composite_key)
-                    history[composite_key] = {"title": media_title, "genre": genre_name, "date": datetime.now().strftime("%Y-%m-%d")}
+                    
+                    # Sauvegarde enrichie avec l'empreinte de l'image pour le recyclage intelligent
+                    history[composite_key] = {
+                        "title": media_title, 
+                        "genre": genre_name, 
+                        "date": datetime.now().strftime("%Y-%m-%d"),
+                        "backdrop_path": best_bg["file_path"]
+                    }
                     success_genre = True
                     break
             except Exception as e:
-                print(f" Échec de traitement image : {e}")
+                print(f" Échec image : {e}")
                 continue
                 
         if not success_genre:
