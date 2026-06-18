@@ -1,282 +1,855 @@
+#!/usr/bin/env python3
+"""
+Backdrop generator driven entirely by explicit TMDB request parameters.
+
+Purpose:
+    This script generates one backdrop image set from explicit TMDB request
+    specs. It does not inspect `Nuvio-Collections.json` itself. Use it when
+    you already know which TMDB requests should be merged into one backdrop.
+    When Fanart artwork is enabled, language selection is prioritized in this
+    order: preferred language, original title language, TMDB backdrop fallback,
+    textless/no-language artwork, and only then any other non-empty Fanart
+    language if everything else fails.
+
+Important parameters:
+    --api-key
+        TMDB API key used for metadata discovery requests.
+    --fanart-key
+        Optional Fanart.tv API key. If provided, the script prefers Fanart
+        thumbs/logos and falls back to TMDB backdrops.
+    --preferred-language
+        Preferred Fanart artwork language code. Defaults to `en`.
+    --label
+        Human-readable label used in logs and for fallback accent generation.
+    --tmdb-request
+        One TMDB request spec. Repeat this flag to merge multiple catalogs into
+        the same backdrop.
+    --accent-color
+        Optional accent color for the gradient overlay. Accepts `#RRGGBB` or
+        `R,G,B`.
+    --output
+        Exact output file path to write.
+    --output-dir
+        Output directory used only when `--output` is not provided.
+    --size
+        Output size: `4k`, `1080p`, or `both`.
+    --profile
+        Named output profile: `compressed` or `high`.
+    --quality
+        Advanced manual output quality override used for both JPG and WEBP.
+    --focus
+        Grid focus preset or explicit `x,y` fractions.
+    --count
+        Maximum number of titles to keep after all request sets are merged.
+
+Request format:
+    movie:key=value&key=value
+    tv:key=value&key=value
+    movie:/movie/popular?language=en-US
+    tv:/trending/tv/week?language=en-US
+
+Examples:
+    python3 -B backdrop.py \
+      --api-key YOUR_TMDB_KEY \
+      --fanart-key YOUR_FANART_KEY \
+      --label "Netflix" \
+      --accent-color "213,30,39" \
+      --tmdb-request 'movie:sort_by=popularity.desc&with_watch_providers=8&watch_region=US' \
+      --tmdb-request 'tv:sort_by=popularity.desc&with_watch_providers=8&watch_region=US' \
+      --output /tmp/netflix.jpg \
+      --size 4k
+"""
+
+import argparse
+import colorsys
+import contextlib
+import io
+import itertools
+import math
 import os
+import shutil
 import sys
 import time
-import math
+from pathlib import Path
+from urllib.parse import parse_qsl
+
 import requests
-from datetime import datetime
-from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageOps, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter
 
-# ==============================================================================
-# CONFIGURATION GLOBALE
-# ==============================================================================
-TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+SCRIPT_DIR = Path(__file__).resolve().parent
+DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "output"
 TMDB_BASE = "https://api.themoviedb.org/3"
-
-if not TMDB_API_KEY:
-    print("Erreur : La variable TMDB_API_KEY n'est pas définie.")
-    sys.exit(1)
-
-OUTPUT_DIR = "Ressources/Collections Covers/Genres/Weekly Backdrops"
-
-# Paramètres de style de la charte graphique Streaming
-TILT_ANGLE = -10      # Inclinaison de la grille de vignettes
-CARD_GAP = 24         # Espacement prononcé entre les cartes
-CORNER_RADIUS = 12    # Angles arrondis des cartes paysage
-
-# Sécurités et filtres de contenu
-ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it", "ja", "ko", "zh"}
-WESTERN_LANGUAGES = {"fr", "en", "es", "de", "it"}
-
-BANNED_KEYWORDS = {
-    195669, 155477, 198385, 256466, 155716, 190340, 156201, 291195,
-    242216, 33998, 190370, 186107, 10053, 910, 348517, 9835, 18321, 
-    267122, 356759
-}
-FAMILY_BANNED_KEYWORDS = {3036, 11001, 192947, 273060, 282071, 243261, 279473}
-
-# ==============================================================================
-# ARCHITECTURE DES GENRES
-# ==============================================================================
-GENRES_CONFIG = {
-    "action": {"label": "Action", "color": (210, 40, 45), "movie_genre": 28, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [3930, 6054, 12993, 9951, 8440, 188955, 226499, 83, 312, 779, 4565, 14955, 853, 9665, 10044]},
-    "animation-japonaise": {"label": "Animation Japonaise", "color": (140, 45, 210), "movie_genre": 16, "tv_genre": 16, "extra": "&with_original_language=ja|ko|zh", "prefer_tv": True, "override_lang": True, "scoring_keywords": [210024, 13141, 207826]},
-    "animation": {"label": "Animation", "color": (0, 150, 210), "movie_genre": 16, "tv_genre": 16, "extra": "&without_genres=99", "min_popularity": 80, "scoring_keywords": [272909, 7376, 278823, 234183, 179411, 234662, 290589, 297442, 339048, 366485]},
-    "aventure": {"label": "Aventure", "color": (20, 130, 70), "movie_genre": 12, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [195114, 161176, 818, 4152, 170362, 210246, 10364, 41586, 6956, 269233]},
-    "comedie": {"label": "Comédie", "color": (220, 110, 10), "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16", "scoring_keywords": [8201, 9755, 9964, 375047, 6241, 9253]},
-    "crime": {"label": "Crime", "color": (70, 85, 105), "movie_genre": 80, "tv_genre": 80, "extra": "&without_genres=16", "scoring_keywords": [2095, 9748, 181644, 157241, 206958, 268067, 703, 5340, 6149, 9826, 155790, 207046]},
-    "documentaire": {"label": "Documentaire", "color": (20, 140, 60), "movie_genre": 99, "tv_genre": 99, "extra": "&without_genres=16", "scoring_keywords": [210002, 283115, 6432, 209250, 9714, 9672, 221355, 18330, 18165, 272851, 270, 9902, 305903, 252105, 211505, 284176, 160330, 9882]},
-    "drame": {"label": "Drame", "color": (30, 90, 170), "movie_genre": 18, "tv_genre": 18, "extra": "&without_genres=16", "scoring_keywords": []},
-    "famille": {"label": "Famille", "color": (170, 25, 150), "movie_genre": 10751, "tv_genre": 10751, "extra": "&without_genres=16", "scoring_keywords": []},
-    "fantastique": {"label": "Fantastique", "color": (110, 30, 190), "movie_genre": 14, "tv_genre": 10765, "extra": "&without_genres=16", "scoring_keywords": []},
-    "guerre": {"label": "Guerre", "color": (90, 80, 70), "movie_genre": 10752, "tv_genre": 10768, "extra": "&without_genres=16", "scoring_keywords": []},
-    "histoire": {"label": "Histoire", "color": (140, 70, 30), "movie_genre": 36, "tv_genre": 10768, "extra": "&without_genres=16", "scoring_keywords": []},
-    "horreur": {"label": "Horreur", "color": (180, 20, 20), "movie_genre": 27, "tv_genre": 27, "extra": "&without_genres=16", "scoring_keywords": [3358, 9748, 6152]},
-    "romance": {"label": "Romance", "color": (180, 35, 90), "movie_genre": 10749, "tv_genre": 10749, "extra": "&without_genres=16&without_original_language=ko|ja|zh", "scoring_keywords": []},
-    "science-fiction": {"label": "Science-Fiction", "color": (15, 60, 160), "movie_genre": 878, "tv_genre": 10765, "extra": "&without_genres=16", "scoring_keywords": [4565, 9882]},
-    "sport": {"label": "Sport", "color": (235, 170, 0), "movie_genre": None, "tv_genre": None, "extra": "&with_keywords=6075|13042|209476|6496|333328|10039&without_genres=16", "scoring_keywords": [6075, 13042, 209476, 6496, 333328, 10039, 9262, 1515, 2903, 5565, 10543]},
-    "thriller": {"label": "Thriller", "color": (15, 100, 85), "movie_genre": 53, "tv_genre": 80, "extra": "&without_genres=16", "scoring_keywords": [9826, 10123]},
-    "western": {"label": "Western", "color": (160, 60, 15), "movie_genre": 37, "tv_genre": 37, "extra": "&without_genres=16", "scoring_keywords": []}
+TMDB_IMG_BASE = "https://image.tmdb.org/t/p"
+BACKDROP_SIZE = "w1280"
+FANART_BASE = "https://webservice.fanart.tv/v3"
+QUALITY_PRESETS = {
+    "compressed": {"quality": 82, "progressive": True, "subsampling": "4:2:0"},
+    "high": {"quality": 95, "progressive": False, "subsampling": 0},
 }
 
-def tmdb_api_call(endpoint, params=None):
-    if params is None: params = {}
-    params["api_key"] = TMDB_API_KEY
+CARD_RADIUS = 9
+TILT_DEG = 10
+TILE_W = 372
+TILE_H = 210
+GAP = 9
+ROWS = 10
+COLS = 10
+STAGGER = 0.5
+FOCUS_X = 0.5
+FOCUS_Y = 0.53
+
+FOCUS_PRESETS = {
+    "center": (0.50, 0.50),
+    "top-right": (0.72, 0.28),
+    "center-right": (0.65, 0.45),
+    "top-center": (0.52, 0.30),
+}
+
+SIZE_PRESETS = {
+    "4k": (3840, 2160, 3840 / 1920),
+    "1080p": (1920, 1080, 1.0),
+}
+
+
+def cleanup_pycache():
+    """Remove the local __pycache__ folder if one was created."""
+    shutil.rmtree(SCRIPT_DIR / "__pycache__", ignore_errors=True)
+
+
+def normalize_media_type(value):
+    if value == "series":
+        return "tv"
+    if value in {"movie", "tv"}:
+        return value
+    raise ValueError(f"Unsupported media type '{value}'.")
+
+
+def default_accent_for_label(label):
+    seed = sum((index + 1) * ord(char) for index, char in enumerate(label or "Backdrop"))
+    hue = (seed % 360) / 360.0
+    red, green, blue = colorsys.hsv_to_rgb(hue, 0.65, 0.88)
+    return (int(red * 255), int(green * 255), int(blue * 255))
+
+
+def parse_accent_color(value):
+    if not value:
+        return None
+    value = value.strip()
+    if value.startswith("#"):
+        value = value[1:]
+        if len(value) != 6:
+            raise ValueError("Hex accent colors must use 6 digits, like #2299aa.")
+        return tuple(int(value[index:index + 2], 16) for index in (0, 2, 4))
+
+    parts = [part.strip() for part in value.split(",")]
+    if len(parts) != 3:
+        raise ValueError("Accent colors must be '#RRGGBB' or 'R,G,B'.")
+    rgb = tuple(int(part) for part in parts)
+    if any(part < 0 or part > 255 for part in rgb):
+        raise ValueError("Accent color channels must be between 0 and 255.")
+    return rgb
+
+
+def tmdb_get(endpoint, params, api_key):
+    query = dict(params)
+    query["api_key"] = api_key
+    last_error = None
     for attempt in range(3):
         try:
-            res = requests.get(f"{TMDB_BASE}{endpoint}", params=params, timeout=15)
-            res.raise_for_status()
-            return res.json()
-        except:
-            if attempt == 2: raise
-            time.sleep(1.5 + attempt)
+            response = requests.get(f"{TMDB_BASE}{endpoint}", params=query, timeout=20)
+            response.raise_for_status()
+            return response.json()
+        except requests.HTTPError as exc:
+            last_error = exc
+            status_code = exc.response.status_code if exc.response is not None else None
+            if status_code is None or status_code < 500 or attempt == 2:
+                raise
+            time.sleep(1 + attempt)
+        except requests.RequestException as exc:
+            last_error = exc
+            if attempt == 2:
+                raise
+            time.sleep(1 + attempt)
+    raise last_error
 
-def get_trending_media(config):
-    movie_pool, tv_pool = [], []
-    m_genre = f"&with_genres={config['movie_genre']}" if config.get('movie_genre') else ""
-    t_genre = f"&with_genres={config['tv_genre']}" if config.get('tv_genre') else ""
 
-    for page in range(1, 4):
-        try:
-            res = tmdb_api_call(f"/discover/movie?sort_by=popularity.desc{m_genre}{config.get('extra', '')}&page={page}&include_adult=false")
-            for item in res.get("results", []):
-                if item.get("backdrop_path"): item["media_type"] = "movie"; movie_pool.append(item)
-        except: break
-    for page in range(1, 4):
-        try:
-            res = tmdb_api_call(f"/discover/tv?sort_by=popularity.desc{t_genre}{config.get('extra', '')}&page={page}&include_adult=false")
-            for item in res.get("results", []):
-                if item.get("backdrop_path"): item["media_type"] = "tv"; tv_pool.append(item)
-        except: break
-    
-    return tv_pool + movie_pool if config.get("prefer_tv", False) else movie_pool + tv_pool
-
-def get_media_keywords(media_type, media_id):
+def parse_request_spec(spec):
+    """Parse a single request spec into either a discover query or a direct TMDB endpoint call."""
     try:
-        res = tmdb_api_call(f"/{media_type}/{media_id}/keywords")
-        kw = res.get("keywords") or res.get("results") or []
-        return {k["id"] for k in kw if "id" in k}
-    except: return set()
+        raw_media_type, raw_request = spec.split(":", 1)
+    except ValueError as exc:
+        raise ValueError(
+            f"Invalid request '{spec}'. Use 'movie:key=value&...' or 'tv:/path?query=...'."
+        ) from exc
 
-def get_textless_backdrop(media_type, media_id, fallback_path):
+    media_type = normalize_media_type(raw_media_type.strip())
+    raw_request = raw_request.strip()
+    if not raw_request:
+        raise ValueError(f"Invalid request '{spec}': missing path or query string.")
+
+    if raw_request.startswith("/"):
+        path, _, query_string = raw_request.partition("?")
+        params = dict(parse_qsl(query_string, keep_blank_values=True))
+        if path.startswith("/discover/"):
+            return {"mode": "discover", "media_type": media_type, "params": params}
+        return {"mode": "endpoint", "media_type": media_type, "path": path, "params": params}
+
+    params = dict(parse_qsl(raw_request, keep_blank_values=True))
+    return {"mode": "discover", "media_type": media_type, "params": params}
+
+
+def fetch_titles_for_spec(spec, api_key, max_pages=3):
+    items = []
+    if spec["mode"] == "discover":
+        endpoint = f"/discover/{spec['media_type']}"
+        base_params = dict(spec["params"])
+    else:
+        endpoint = spec["path"]
+        base_params = dict(spec.get("params", {}))
+
+    for page in range(1, max_pages + 1):
+        data = tmdb_get(endpoint, {**base_params, "page": page}, api_key)
+        page_results = data.get("results", [])
+        if not page_results:
+            break
+        for item in page_results:
+            if item.get("backdrop_path"):
+                items.append((spec["media_type"], item))
+        total_pages = data.get("total_pages") or max_pages
+        if page >= total_pages:
+            break
+    return items
+
+
+def fetch_titles(request_specs, api_key, count=60):
+    # Interleave results from each request so mixed folders (for example movie + TV)
+    # do not get visually dominated by the first request in the list.
+    per_spec_items = [fetch_titles_for_spec(spec, api_key) for spec in request_specs]
+    merged = []
+    max_len = max((len(spec_items) for spec_items in per_spec_items), default=0)
+    for index in range(max_len):
+        for spec_items in per_spec_items:
+            if index < len(spec_items):
+                merged.append(spec_items[index])
+
+    seen = set()
+    unique = []
+    for media_type, item in merged:
+        key = (media_type, item["id"])
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append((media_type, item))
+        if len(unique) >= count:
+            break
+    return unique
+
+
+def get_tmdb_external_ids(kind, tmdb_id, api_key):
     try:
-        res = tmdb_api_call(f"/{media_type}/{media_id}/images", {"include_image_language": "null"})
-        bd = res.get("backdrops", [])
-        if bd:
-            bd.sort(key=lambda x: (x.get("vote_average", 0) * 10) + x.get("vote_count", 0), reverse=True)
-            return bd[0]["file_path"]
-    except: pass
-    return fallback_path
+        return tmdb_get(f"/{kind}/{tmdb_id}/external_ids", {}, api_key)
+    except Exception:
+        return {}
 
-def create_premium_gradient(width, height, base_color):
-    """Génère le fond en dégradé premium linéaire fluide de la charte streaming"""
-    small_grad = Image.new("RGB", (4, 4))
-    r, g, b = base_color
-    
-    c_top_right = (int(r * 0.55), int(g * 0.55), int(b * 0.55))
-    c_top_left = (int(r * 0.20), int(g * 0.20), int(b * 0.20))
-    c_bottom_right = (int(r * 0.10), int(g * 0.10), int(b * 0.10))
-    c_bottom_left = (10, 10, 14)
-    
-    pixels = [
-        c_top_left, c_top_left, c_top_right, c_top_right,
-        c_top_left, c_top_left, c_top_right, c_top_right,
-        c_bottom_left, c_bottom_left, c_bottom_right, c_bottom_right,
-        c_bottom_left, c_bottom_left, c_bottom_right, c_bottom_right,
-    ]
-    small_grad.putdata(pixels)
-    return small_grad.resize((width, height), Image.Resampling.BILINEAR)
 
-def add_rounded_corners(img, radius):
-    mask = Image.new("L", img.size, 0)
-    draw = ImageDraw.Draw(mask)
-    draw.rounded_rectangle((0, 0, img.size[0], img.size[1]), radius, fill=255)
-    img_with_corners = img.copy()
-    img_with_corners.putalpha(mask)
-    return img_with_corners
+def fanart_get_tv(tvdb_id, fanart_key):
+    try:
+        response = requests.get(f"{FANART_BASE}/tv/{tvdb_id}", params={"api_key": fanart_key}, timeout=15)
+        response.raise_for_status()
+        return response.json()
+    except Exception:
+        return None
 
-def generate_grid_backdrop(genre_name, config):
-    canvas_w, canvas_h = 1920, 1080
-    background = create_premium_gradient(canvas_w, canvas_h, config["color"])
-    
-    raw_candidates = get_trending_media(config)
-    scoring_keywords = set(config.get("scoring_keywords", []))
-    current_year = datetime.now().year
-    
-    processed_candidates = []
-    seen_ids = set()
-    
-    for item in raw_candidates:
-        composite_key = f"{item['media_type']}_{item['id']}"
-        if composite_key in seen_ids or item.get("adult"): continue
-        if not config.get("override_lang", False) and item.get("original_language", "") not in ALLOWED_LANGUAGES: continue
-        if genre_name == "animation" and item.get("original_language", "") not in WESTERN_LANGUAGES: continue
-        
-        keywords = get_media_keywords(item["media_type"], item["id"])
-        if keywords.intersection(BANNED_KEYWORDS): continue
-        if genre_name == "famille" and keywords.intersection(FAMILY_BANNED_KEYWORDS): continue
-        
-        score = len(keywords.intersection(scoring_keywords)) * 55
-        score += min(item.get("popularity", 0) / 2.5, 140)
-        
-        release_date = item.get("release_date") or item.get("first_air_date") or ""
-        if release_date and len(release_date) >= 4 and release_date[:4].isdigit():
-            if int(release_date[:4]) >= (current_year - 10): score += 150
-            else: score -= 100
-        
-        if genre_name != "animation-japonaise" and item.get("original_language", "") in WESTERN_LANGUAGES:
-            score += 75
-            
-        processed_candidates.append((score, item))
-        seen_ids.add(composite_key)
-        
-    processed_candidates.sort(key=lambda x: x[0], reverse=True)
-    
-    # Construction de la grille surdimensionnée inclinée (Tilted Mosaic Architecture)
-    # Taille augmentée pour couvrir l'espace complet lors de la rotation à -10°
-    grid_w, grid_h = 2600, 1600
-    grid_layer = Image.new("RGBA", (grid_w, grid_h), (0, 0, 0, 0))
-    
-    cell_w, cell_h = 266, 150  # Format paysage 16:9 cinématographique
-    cols, rows = 9, 8
-    max_vignettes = cols * rows
-    
-    count = 0
-    for score, item in processed_candidates:
-        if count >= max_vignettes: break
-        
-        backdrop_path = get_textless_backdrop(item["media_type"], item["id"], item["backdrop_path"])
-        url = f"https://image.tmdb.org/t/p/w500{backdrop_path}"
-        
-        try:
-            res = requests.get(url, stream=True, timeout=10)
-            if res.status_code == 200:
-                vignette = Image.open(res.raw).convert("RGB")
-                vignette = ImageOps.fit(vignette, (cell_w, cell_h), method=Image.Resampling.LANCZOS)
-                
-                # Effet d'atténuation streaming pour intégrer la grille dans le dégradé coloré
-                vignette = ImageEnhance.Brightness(vignette).enhance(0.58)
-                vignette = add_rounded_corners(vignette, radius=CORNER_RADIUS)
-                
-                r_idx = count // cols
-                c_idx = count % cols
-                
-                x = c_idx * (cell_w + CARD_GAP) + 30
-                y = r_idx * (cell_h + CARD_GAP) + 30
-                
-                grid_layer.paste(vignette, (x, y), vignette)
-                count += 1
-        except:
+
+def fanart_get_movie(tmdb_id, fanart_key):
+    try:
+        response = requests.get(f"{FANART_BASE}/movies/{tmdb_id}", params={"api_key": fanart_key}, timeout=15)
+        response.raise_for_status()
+        return response.json()
+    except Exception:
+        return None
+
+
+def fanart_candidate_groups(fanart_data, kind):
+    """Return preferred thumb/background candidate groups in priority order."""
+    if not fanart_data:
+        return []
+    if kind == "tv":
+        return [
+            ("thumb", fanart_data.get("tvthumb") or []),
+            ("background", fanart_data.get("showbackground") or []),
+        ]
+    else:
+        return [
+            ("thumb", fanart_data.get("moviethumb") or []),
+            ("background", fanart_data.get("moviebackground") or []),
+        ]
+
+
+def normalize_fanart_lang(value):
+    if value is None:
+        return None
+    value = str(value).strip().lower()
+    if value in {"", "00", "none", "null"}:
+        return None
+    return value
+
+
+def pick_fanart_url(fanart_data, kind, preferred_language, original_language):
+    """
+    Fanart selection priority:
+    1. preferred language
+    2. original title language
+    3. textless / no language
+    4. any other non-empty language
+    """
+    preferred_language = normalize_fanart_lang(preferred_language)
+    original_language = normalize_fanart_lang(original_language)
+
+    ranked_groups = {
+        "preferred": [],
+        "original": [],
+        "textless": [],
+        "other": [],
+    }
+
+    for group_rank, (_, candidates) in enumerate(fanart_candidate_groups(fanart_data, kind)):
+        if not candidates:
             continue
 
-    print(f" -> Grille construite : {count} visuels assemblés.")
-    
-    # Application de la rotation à -10° (Bilinear pour conserver le lissage des arrondis)
-    rotated_grid = grid_layer.rotate(TILT_ANGLE, resample=Image.Resampling.BILINEAR, expand=False)
-    
-    # Centrage et fusion de la grille inclinée sur le fond dégradé principal
-    offset_x = (grid_w - canvas_w) // 2
-    offset_y = (grid_h - canvas_h) // 2
-    crop_box = (offset_x, offset_y, offset_x + canvas_w, offset_y + canvas_h)
-    final_grid_cropped = rotated_grid.crop(crop_box)
-    
-    background.paste(final_grid_cropped, (0, 0), final_grid_cropped)
-    
-    # Masque dégradé linéaire noir (vignette) pour l'intégration du texte
-    gradient_overlay = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
-    g_draw = ImageDraw.Draw(gradient_overlay)
-    for y in range(250, canvas_h):
-        alpha = int(((y - 250) / 830) ** 1.6 * 255)
-        g_draw.line([(0, y), (canvas_w, y)], fill=(0, 0, 0, alpha))
-        
-    final_img = Image.alpha_composite(background.convert("RGBA"), gradient_overlay)
-    
-    # Typographie premium (Alignée sur la charte posters-genres.py)
-    text_layer = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
-    shadow_layer = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
-    t_draw = ImageDraw.Draw(text_layer)
-    s_draw = ImageDraw.Draw(shadow_layer)
-    
-    font_size = 165
-    try: font = ImageFont.truetype(".github/assets/fonts/SF-Pro-Display-Bold.otf", font_size)
-    except: font = ImageFont.load_default()
+        for candidate in candidates:
+            lang = normalize_fanart_lang(candidate.get("lang"))
+            entry = {"candidate": candidate, "group_rank": group_rank}
+            if preferred_language and lang == preferred_language:
+                ranked_groups["preferred"].append(entry)
+            elif original_language and lang == original_language:
+                ranked_groups["original"].append(entry)
+            elif lang is None:
+                ranked_groups["textless"].append(entry)
+            elif lang:
+                ranked_groups["other"].append(entry)
 
-    padding_left, padding_bottom = 130, 140
-    max_text_width = canvas_w - (padding_left * 2)
+    for bucket in ("preferred", "original", "textless", "other"):
+        if ranked_groups[bucket]:
+            best = sorted(
+                ranked_groups[bucket],
+                key=lambda entry: (entry["group_rank"], -int(entry["candidate"].get("likes", 0))),
+            )[0]["candidate"]
+            if best.get("url"):
+                return best["url"], bucket
 
-    words = config["label"].split(" ")
-    lines, current_line = [], ""
-    for word in words:
-        test_line = f"{current_line} {word}".strip()
-        if t_draw.textlength(test_line, font=font) <= max_text_width: current_line = test_line
+    return None, None
+
+
+def download_image_url(url, retries=2):
+    for attempt in range(retries + 1):
+        try:
+            response = requests.get(url, timeout=20)
+            response.raise_for_status()
+            return Image.open(io.BytesIO(response.content)).convert("RGBA")
+        except Exception as exc:
+            if attempt == retries:
+                print(f"  ! Failed to download {url}: {exc}")
+                return None
+            time.sleep(1)
+
+
+def download_tmdb_backdrop(path, retries=2):
+    return download_image_url(f"{TMDB_IMG_BASE}/{BACKDROP_SIZE}{path}", retries=retries)
+
+
+def select_best_tmdb_backdrop(kind, tmdb_id, api_key, fallback_path, preferred_lang="fr"):
+    """
+    Fetch all backdrops from TMDB gallery and filter them by explicit language priority:
+    1. Preferred Language (ex: 'fr')
+    2. Fallback English ('en')
+    3. Textless / No Language (None)
+    """
+    try:
+        data = tmdb_get(f"/{kind}/{tmdb_id}/images", {}, api_key)
+        backdrops_list = data.get("backdrops", [])
+        if not backdrops_list:
+            return fallback_path
+
+        # 1. Recherche du Français (ou preferred_lang)
+        fr_imgs = [i for i in backdrops_list if i.get("iso_639_1") == preferred_lang]
+        if fr_imgs:
+            return max(fr_imgs, key=lambda x: x.get("vote_average", 0)).get("file_path")
+
+        # 2. Recherche de l'Anglais (pour capturer les logos si pas de FR)
+        if preferred_lang != "en":
+            en_imgs = [i for i in backdrops_list if i.get("iso_639_1") == "en"]
+            if en_imgs:
+                return max(en_imgs, key=lambda x: x.get("vote_average", 0)).get("file_path")
+
+        # 3. Recherche du Textless / Sans langue (None ou vide)
+        null_imgs = [i for i in backdrops_list if i.get("iso_639_1") is None or i.get("iso_639_1") == "null"]
+        if null_imgs:
+            return max(null_imgs, key=lambda x: x.get("vote_average", 0)).get("file_path")
+
+        # Repli ultime si aucun filtre ne matche
+        return backdrops_list[0].get("file_path")
+    except Exception:
+        return fallback_path
+
+
+def fetch_tile_image(kind, item, api_key, fanart_key, preferred_language):
+    tmdb_id = item["id"]
+    original_language = item.get("original_language")
+    preferred_url = None
+    textless_url = None
+    last_resort_url = None
+
+    if fanart_key:
+        if kind == "tv":
+            external_ids = get_tmdb_external_ids("tv", tmdb_id, api_key)
+            tvdb_id = external_ids.get("tvdb_id")
+            if tvdb_id:
+                candidate_url, bucket = pick_fanart_url(
+                    fanart_get_tv(tvdb_id, fanart_key),
+                    "tv",
+                    preferred_language,
+                    original_language,
+                )
+                if bucket == "other":
+                    last_resort_url = candidate_url
+                elif bucket == "textless":
+                    textless_url = candidate_url
+                else:
+                    preferred_url = candidate_url
         else:
-            if current_line: lines.append(current_line)
-            current_line = word
-    if current_line: lines.append(current_line)
+            candidate_url, bucket = pick_fanart_url(
+                fanart_get_movie(tmdb_id, fanart_key),
+                "movie",
+                preferred_language,
+                original_language,
+            )
+            if bucket == "other":
+                last_resort_url = candidate_url
+            elif bucket == "textless":
+                textless_url = candidate_url
+            else:
+                preferred_url = candidate_url
 
-    line_spacing, line_height = 20, font_size - 22
-    total_text_height = (len(lines) * line_height) + ((len(lines) - 1) * line_spacing)
-    base_y = (canvas_h - padding_bottom - line_height) - (total_text_height - line_height)
+    if preferred_url:
+        image = download_image_url(preferred_url)
+        if image:
+            return image, "fanart"
 
-    current_y = base_y
-    for line in lines:
-        s_draw.text((padding_left + 6, current_y + 10), line, fill=(0, 0, 0, 245), font=font)
-        t_draw.text((padding_left, current_y), line, fill=(255, 255, 255, 255), font=font)
-        current_y += line_height + line_spacing
-
-    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(12))
-    final_output = Image.alpha_composite(final_img, shadow_layer)
-    final_output = Image.alpha_composite(final_output, text_layer).convert("RGB")
+    # --- REPRISE ET CORRECTION DE LA LOGIQUE TMDB ---
+    # Au lieu d'utiliser bêtement item["backdrop_path"], on interroge la galerie complète
+    # avec notre tri linguistique hiérarchisé.
+    best_backdrop_path = select_best_tmdb_backdrop(kind, tmdb_id, api_key, item["backdrop_path"], preferred_language)
     
-    # Sauvegarde des fichiers finaux
-    final_output.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=94)
-    final_output.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=94)
+    tmdb_image = download_tmdb_backdrop(best_backdrop_path)
+    if tmdb_image:
+        return tmdb_image, "tmdb"
+
+    if textless_url:
+        image = download_image_url(textless_url)
+        if image:
+            return image, "fanart"
+
+    if last_resort_url:
+        image = download_image_url(last_resort_url)
+        if image:
+            return image, "fanart_other_language"
+
+    return None, "missing"
+
+
+def rounded_rect_mask(width, height, radius=CARD_RADIUS):
+    mask = Image.new("L", (width, height), 0)
+    draw = ImageDraw.Draw(mask)
+    draw.rounded_rectangle([0, 0, width - 1, height - 1], radius=radius, fill=255)
+    return mask
+
+
+def make_tile(image, tile_width, tile_height):
+    source_width, source_height = image.size
+    target_ratio = tile_width / tile_height
+    current_ratio = source_width / source_height
+    if current_ratio > target_ratio:
+        new_width = int(source_height * target_ratio)
+        left = (source_width - new_width) // 2
+        image = image.crop((left, 0, left + new_width, source_height))
+    else:
+        new_height = int(source_width / target_ratio)
+        top = (source_height - new_height) // 2
+        image = image.crop((0, top, source_width, top + new_height))
+    image = image.resize((tile_width, tile_height), Image.LANCZOS)
+    scaled_radius = max(8, int(CARD_RADIUS * tile_width / TILE_W))
+    mask = rounded_rect_mask(tile_width, tile_height, radius=scaled_radius)
+    result = Image.new("RGBA", (tile_width, tile_height), (0, 0, 0, 0))
+    result.paste(image, mask=mask)
+    return result
+
+
+def build_tilted_grid(tiles, canvas_width, canvas_height, scale=1.0, focus_x=None, focus_y=None):
+    fx = FOCUS_X if focus_x is None else focus_x
+    fy = FOCUS_Y if focus_y is None else focus_y
+
+    tile_width = int(TILE_W * scale)
+    tile_height = int(TILE_H * scale)
+    gap = int(GAP * scale)
+
+    cols = COLS + 3
+    rows = ROWS + 3
+    needed = rows * cols
+    tile_list = (tiles * (needed // len(tiles) + 1))[:needed]
+    stagger_px = int(STAGGER * (tile_width + gap))
+
+    grid_width = cols * (tile_width + gap) + rows * stagger_px
+    grid_height = rows * (tile_height + gap)
+    grid = Image.new("RGBA", (grid_width, grid_height), (0, 0, 0, 0))
+
+    focal_x = fx * grid_width
+    focal_y = fy * grid_height
+    focal_row = max(0, min(rows - 1, int(focal_y / (tile_height + gap))))
+    focal_col = max(0, min(cols - 1, int((focal_x - focal_row * stagger_px) / (tile_width + gap))))
+
+    cells = [(row, col) for row in range(rows) for col in range(cols)]
+    cells.sort(key=lambda pos: abs(pos[0] - focal_row) + abs(pos[1] - focal_col))
+
+    for index, (row, col) in enumerate(cells):
+        if index >= len(tile_list):
+            break
+        x = row * stagger_px + col * (tile_width + gap)
+        y = row * (tile_height + gap)
+        tile = make_tile(tile_list[index], tile_width, tile_height)
+        grid.paste(tile, (x, y), tile)
+
+    rotated = grid.rotate(TILT_DEG, expand=True, resample=Image.BICUBIC)
+    rotated_width, rotated_height = rotated.size
+
+    angle_rad = math.radians(-TILT_DEG)
+    pre_center_x = fx * grid_width - grid_width / 2
+    pre_center_y = fy * grid_height - grid_height / 2
+    rot_center_x = pre_center_x * math.cos(angle_rad) - pre_center_y * math.sin(angle_rad)
+    rot_center_y = pre_center_x * math.sin(angle_rad) + pre_center_y * math.cos(angle_rad)
+
+    focus_in_rot_x = rotated_width / 2 + rot_center_x
+    focus_in_rot_y = rotated_height / 2 + rot_center_y
+
+    paste_x = int(canvas_width / 2 - focus_in_rot_x)
+    paste_y = int(canvas_height / 2 - focus_in_rot_y)
+
+    canvas = Image.new("RGBA", (canvas_width, canvas_height), (10, 10, 12, 255))
+    canvas.paste(rotated, (paste_x, paste_y), rotated)
+    return canvas
+
+
+def ensure_minimum_tiles(tile_images, minimum_count):
+    """Repeat available tiles until the minimum count needed for compositing is met."""
+    if len(tile_images) >= minimum_count or not tile_images:
+        return tile_images
+
+    padded_tiles = list(tile_images)
+    for tile in itertools.cycle(tile_images):
+        if len(padded_tiles) >= minimum_count:
+            break
+        padded_tiles.append(tile.copy())
+    return padded_tiles
+
+
+def apply_gradient(canvas, accent):
+    width, height = canvas.size
+
+    def make_linear_gradient(grad_width, grad_height, direction):
+        image = Image.new("RGBA", (grad_width, grad_height), (0, 0, 0, 0))
+        pixels = image.load()
+
+        if direction == "left":
+            for x in range(grad_width):
+                mix = max(0.0, 1.0 - x / (grad_width * 0.45))
+                alpha = int(200 * mix ** 1.6)
+                if alpha:
+                    color = (6, 6, 8, alpha)
+                    for y in range(grad_height):
+                        pixels[x, y] = color
+
+        elif direction == "bottom":
+            for y in range(grad_height):
+                mix = max(0.0, (y - grad_height * 0.50) / (grad_height * 0.50))
+                alpha = int(200 * mix ** 1.4)
+                if alpha:
+                    color = (6, 6, 8, alpha)
+                    for x in range(grad_width):
+                        pixels[x, y] = color
+
+        elif direction == "corner_bl":
+            max_diag = math.hypot(grad_width, grad_height)
+            for x in range(grad_width):
+                for y in range(grad_height):
+                    distance = math.hypot(x, grad_height - y)
+                    mix = distance / max_diag
+                    base = max(0.0, 1.0 - mix / 0.60)
+                    alpha = int(230 * base ** 2.2)
+                    if alpha:
+                        pixels[x, y] = (6, 6, 8, min(255, alpha))
+
+        elif direction == "corner_tr_color":
+            max_diag = math.hypot(grad_width, grad_height)
+            red, green, blue = accent
+            for x in range(grad_width):
+                for y in range(grad_height):
+                    distance = math.hypot(grad_width - x, y)
+                    mix = distance / max_diag
+                    base = max(0.0, 1.0 - mix / 0.72)
+                    alpha = int(118 * base ** 1.9)
+                    if alpha:
+                        pixels[x, y] = (red, green, blue, min(255, alpha))
+
+        return image
+
+    left_grad = make_linear_gradient(width, height, "left")
+    bottom_grad = make_linear_gradient(width, height, "bottom")
+    small_corner = make_linear_gradient(width // 4, height // 4, "corner_bl")
+    corner_grad = small_corner.resize((width, height), Image.BILINEAR)
+    accent_small = make_linear_gradient(width // 4, height // 4, "corner_tr_color")
+    accent_grad = accent_small.resize((width, height), Image.BILINEAR)
+
+    result = Image.alpha_composite(canvas, corner_grad)
+    result = Image.alpha_composite(result, left_grad)
+    result = Image.alpha_composite(result, bottom_grad)
+    accent_grad = accent_grad.filter(ImageFilter.GaussianBlur(radius=max(28, width // 64)))
+    return Image.alpha_composite(result, accent_grad)
+
+
+def resolve_quality_settings(profile="compressed", quality=None):
+    settings = dict(QUALITY_PRESETS[profile])
+    if quality is not None:
+        settings["quality"] = quality
+    return settings
+
+
+def save_output(canvas, path, quality_settings):
+    final = canvas.convert("RGB")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    final.save(
+        path,
+        "JPEG",
+        quality=quality_settings["quality"],
+        optimize=True,
+        progressive=quality_settings["progressive"],
+        subsampling=quality_settings["subsampling"],
+    )
+    jpg_size_mb = os.path.getsize(path) / 1_048_576
+    print(
+        f"  Saved {path} ({final.size[0]}x{final.size[1]}, {jpg_size_mb:.1f} MB, "
+        f"q={quality_settings['quality']}, mode={quality_settings['subsampling']})"
+    )
+    webp_path = path.with_suffix(".webp")
+    with Image.open(path) as jpg_image:
+        jpg_image.save(webp_path, "WEBP", quality=quality_settings["quality"], method=6)
+        webp_size_mb = os.path.getsize(webp_path) / 1_048_576
+        print(
+            f"  Saved {webp_path} ({jpg_image.size[0]}x{jpg_image.size[1]}, {webp_size_mb:.1f} MB, "
+            f"q={quality_settings['quality']})"
+        )
+
+
+def resolve_outputs(output=None, output_dir=None, label=None, size="both"):
+    if output:
+        base = Path(output)
+        if size == "both":
+            return {
+                "4k": base.with_name(f"{base.stem}_4k{base.suffix or '.jpg'}"),
+                "1080p": base.with_name(f"{base.stem}_1080p{base.suffix or '.jpg'}"),
+            }
+        return {size: base}
+
+    directory = Path(output_dir or DEFAULT_OUTPUT_DIR)
+    directory.mkdir(parents=True, exist_ok=True)
+    stem = (label or "backdrop").strip().lower().replace(" ", "_").replace("/", "_")
+    if size == "both":
+        return {
+            "4k": directory / f"{stem}_wallpaper_4k.jpg",
+            "1080p": directory / f"{stem}_wallpaper_1080p.jpg",
+        }
+    suffix = "4k" if size == "4k" else "1080p"
+    return {size: directory / f"{stem}_wallpaper_{suffix}.jpg"}
+
+
+def backdrops(
+    api_key,
+    label,
+    tmdb_requests,
+    fanart_key=None,
+    accent_color=None,
+    output=None,
+    output_dir=None,
+    focus_x=None,
+    focus_y=None,
+    count=60,
+    size="both",
+    profile="compressed",
+    quality=None,
+    preferred_language="en",
+    logger=None,
+):
+    """Fetch titles for the supplied TMDB requests and render one or more backdrop images."""
+    log = logger or print
+    request_specs = [parse_request_spec(spec) for spec in tmdb_requests]
+    if not request_specs:
+        raise ValueError("No TMDB request specs were supplied.")
+
+    fx = FOCUS_X if focus_x is None else focus_x
+    fy = FOCUS_Y if focus_y is None else focus_y
+    accent = accent_color or default_accent_for_label(label)
+    outputs = resolve_outputs(output=output, output_dir=output_dir, label=label, size=size)
+    quality_settings = resolve_quality_settings(profile=profile, quality=quality)
+
+    fanart_note = "Fanart.tv thumbs" if fanart_key else "TMDB backdrops only"
+    log(f"\n{'-' * 50}")
+    log(f"  Label   : {label}")
+    log(f"  Images  : {fanart_note}")
+    log(f"  Lang    : preferred={preferred_language}")
+    log(f"  Focus   : x={fx:.2f}, y={fy:.2f}")
+    log(f"  Sizes   : {', '.join(outputs)}")
+    log(f"  Profile : {profile} (q={quality_settings['quality']})")
+    log(f"{'-' * 50}\n")
+
+    log("Fetching titles from TMDB...")
+    titles = fetch_titles(request_specs, api_key, count=count)
+    log(f"  Found {len(titles)} titles.\n")
+    if not titles:
+        raise RuntimeError("No titles found for the supplied TMDB requests.")
+
+    log("Downloading tile images...")
+    tile_images = []
+    fanart_hits = 0
+    tmdb_fallbacks = 0
+    other_language_fanart_hits = 0
+    progress_output = io.StringIO()
+    show_tty_progress = sys.stdout.isatty()
+    for index, (media_type, item) in enumerate(titles, start=1):
+        title = item.get("title") or item.get("name", "?")
+        progress_line = f"  [{index:02d}/{len(titles)}] {title[:40]:<40}"
+        if show_tty_progress:
+            sys.stdout.write(f"{progress_line}\r")
+            sys.stdout.flush()
+        else:
+            log(progress_line)
+        image, source = fetch_tile_image(media_type, item, api_key, fanart_key, preferred_language)
+        if image:
+            tile_images.append(image)
+            if source == "fanart":
+                fanart_hits += 1
+            elif source == "fanart_other_language":
+                other_language_fanart_hits += 1
+            else:
+                tmdb_fallbacks += 1
+    if show_tty_progress and titles:
+        sys.stdout.write("\n")
+        sys.stdout.flush()
+
+    if fanart_key:
+        log(
+            f"  Downloaded {len(tile_images)} images "
+            f"({fanart_hits} preferred/original/textless Fanart, "
+            f"{tmdb_fallbacks} TMDB fallback, "
+            f"{other_language_fanart_hits} other-language Fanart).\n"
+        )
+    elif tmdb_fallbacks > 0:
+        log(f"  Downloaded {len(tile_images)} images.\n")
+
+    minimum_tiles = 12
+    if len(tile_images) < minimum_tiles:
+        log(f"  Only {len(tile_images)} image(s) available; repeating tiles to reach {minimum_tiles}.\n")
+        tile_images = ensure_minimum_tiles(tile_images, minimum_tiles)
+
+    saved_paths = {}
+    for output_size, destination in outputs.items():
+        width, height, scale = SIZE_PRESETS[output_size]
+        log(f"Compositing {output_size} ({width}x{height})...")
+        canvas = build_tilted_grid(tile_images, width, height, scale=scale, focus_x=fx, focus_y=fy)
+        canvas = apply_gradient(canvas, accent)
+        with contextlib.redirect_stdout(progress_output):
+            save_output(canvas, destination, quality_settings=quality_settings)
+        for line in progress_output.getvalue().splitlines():
+            if line.strip():
+                log(line)
+        progress_output.seek(0)
+        progress_output.truncate(0)
+        saved_paths[output_size] = destination
+
+    log("\nDone.\n")
+    return saved_paths
+
+
+def parse_focus_value(value):
+    if not value:
+        return FOCUS_X, FOCUS_Y
+    if value in FOCUS_PRESETS:
+        return FOCUS_PRESETS[value]
+    try:
+        raw_x, raw_y = value.split(",", 1)
+        return float(raw_x), float(raw_y)
+    except Exception as exc:
+        raise ValueError(
+            f"Invalid --focus value '{value}'. Use a preset ({', '.join(FOCUS_PRESETS)}) or 'x,y'."
+        ) from exc
+
 
 def main():
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    for genre_name, config in GENRES_CONFIG.items():
-        print(f"\n--- Génération Hebdomadaire Backdrops : {config['label']} ---")
-        generate_grid_backdrop(genre_name, config)
-    print("\n[SUCCESS] Tous vos backdrops hebdomadaires inclinés style streaming sont prêts.")
+    parser = argparse.ArgumentParser(description="Generate collection backdrops from explicit TMDB requests.")
+    parser.add_argument("--api-key", required=False, help="TMDB API key (v3)")
+    parser.add_argument("--fanart-key", required=False, default=None, help="Fanart.tv API key")
+    parser.add_argument("--preferred-language", default="en", help="Preferred Fanart artwork language code. Default: en")
+    parser.add_argument("--label", required=True, help="Label for logs and fallback accent generation")
+    parser.add_argument(
+        "--tmdb-request",
+        action="append",
+        default=[],
+        help="TMDB request spec. Repeat this flag to merge multiple catalogs into one backdrop.",
+    )
+    parser.add_argument("--accent-color", default=None, help="Accent color as '#RRGGBB' or 'R,G,B'")
+    parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR), help="Directory for generated files when --output is not set")
+    parser.add_argument("--output", default=None, help="Exact output file path. Use this when another script has already decided the final filename.")
+    parser.add_argument("--size", choices=("4k", "1080p", "both"), default="both", help="Which size(s) to render")
+    parser.add_argument("--profile", choices=tuple(QUALITY_PRESETS), default="compressed", help="Named output profile. 'compressed' is smaller, 'high' keeps more detail.")
+    parser.add_argument("--quality", type=int, default=None, help="Advanced override for output quality from 1-95. If set, it overrides the selected profile for both JPG and WEBP.")
+    parser.add_argument(
+        "--focus",
+        default=None,
+        help=f"Preset ({', '.join(FOCUS_PRESETS)}) or 'x,y' fractions for focal placement.",
+    )
+    parser.add_argument("--count", type=int, default=60, help="Max number of source titles to use after merging requests")
+    args = parser.parse_args()
+
+    if not args.api_key:
+        print("Error: --api-key is required.")
+        sys.exit(1)
+
+    try:
+        accent = parse_accent_color(args.accent_color) if args.accent_color else None
+        focus_x, focus_y = parse_focus_value(args.focus)
+        if args.quality is not None and (args.quality < 1 or args.quality > 95):
+            raise ValueError("--quality must be between 1 and 95.")
+        backdrops(
+            api_key=args.api_key,
+            label=args.label,
+            tmdb_requests=args.tmdb_request,
+            fanart_key=args.fanart_key,
+            accent_color=accent,
+            output=args.output,
+            output_dir=args.output_dir,
+            focus_x=focus_x,
+            focus_y=focus_y,
+            count=args.count,
+            size=args.size,
+            profile=args.profile,
+            quality=args.quality,
+            preferred_language=args.preferred_language,
+        )
+    except Exception as exc:
+        print(f"Error: {exc}")
+        sys.exit(1)
+
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        cleanup_pycache()
