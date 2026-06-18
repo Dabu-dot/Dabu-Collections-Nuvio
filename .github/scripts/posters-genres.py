@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageOps, ImageFilter
 
 # ==============================================================================
-# CONFIGURATION GLOBALE & COUPE-CIRCUIT DE SÉCURITÉ
+# CONFIGURATION GLOBALE & SÉCURITÉS
 # ==============================================================================
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 TMDB_BASE = "https://api.themoviedb.org/3"
@@ -25,7 +25,7 @@ BANNED_KEYWORDS = {155716, 190340, 156201, 291195, 180549, 210113}
 # IDs TMDB des genres TV de flux (News, Reality, Talk, Soap) à exclure
 BANNED_TV_GENRES = {10763, 10764, 10767, 10766}
 
-# Langues globales autorisées (Filtre appliqué en Python)
+# Catalogue étendu des langues autorisées
 ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it", "ja", "ko", "zh"}
 
 RUN_PROCESSED_IDS = set()
@@ -109,7 +109,7 @@ GENRES_CONFIG = {
 }
 
 # ==============================================================================
-# UTILS & CORE SYSTEM
+# UTILS SYSTEM
 # ==============================================================================
 def tmdb_api_call(endpoint, params=None):
     if params is None: params = {}
@@ -146,58 +146,60 @@ def get_media_keywords(media_type, media_id):
     except: return set()
 
 # ==============================================================================
-# ALGORITHME DE RECHERCHE CORRIGÉ ET ISOLÉ
+# ENGINE DE RECHERCHE PURIFIÉ ET DICTIONNAIRE DE PARAMÈTRES
 # ==============================================================================
-def get_trending_media_for_genre(config, excluded_keys):
+def get_trending_media_for_genre(genre_name, config, excluded_keys):
     movie_pool, tv_pool = [], []
     
-    # 1. MOISSONNAGE DU CATALOGUE CINÉMA (Uniquement si éligible)
+    # 1. MOISSONNAGE DU CATALOGUE CINÉMA
     if config["movie_genre"] or config.get("is_pseudo_genre"):
-        movie_params = "&include_adult=false"
+        params = {"sort_by": "popularity.desc", "include_adult": "false"}
+        
         if config["type"] == "live-action":
-            movie_params += "&without_genres=16"
+            params["without_genres"] = "16"
         elif config["type"] in {"animation-occidentale", "animation-asiatique"}:
-            movie_params += "&with_genres=16"
+            params["with_genres"] = "16"
 
         if config.get("is_pseudo_genre"):
-            kw_string = "|".join(str(k) for k in config["scoring_keywords"])
-            movie_params += f"&with_keywords={kw_string}"
+            params["with_keywords"] = "|".join(str(k) for k in config["scoring_keywords"])
         elif config["movie_genre"]:
-            movie_params += f"&with_genres={config['movie_genre']}"
+            params["with_genres"] = str(config["movie_genre"])
 
         for page in range(1, 4):
+            params["page"] = page
             try:
-                res = tmdb_api_call(f"/discover/movie?sort_by=popularity.desc{movie_params}&page={page}")
+                res = tmdb_api_call("/discover/movie", params)
                 for item in res.get("results", []):
                     if item.get("backdrop_path"): 
                         item["media_type"] = "movie"
                         movie_pool.append(item)
             except: break
 
-    # 2. MOISSONNAGE DU CATALOGUE SÉRIES (Uniquement si éligible)
+    # 2. MOISSONNAGE DU CATALOGUE SÉRIES
     if config["tv_genre"] or config.get("is_pseudo_genre"):
-        tv_params = "&include_adult=false"
+        params = {"sort_by": "popularity.desc", "include_adult": "false"}
+        
         if config["type"] == "live-action":
-            tv_params += "&without_genres=16"
+            params["without_genres"] = "16"
         elif config["type"] in {"animation-occidentale", "animation-asiatique"}:
-            tv_params += "&with_genres=16"
+            params["with_genres"] = "16"
 
         if config.get("is_pseudo_genre"):
-            kw_string = "|".join(str(k) for k in config["scoring_keywords"])
-            tv_params += f"&with_keywords={kw_string}"
+            params["with_keywords"] = "|".join(str(k) for k in config["scoring_keywords"])
         elif config["tv_genre"]:
-            tv_params += f"&with_genres={config['tv_genre']}"
+            params["with_genres"] = str(config["tv_genre"])
 
         for page in range(1, 4):
+            params["page"] = page
             try:
-                res = tmdb_api_call(f"/discover/tv?sort_by=popularity.desc{tv_params}&page={page}")
+                res = tmdb_api_call("/discover/tv", params)
                 for item in res.get("results", []):
                     if item.get("backdrop_path"): 
                         item["media_type"] = "tv"
                         tv_pool.append(item)
             except: break
 
-    # 3. FILTRAGE PYTHON CENTRALISÉ (Filtre Géo / Langue)
+    # 3. FILTRAGE CENTRALISÉ ET ADAPTATIF EN PYTHON
     combined = movie_pool + tv_pool
     filtered = []
     
@@ -205,27 +207,27 @@ def get_trending_media_for_genre(config, excluded_keys):
         composite_key = f"{item['media_type']}_{item['id']}"
         orig_lang = item.get("original_language", "")
         
-        # Protection historique glissant
         if composite_key in excluded_keys or composite_key in RUN_PROCESSED_IDS: 
             continue
             
-        # APPLICATION DU FILTRE GÉOGRAPHIQUE EN PYTHON
         if orig_lang not in ALLOWED_LANGUAGES:
             continue
             
-        # RESPECT DES DIRECTIVES D'ANIMATION CIBLÉES
+        # CLASSIFICATION ACTION : Exclusion du cinéma asiatique
+        if genre_name == "action" and orig_lang in {"ja", "ko", "zh"}:
+            continue
+            
+        # DIRECTIVES D'ANIMATION CIBLÉES
         if config["type"] == "animation-occidentale":
             if orig_lang in {"ja", "ko", "zh"}: continue
         elif config["type"] == "animation-asiatique":
             if orig_lang not in {"ja", "ko", "zh"}: continue
         
-        # SÉCURITÉ ANTI-FLUX TV
         if item["media_type"] == "tv":
             genre_ids = set(item.get("genre_ids", []))
             if genre_ids.intersection(BANNED_TV_GENRES):
                 continue
         
-        # VÉRIFICATION TRADUCTION FRANÇAISE POUR LE LIVE-ACTION ASIATIQUE
         if orig_lang in {"ja", "ko", "zh"} and config["type"] == "live-action":
             try:
                 trans = tmdb_api_call(f"/{item['media_type']}/{item['id']}/translations")
@@ -238,7 +240,7 @@ def get_trending_media_for_genre(config, excluded_keys):
     return filtered
 
 # ==============================================================================
-# LOGIQUE GRAPHISME ET ARTWORK
+# FILTRE AVANCÉ DES VISUELS CONTRE LES IMPUFIÉS ET LES LOGOS PROMO
 # ==============================================================================
 def get_best_textless_backdrops(media_type, media_id, fallback_path):
     try:
@@ -258,17 +260,26 @@ def score_and_select_backdrop(backdrops):
         height = bg.get("height", 0)
         votes = bg.get("vote_count", 0)
         
-        base_score = votes * 2
-        if width >= 3840 or height >= 2160: base_score += 500  
-        elif width >= 2560 or height >= 1440: base_score += 250  
-        elif width >= 1920 or height >= 1080: base_score += 50   
-        else: base_score -= 100  
+        # Les votes de la communauté repoussent fortement les images promotionnelles polluées
+        base_score = votes * 10
+        
+        # Pénalisation des faux-backdrops (ex: affiches tronquées) hors format 16:9 ciné
+        aspect_ratio = width / height if height > 0 else 0
+        if abs(aspect_ratio - 1.777) > 0.03:
+            base_score -= 150
+        
+        # Primes légères de netteté sans écraser le vote organique
+        if width >= 1920 and height >= 1080: base_score += 30
+        if width >= 3840 and height >= 2160: base_score += 20  
             
         scored_images.append((base_score, bg))
         
     scored_images.sort(key=lambda x: x[0], reverse=True)
     return scored_images[0][1] if scored_images else backdrops[0]
 
+# ==============================================================================
+# CHARTE ET TRAITEMENT GRAPHIQUE
+# ==============================================================================
 def apply_premium_duotone(img, base_color):
     img_gray = img.convert("L")
     stat = img_gray.histogram()
@@ -352,10 +363,11 @@ def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     history = load_and_clean_history()
     excluded_keys = set(history.keys())
+    current_year = datetime.now().year
 
     for genre_name, config in GENRES_CONFIG.items():
         print(f"\n--- Analyse Algorithmique : {config['label']} ---")
-        candidates = get_trending_media_for_genre(config, excluded_keys)
+        candidates = get_trending_media_for_genre(genre_name, config, excluded_keys)
         if not candidates:
             print(" -> Aucun candidat éligible trouvé après filtrage géographique.")
             continue
@@ -365,14 +377,21 @@ def main():
         
         for item in candidates:
             media_keywords = get_media_keywords(item["media_type"], item["id"])
-            
             if media_keywords.intersection(BANNED_KEYWORDS):
                 continue
                 
-            keyword_bonus = len(media_keywords.intersection(scoring_keywords)) * 30
-            popularity_bonus = min(item.get("popularity", 0) / 4, 150)
+            # Les points mots-clés sont prioritaires (x60) pour capturer l'essence pure du genre (ex: Comédie)
+            keyword_bonus = len(media_keywords.intersection(scoring_keywords)) * 60
+            popularity_bonus = min(item.get("popularity", 0) / 3, 120)
             
             total_score = keyword_bonus + popularity_bonus
+            
+            # BONUS DE FRAÎCHEUR : Bonus temporel substantiel si le contenu a moins de 10 ans (>= 2016)
+            air_date = item.get("release_date") or item.get("first_air_date") or ""
+            if air_date and len(air_date) >= 4 and air_date[:4].isdigit():
+                if int(air_date[:4]) >= (current_year - 10):
+                    total_score += 40
+            
             scored_candidates.append({"item": item, "score": total_score})
             
         scored_candidates.sort(key=lambda x: x["score"], reverse=True)
