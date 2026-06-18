@@ -30,7 +30,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pillow requests
+          python -m pip install pillow requests numpy
 
       - name: Generate Genres Backdrops
         env:
@@ -99,11 +99,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
+          # Indexation ciblée stricte (évite de commit des fichiers résiduels)
           git add "Ressources/Collections Covers/Genres/"
           
-          if ! git diff --cached --exit-code --quiet; then
+          # Vérification intelligente de l'arbre Git avant commit (évite les builds vides)
+          if ! git diff --cached --exit-code; then
             git commit -m "chore: refresh weekly genres backdrops (FR) [skip ci]"
             git push origin main
           else
-            echo "No changes to commit. Folder is already up to date."
+            echo "Aucun changement détecté (les mosaïques actuelles sont identiques ou préservées)."
           fi
