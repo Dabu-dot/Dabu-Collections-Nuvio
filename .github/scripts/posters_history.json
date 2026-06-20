@@ -2,14 +2,110 @@
     "movie_911430": {
         "title": "F1",
         "genre": "sport",
-        "date": "2026-06-19",
-        "backdrop_path": "/lkDYN0whyE82mcM20rwtwjbniKF.jpg"
+        "date": "2026-06-20",
+        "backdrop_path": "/rZWkXnIyTLzUJpHSUpOb7vgB0BL.jpg"
     },
     "tv_14951": {
         "title": "Nature",
         "genre": "documentaire",
-        "date": "2026-06-19",
+        "date": "2026-06-20",
         "backdrop_path": "/j6aCSIjK4N7SpkSPBBNv7vbDvJo.jpg"
+    },
+    "movie_1380291": {
+        "title": "Tom Clancy's Jack Ryan: Ghost War",
+        "genre": "action",
+        "date": "2026-06-20",
+        "backdrop_path": "/dd31qJxOarrHyGZwYsCzOjobQzP.jpg"
+    },
+    "tv_73833": {
+        "title": "The Ancient Magus' Bride",
+        "genre": "animation-japonaise",
+        "date": "2026-06-20",
+        "backdrop_path": "/KI2sFvqJHzc95WM7dcX9kM8tY1.jpg"
+    },
+    "movie_862": {
+        "title": "Toy Story",
+        "genre": "animation",
+        "date": "2026-06-20",
+        "backdrop_path": "/3Rfvhy1Nl6sSGJwyjb0QiZzZYlB.jpg"
+    },
+    "tv_73375": {
+        "title": "Tom Clancy's Jack Ryan",
+        "genre": "aventure",
+        "date": "2026-06-20",
+        "backdrop_path": "/mDVIU9Y2TYeK2W29a2HRBiWt3JA.jpg"
+    },
+    "movie_1390300": {
+        "title": "Over Your Dead Body",
+        "genre": "comedie",
+        "date": "2026-06-20",
+        "backdrop_path": "/sb76azrAXr9U13uEQxNP5e3fujY.jpg"
+    },
+    "tv_278178": {
+        "title": "I Will Find You",
+        "genre": "crime",
+        "date": "2026-06-20",
+        "backdrop_path": "/2yDDwP48GqL9Fpb6UEgGHyqM63y.jpg"
+    },
+    "movie_1292415": {
+        "title": "Beast",
+        "genre": "drame",
+        "date": "2026-06-20",
+        "backdrop_path": "/vmdt6nUXYX4mM0Ahcvh4bgHOjUt.jpg"
+    },
+    "movie_1087192": {
+        "title": "How to Train Your Dragon",
+        "genre": "famille",
+        "date": "2026-06-20",
+        "backdrop_path": "/7HqLLVjdjhXS0Qoz1SgZofhkIpE.jpg"
+    },
+    "tv_95396": {
+        "title": "Severance",
+        "genre": "fantastique",
+        "date": "2026-06-20",
+        "backdrop_path": "/npD65vPa4vvn1ZHpp3o05A5vdKT.jpg"
+    },
+    "tv_126308": {
+        "title": "Shōgun",
+        "genre": "guerre",
+        "date": "2026-06-20",
+        "backdrop_path": "/5zmiBoMzeeVdQ62no55JOJMY498.jpg"
+    },
+    "tv_116135": {
+        "title": "Vikings: Valhalla",
+        "genre": "histoire",
+        "date": "2026-06-20",
+        "backdrop_path": "/k47JEUTQsSMN532HRg6RCzZKBdB.jpg"
+    },
+    "movie_1127384": {
+        "title": "Deep Water",
+        "genre": "horreur",
+        "date": "2026-06-20",
+        "backdrop_path": "/iYjlQzWbcFIjWe2WifbEPb4kErp.jpg"
+    },
+    "movie_337167": {
+        "title": "Fifty Shades Freed",
+        "genre": "romance",
+        "date": "2026-06-20",
+        "backdrop_path": "/9ywA15OAiwjSTvg3cBs9B7kOCBF.jpg"
+    },
+    "movie_1196067": {
+        "title": "Worldbreaker",
+        "genre": "science-fiction",
+        "date": "2026-06-20",
+        "backdrop_path": "/gMItMzDOyrfQGZsMWRM9tdxq5cV.jpg"
+    },
+    "tv_75219": {
+        "title": "9-1-1",
+        "genre": "thriller",
+        "date": "2026-06-20",
+        "backdrop_path": "/h050XJoiIobaH6bhj3MAhgilkpJ.jpg"
+    },
+    "tv_10180": {
+        "title": "The Virginian",
+        "genre": "western",
+        "date": "2026-06-20",
+        "backdrop_path": "/gmQbEibys6LuPTgB7is3AEKTdrE.jpg"
     },
     "tv_67198": {
         "title": "Star Trek: Discovery",
