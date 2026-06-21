@@ -176,16 +176,13 @@ def generate_grid_backdrop(genre_name, config):
         
     processed_candidates.sort(key=lambda x: x[0], reverse=True)
     
-    # Résolution Problème 3 : Vignettes XXL visibles & légères
     cell_w, cell_h = 444, 250  
-    cols, rows = 7, 6          # 42 éléments au lieu de 110, beaucoup plus léger !
+    cols, rows = 7, 6          
     max_vignettes = cols * rows
     
-    # Zone surdimensionnée pour accueillir proprement la rotation sans trous
     grid_w, grid_h = 3600, 2400
     grid_layer = Image.new("RGBA", (grid_w, grid_h), (0, 0, 0, 0))
     
-    # Calcul mathématique pour centrer parfaitement le bloc de la grille sur le canvas
     grid_total_w = cols * cell_w + (cols - 1) * CARD_GAP + ((cell_w + CARD_GAP) // 2)
     grid_total_h = rows * cell_h + (rows - 1) * CARD_GAP
     start_x = (grid_w - grid_total_w) // 2
@@ -196,7 +193,7 @@ def generate_grid_backdrop(genre_name, config):
         if count >= max_vignettes: break
         
         backdrop_path = get_best_backdrop(item["media_type"], item["id"], item["backdrop_path"])
-        url = f"https://image.tmdb.org/t/p/w780{backdrop_path}" # w780 assure une netteté parfaite sur du 444px
+        url = f"https://image.tmdb.org/t/p/w780{backdrop_path}"
         
         try:
             res = requests.get(url, stream=True, timeout=10)
@@ -210,9 +207,7 @@ def generate_grid_backdrop(genre_name, config):
                 r_idx = count // cols
                 c_idx = count % cols
                 
-                # Placement x de base centré
                 x = start_x + c_idx * (cell_w + CARD_GAP)
-                # Résolution Problème 4 : Décalage brique d'une ligne sur deux de 50%
                 if r_idx % 2 == 1:
                     x += (cell_w + CARD_GAP) // 2
                 
@@ -223,66 +218,18 @@ def generate_grid_backdrop(genre_name, config):
         except:
             continue
 
-    print(f" -> Grille XXL construite : {count} visuels assemblés.")
+    print(f" -> Grille XXL épurée construite : {count} visuels assemblés.")
     
-    # Application de la rotation
     rotated_grid = grid_layer.rotate(TILT_ANGLE, resample=Image.Resampling.BILINEAR, expand=False)
     
-    # Découpage chirurgical au centre pour le canvas final 1920x1080
     offset_x = (grid_w - canvas_w) // 2
     offset_y = (grid_h - canvas_h) // 2
     crop_box = (offset_x, offset_y, offset_x + canvas_w, offset_y + canvas_h)
     final_grid_cropped = rotated_grid.crop(crop_box)
     
     background.paste(final_grid_cropped, (0, 0), final_grid_cropped)
+    final_output = background.convert("RGB")
     
-    # Résolution Bug : Masque noir abaissé et adouci pour éviter l'effet "gros bloc noir"
-    gradient_overlay = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
-    g_draw = ImageDraw.Draw(gradient_overlay)
-    for y in range(450, canvas_h):
-        alpha = int(((y - 450) / 630) ** 1.3 * 235) # Max 235 pour garder de la transparence en bas
-        g_draw.line([(0, y), (canvas_w, y)], fill=(0, 0, 0, alpha))
-        
-    final_img = Image.alpha_composite(background.convert("RGBA"), gradient_overlay)
-    
-    # Typographie premium
-    text_layer = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
-    shadow_layer = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
-    t_draw = ImageDraw.Draw(text_layer)
-    s_draw = ImageDraw.Draw(shadow_layer)
-    
-    font_size = 165
-    try: font = ImageFont.truetype(".github/assets/fonts/SF-Pro-Display-Bold.otf", font_size)
-    except: font = ImageFont.load_default()
-
-    padding_left, padding_bottom = 130, 140
-    max_text_width = canvas_w - (padding_left * 2)
-
-    words = config["label"].split(" ")
-    lines, current_line = [], ""
-    for word in words:
-        test_line = f"{current_line} {word}".strip()
-        if t_draw.textlength(test_line, font=font) <= max_text_width: current_line = test_line
-        else:
-            if current_line: lines.append(current_line)
-            current_line = word
-    if current_line: lines.append(current_line)
-
-    line_spacing, line_height = 20, font_size - 22
-    total_text_height = (len(lines) * line_height) + ((len(lines) - 1) * line_spacing)
-    base_y = (canvas_h - padding_bottom - line_height) - (total_text_height - line_height)
-
-    current_y = base_y
-    for line in lines:
-        s_draw.text((padding_left + 6, current_y + 10), line, fill=(0, 0, 0, 245), font=font)
-        t_draw.text((padding_left, current_y), line, fill=(255, 255, 255, 255), font=font)
-        current_y += line_height + line_spacing
-
-    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(12))
-    final_output = Image.alpha_composite(final_img, shadow_layer)
-    final_output = Image.alpha_composite(final_output, text_layer).convert("RGB")
-    
-    # Sauvegarde directe dans le bon dossier Genres (écrase l'existant automatiquement)
     final_output.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=94)
     final_output.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=94)
 
@@ -291,7 +238,8 @@ def main():
     for genre_name, config in GENRES_CONFIG.items():
         print(f"\n--- Génération Hebdomadaire Backdrops : {config['label']} ---")
         generate_grid_backdrop(genre_name, config)
-    print("\n[SUCCESS] Tous vos backdrops hebdomadaires géants style streaming sont prêts.")
+    print("\n[SUCCESS] Tous vos backdrops hebdomadaires géants sans texte sont prêts.")
 
 if __name__ == "__main__":
     main()
+    
