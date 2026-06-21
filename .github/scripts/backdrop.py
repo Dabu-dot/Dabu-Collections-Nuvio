@@ -16,13 +16,12 @@ if not TMDB_API_KEY:
     print("Erreur : La variable TMDB_API_KEY n'est pas définie.")
     sys.exit(1)
 
-# Problème 1 : Sauvegarde directe dans le dossier Genres
 OUTPUT_DIR = "Ressources/Collections Covers/Genres"
 
 # Paramètres de style de la charte graphique Streaming
 TILT_ANGLE = -10      # Inclinaison de la grille de vignettes
-CARD_GAP = 24         # Espacement prononcé entre les cartes
-CORNER_RADIUS = 12    # Angles arrondis des cartes paysage
+CARD_GAP = 28         # Espacement harmonieux pour les grandes cartes
+CORNER_RADIUS = 14    # Angles arrondis plus prononcés pour les grandes cartes
 
 # Sécurités et filtres de contenu
 ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it", "ja", "ko", "zh"}
@@ -98,7 +97,6 @@ def get_media_keywords(media_type, media_id):
         return {k["id"] for k in kw if "id" in k}
     except: return set()
 
-# Problème 2 : Utiliser les backdrops avec logos (priorité anglais), textless en fallback
 def get_best_backdrop(media_type, media_id, fallback_path):
     try:
         res = tmdb_api_call(f"/{media_type}/{media_id}/images")
@@ -106,7 +104,6 @@ def get_best_backdrop(media_type, media_id, fallback_path):
         if bd:
             def sort_by_preference(x):
                 lang = x.get("iso_639_1")
-                # Score de langue : 2 pour l'anglais (souvent avec logo), 1 pour textless (None), 0 pour le reste
                 lang_priority = 2 if lang == "en" else (1 if lang is None or lang == "" else 0)
                 vote_score = (x.get("vote_average", 0) * 10) + x.get("vote_count", 0)
                 return (lang_priority, vote_score)
@@ -179,21 +176,27 @@ def generate_grid_backdrop(genre_name, config):
         
     processed_candidates.sort(key=lambda x: x[0], reverse=True)
     
-    # Problème 4 : Augmentation de la taille de grille pour absorber le décalage (Staggered Grid)
-    grid_w, grid_h = 2800, 1800
+    # Résolution Problème 3 : Vignettes XXL visibles & légères
+    cell_w, cell_h = 444, 250  
+    cols, rows = 7, 6          # 42 éléments au lieu de 110, beaucoup plus léger !
+    max_vignettes = cols * rows
+    
+    # Zone surdimensionnée pour accueillir proprement la rotation sans trous
+    grid_w, grid_h = 3600, 2400
     grid_layer = Image.new("RGBA", (grid_w, grid_h), (0, 0, 0, 0))
     
-    cell_w, cell_h = 266, 150  # Format paysage 16:9 cinématographique
-    cols, rows = 11, 10        # Augmenté pour éviter les zones vides suite au décalage
-    max_vignettes = cols * rows
+    # Calcul mathématique pour centrer parfaitement le bloc de la grille sur le canvas
+    grid_total_w = cols * cell_w + (cols - 1) * CARD_GAP + ((cell_w + CARD_GAP) // 2)
+    grid_total_h = rows * cell_h + (rows - 1) * CARD_GAP
+    start_x = (grid_w - grid_total_w) // 2
+    start_y = (grid_h - grid_total_h) // 2
     
     count = 0
     for score, item in processed_candidates:
         if count >= max_vignettes: break
         
         backdrop_path = get_best_backdrop(item["media_type"], item["id"], item["backdrop_path"])
-        # Problème 3 : Téléchargement en w780 au lieu de w500 pour avoir des images nettes et plus grandes
-        url = f"https://image.tmdb.org/t/p/w780{backdrop_path}"
+        url = f"https://image.tmdb.org/t/p/w780{backdrop_path}" # w780 assure une netteté parfaite sur du 444px
         
         try:
             res = requests.get(url, stream=True, timeout=10)
@@ -201,32 +204,31 @@ def generate_grid_backdrop(genre_name, config):
                 vignette = Image.open(res.raw).convert("RGB")
                 vignette = ImageOps.fit(vignette, (cell_w, cell_h), method=Image.Resampling.LANCZOS)
                 
-                # Effet d'atténuation streaming
                 vignette = ImageEnhance.Brightness(vignette).enhance(0.58)
                 vignette = add_rounded_corners(vignette, radius=CORNER_RADIUS)
                 
                 r_idx = count // cols
                 c_idx = count % cols
                 
-                # Problème 4 : Décalage de 50% sur une ligne sur deux
-                base_x = -150  # On commence en négatif pour bien saturer la gauche suite aux décalages
-                x = base_x + c_idx * (cell_w + CARD_GAP)
+                # Placement x de base centré
+                x = start_x + c_idx * (cell_w + CARD_GAP)
+                # Résolution Problème 4 : Décalage brique d'une ligne sur deux de 50%
                 if r_idx % 2 == 1:
                     x += (cell_w + CARD_GAP) // 2
                 
-                y = 30 + r_idx * (cell_h + CARD_GAP)
+                y = start_y + r_idx * (cell_h + CARD_GAP)
                 
                 grid_layer.paste(vignette, (x, y), vignette)
                 count += 1
         except:
             continue
 
-    print(f" -> Grille construite : {count} visuels assemblés.")
+    print(f" -> Grille XXL construite : {count} visuels assemblés.")
     
-    # Application de la rotation à -10°
+    # Application de la rotation
     rotated_grid = grid_layer.rotate(TILT_ANGLE, resample=Image.Resampling.BILINEAR, expand=False)
     
-    # Centrage et fusion de la grille inclinée sur le fond dégradé principal
+    # Découpage chirurgical au centre pour le canvas final 1920x1080
     offset_x = (grid_w - canvas_w) // 2
     offset_y = (grid_h - canvas_h) // 2
     crop_box = (offset_x, offset_y, offset_x + canvas_w, offset_y + canvas_h)
@@ -234,11 +236,11 @@ def generate_grid_backdrop(genre_name, config):
     
     background.paste(final_grid_cropped, (0, 0), final_grid_cropped)
     
-    # Masque dégradé linéaire noir
+    # Résolution Bug : Masque noir abaissé et adouci pour éviter l'effet "gros bloc noir"
     gradient_overlay = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
     g_draw = ImageDraw.Draw(gradient_overlay)
-    for y in range(250, canvas_h):
-        alpha = int(((y - 250) / 830) ** 1.6 * 255)
+    for y in range(450, canvas_h):
+        alpha = int(((y - 450) / 630) ** 1.3 * 235) # Max 235 pour garder de la transparence en bas
         g_draw.line([(0, y), (canvas_w, y)], fill=(0, 0, 0, alpha))
         
     final_img = Image.alpha_composite(background.convert("RGBA"), gradient_overlay)
@@ -280,7 +282,7 @@ def generate_grid_backdrop(genre_name, config):
     final_output = Image.alpha_composite(final_img, shadow_layer)
     final_output = Image.alpha_composite(final_output, text_layer).convert("RGB")
     
-    # Sauvegarde des fichiers finaux directement dans OUTPUT_DIR (écrase l'existant)
+    # Sauvegarde directe dans le bon dossier Genres (écrase l'existant automatiquement)
     final_output.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=94)
     final_output.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=94)
 
@@ -289,7 +291,7 @@ def main():
     for genre_name, config in GENRES_CONFIG.items():
         print(f"\n--- Génération Hebdomadaire Backdrops : {config['label']} ---")
         generate_grid_backdrop(genre_name, config)
-    print("\n[SUCCESS] Tous vos backdrops hebdomadaires inclinés style streaming sont prêts.")
+    print("\n[SUCCESS] Tous vos backdrops hebdomadaires géants style streaming sont prêts.")
 
 if __name__ == "__main__":
     main()
