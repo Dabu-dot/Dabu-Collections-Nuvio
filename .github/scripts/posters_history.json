@@ -2,14 +2,110 @@
     "movie_911430": {
         "title": "F1",
         "genre": "sport",
-        "date": "2026-06-20",
-        "backdrop_path": "/rZWkXnIyTLzUJpHSUpOb7vgB0BL.jpg"
+        "date": "2026-06-21",
+        "backdrop_path": "/lkDYN0whyE82mcM20rwtwjbniKF.jpg"
     },
     "tv_14951": {
         "title": "Nature",
         "genre": "documentaire",
-        "date": "2026-06-20",
+        "date": "2026-06-21",
         "backdrop_path": "/j6aCSIjK4N7SpkSPBBNv7vbDvJo.jpg"
+    },
+    "movie_1168190": {
+        "title": "The Wrecking Crew",
+        "genre": "action",
+        "date": "2026-06-21",
+        "backdrop_path": "/cz4vLJrmaV1zJlRYbxqtvLzeLWB.jpg"
+    },
+    "tv_67075": {
+        "title": "Mob Psycho 100",
+        "genre": "animation-japonaise",
+        "date": "2026-06-21",
+        "backdrop_path": "/kP5duNJEbTfXpBs6CITsaZ88pQi.jpg"
+    },
+    "tv_57532": {
+        "title": "PAW Patrol",
+        "genre": "animation",
+        "date": "2026-06-21",
+        "backdrop_path": "/7OrV2aAH5Yp7hA9zCCvUloLvZtl.jpg"
+    },
+    "movie_969681": {
+        "title": "Spider-Man: Brand New Day",
+        "genre": "aventure",
+        "date": "2026-06-21",
+        "backdrop_path": "/vjMvFSmGUxEtqVdaZgvFee9XkZl.jpg"
+    },
+    "movie_614945": {
+        "title": "Voicemails for Isabelle",
+        "genre": "comedie",
+        "date": "2026-06-21",
+        "backdrop_path": "/7wwzkJ8it0LO76JBN2NCYqzrCZw.jpg"
+    },
+    "movie_414906": {
+        "title": "The Batman",
+        "genre": "crime",
+        "date": "2026-06-21",
+        "backdrop_path": "/tRS6jvPM9qPrrnx2KRp3ew96Yot.jpg"
+    },
+    "movie_1156594": {
+        "title": "Our Fault",
+        "genre": "drame",
+        "date": "2026-06-21",
+        "backdrop_path": "/7QirCB1o80NEFpQGlQRZerZbQEp.jpg"
+    },
+    "movie_939243": {
+        "title": "Sonic the Hedgehog 3",
+        "genre": "famille",
+        "date": "2026-06-21",
+        "backdrop_path": "/zOpe0eHsq0A2NvNyBbtT6sj53qV.jpg"
+    },
+    "tv_95057": {
+        "title": "Superman & Lois",
+        "genre": "fantastique",
+        "date": "2026-06-21",
+        "backdrop_path": "/pPKiIJEEcV0E1hpVcWRXyp73ZpX.jpg"
+    },
+    "tv_2947": {
+        "title": "Veep",
+        "genre": "guerre",
+        "date": "2026-06-21",
+        "backdrop_path": "/vKaDMLbdLrThldFj9Vavo6suTS2.jpg"
+    },
+    "movie_324786": {
+        "title": "Hacksaw Ridge",
+        "genre": "histoire",
+        "date": "2026-06-21",
+        "backdrop_path": "/vDKRMZGFTKP9nQolzeSB1rB1w6p.jpg"
+    },
+    "movie_1694978": {
+        "title": "Chum",
+        "genre": "horreur",
+        "date": "2026-06-21",
+        "backdrop_path": "/6kheApG5qPsKbiKDxsGpOb6i6i6.jpg"
+    },
+    "movie_1156593": {
+        "title": "Your Fault",
+        "genre": "romance",
+        "date": "2026-06-21",
+        "backdrop_path": "/k24eZq5I3jyz4htPkZCRpnUmBzE.jpg"
+    },
+    "movie_1236153": {
+        "title": "Mercy",
+        "genre": "science-fiction",
+        "date": "2026-06-21",
+        "backdrop_path": "/gIClklFGYBe0uiOoiP2vtocJbss.jpg"
+    },
+    "movie_1288341": {
+        "title": "Seven Snipers",
+        "genre": "thriller",
+        "date": "2026-06-21",
+        "backdrop_path": "/g2aOpyCO1vEyUZURh3V5uaHu187.jpg"
+    },
+    "tv_10929": {
+        "title": "The Wild Wild West",
+        "genre": "western",
+        "date": "2026-06-21",
+        "backdrop_path": "/4iSl4y1gWZwXmjyS3Ho8HqLWXAK.jpg"
     },
     "movie_1380291": {
         "title": "Tom Clancy's Jack Ryan: Ghost War",
