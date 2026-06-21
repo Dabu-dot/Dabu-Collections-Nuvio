@@ -29,7 +29,7 @@ jobs:
       - name: Generate Genres Backdrops
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-          PYTHONUNBUFFERED: "1" # Évite la duplication ou le blocage des logs de sortie
+          PYTHONUNBUFFERED: "1"
         run: |
           echo "=== [START] Lancement de la matrice des backdrops de genres ==="
           python3 .github/scripts/backdrop.py
@@ -40,7 +40,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # Problème 1 : On ajoute uniquement les extensions .jpg et .webp générées à la racine du dossier Genres
+          # Ajout strict des fichiers du dossier Genres racine (sans le sous-dossier inutile)
           git add "Ressources/Collections Covers/Genres/*.jpg" "Ressources/Collections Covers/Genres/*.webp"
           
           if ! git diff --cached --exit-code --quiet; then
