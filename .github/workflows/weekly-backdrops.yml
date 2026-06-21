@@ -1,16 +1,12 @@
-### VERSION MIXTE FILMS & SERIES (HEBDOMADAIRE) ###
 name: Weekly Backdrops
 
 on:
   schedule:
-    - cron: "0 4 * * 0" # Exécution automatique tous les dimanches à 4h00 UTC
-  workflow_dispatch: # Permet toujours le déclenchement manuel
+    - cron: "0 4 * * 0" # Automatisation complète chaque dimanche à 4h00 UTC
+  workflow_dispatch: # Permet de forcer manuellement le run depuis GitHub
 
 permissions:
   contents: write
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
   generate-backdrops:
@@ -19,8 +15,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -34,76 +28,23 @@ jobs:
 
       - name: Generate Genres Backdrops
         env:
-          PYTHONDONTWRITEBYTECODE: "1"
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-          FANART_API_KEY: ${{ secrets.FANART_API_KEY }}
+          PYTHONUNBUFFERED: "1" # Évite la duplication ou le blocage des logs de sortie
         run: |
-          # 1. Action
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Action" --tmdb-request "movie:with_genres=28&sort_by=popularity.desc" --tmdb-request "tv:with_genres=10759&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/action.jpg"
-
-          # 2. Aventure
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Aventure" --tmdb-request "movie:with_genres=12&sort_by=popularity.desc" --tmdb-request "tv:with_genres=10759&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/aventure.jpg"
-
-          # 3. Animation
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Animation" --tmdb-request "movie:with_genres=16&sort_by=popularity.desc" --tmdb-request "tv:with_genres=16&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/animation.jpg"
-
-          # 4. Animation Japonaise
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Animation Japonaise" --tmdb-request "movie:with_genres=16&with_original_language=ja&sort_by=popularity.desc" --tmdb-request "tv:with_genres=16&with_original_language=ja&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/animation-japonaise.jpg"
-
-          # 5. Comédie
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Comédie" --tmdb-request "movie:with_genres=35&sort_by=popularity.desc" --tmdb-request "tv:with_genres=35&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/comedie.jpg"
-
-          # 6. Crime
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Crime" --tmdb-request "movie:with_genres=80&sort_by=popularity.desc" --tmdb-request "tv:with_genres=80&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/crime.jpg"
-
-          # 7. Documentaire
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Documentaire" --tmdb-request "movie:with_genres=99&sort_by=popularity.desc" --tmdb-request "tv:with_genres=99&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/documentaire.jpg"
-
-          # 8. Drame
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Drame" --tmdb-request "movie:with_genres=18&sort_by=popularity.desc" --tmdb-request "tv:with_genres=18&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/drame.jpg"
-
-          # 9. Famille
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Famille" --tmdb-request "movie:with_genres=10751&sort_by=popularity.desc" --tmdb-request "tv:with_genres=10751&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/famille.jpg"
-
-          # 10. Fantastique
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Fantastique" --tmdb-request "movie:with_genres=14&sort_by=popularity.desc" --tmdb-request "tv:with_genres=10765&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/fantastique.jpg"
-
-          # 11. Guerre
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Guerre" --tmdb-request "movie:with_genres=10752&sort_by=popularity.desc" --tmdb-request "tv:with_genres=10768&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/guerre.jpg"
-
-          # 12. Histoire
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Histoire" --tmdb-request "movie:with_genres=36&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/histoire.jpg"
-
-          # 13. Horreur
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Horreur" --tmdb-request "movie:with_genres=27&sort_by=popularity.desc" --tmdb-request "tv:with_genres=27&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/horreur.jpg"
-
-          # 14. Romance
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Romance" --tmdb-request "movie:with_genres=10749&sort_by=popularity.desc" --tmdb-request "tv:with_genres=10749&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/romance.jpg"
-
-          # 15. Science-Fiction
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Science-Fiction" --tmdb-request "movie:with_genres=878&sort_by=popularity.desc" --tmdb-request "tv:with_genres=10765&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/science-fiction.jpg"
-
-          # 16. Thriller
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Thriller" --tmdb-request "movie:with_genres=53&sort_by=popularity.desc" --tmdb-request "tv:with_genres=9648&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/thriller.jpg"
-
-          # 17. Western
-          python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Western" --tmdb-request "movie:with_genres=37&sort_by=popularity.desc" --tmdb-request "tv:with_genres=37&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/western.jpg"
-
-      - name: Clean Python cache folders
-        run: |
-          find . -type d -name "__pycache__" -prune -exec rm -rf {} +
+          echo "=== [START] Lancement de la matrice des backdrops de genres ==="
+          python3 .github/scripts/backdrop.py
+          echo "=== [END] Fin de la génération ==="
 
       - name: Commit and push updated assets
-        id: publish
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          git add "Ressources/Collections Covers/Genres/"
+          git add "Ressources/Collections Covers/Genres/Weekly Backdrops/*"
           
           if ! git diff --cached --exit-code --quiet; then
-            git commit -m "chore: refresh weekly genres backdrops (FR) [skip ci]"
+            git commit -m "chore: refresh weekly tilted genres backdrops [skip ci]"
             git push origin main
           else
-            echo "No changes to commit. Folder is already up to date."
+            echo "Aucun changement détecté dans la structure graphique."
           fi
