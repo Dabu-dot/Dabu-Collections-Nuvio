@@ -16,7 +16,8 @@ if not TMDB_API_KEY:
     print("Erreur : La variable TMDB_API_KEY n'est pas définie.")
     sys.exit(1)
 
-OUTPUT_DIR = "Ressources/Collections Covers/Genres/Weekly Backdrops"
+# Problème 1 : Sauvegarde directe dans le dossier Genres
+OUTPUT_DIR = "Ressources/Collections Covers/Genres"
 
 # Paramètres de style de la charte graphique Streaming
 TILT_ANGLE = -10      # Inclinaison de la grille de vignettes
@@ -97,18 +98,25 @@ def get_media_keywords(media_type, media_id):
         return {k["id"] for k in kw if "id" in k}
     except: return set()
 
-def get_textless_backdrop(media_type, media_id, fallback_path):
+# Problème 2 : Utiliser les backdrops avec logos (priorité anglais), textless en fallback
+def get_best_backdrop(media_type, media_id, fallback_path):
     try:
-        res = tmdb_api_call(f"/{media_type}/{media_id}/images", {"include_image_language": "null"})
+        res = tmdb_api_call(f"/{media_type}/{media_id}/images")
         bd = res.get("backdrops", [])
         if bd:
-            bd.sort(key=lambda x: (x.get("vote_average", 0) * 10) + x.get("vote_count", 0), reverse=True)
+            def sort_by_preference(x):
+                lang = x.get("iso_639_1")
+                # Score de langue : 2 pour l'anglais (souvent avec logo), 1 pour textless (None), 0 pour le reste
+                lang_priority = 2 if lang == "en" else (1 if lang is None or lang == "" else 0)
+                vote_score = (x.get("vote_average", 0) * 10) + x.get("vote_count", 0)
+                return (lang_priority, vote_score)
+
+            bd.sort(key=sort_by_preference, reverse=True)
             return bd[0]["file_path"]
     except: pass
     return fallback_path
 
 def create_premium_gradient(width, height, base_color):
-    """Génère le fond en dégradé premium linéaire fluide de la charte streaming"""
     small_grad = Image.new("RGB", (4, 4))
     r, g, b = base_color
     
@@ -171,21 +179,21 @@ def generate_grid_backdrop(genre_name, config):
         
     processed_candidates.sort(key=lambda x: x[0], reverse=True)
     
-    # Construction de la grille surdimensionnée inclinée (Tilted Mosaic Architecture)
-    # Taille augmentée pour couvrir l'espace complet lors de la rotation à -10°
-    grid_w, grid_h = 2600, 1600
+    # Problème 4 : Augmentation de la taille de grille pour absorber le décalage (Staggered Grid)
+    grid_w, grid_h = 2800, 1800
     grid_layer = Image.new("RGBA", (grid_w, grid_h), (0, 0, 0, 0))
     
     cell_w, cell_h = 266, 150  # Format paysage 16:9 cinématographique
-    cols, rows = 9, 8
+    cols, rows = 11, 10        # Augmenté pour éviter les zones vides suite au décalage
     max_vignettes = cols * rows
     
     count = 0
     for score, item in processed_candidates:
         if count >= max_vignettes: break
         
-        backdrop_path = get_textless_backdrop(item["media_type"], item["id"], item["backdrop_path"])
-        url = f"https://image.tmdb.org/t/p/w500{backdrop_path}"
+        backdrop_path = get_best_backdrop(item["media_type"], item["id"], item["backdrop_path"])
+        # Problème 3 : Téléchargement en w780 au lieu de w500 pour avoir des images nettes et plus grandes
+        url = f"https://image.tmdb.org/t/p/w780{backdrop_path}"
         
         try:
             res = requests.get(url, stream=True, timeout=10)
@@ -193,15 +201,20 @@ def generate_grid_backdrop(genre_name, config):
                 vignette = Image.open(res.raw).convert("RGB")
                 vignette = ImageOps.fit(vignette, (cell_w, cell_h), method=Image.Resampling.LANCZOS)
                 
-                # Effet d'atténuation streaming pour intégrer la grille dans le dégradé coloré
+                # Effet d'atténuation streaming
                 vignette = ImageEnhance.Brightness(vignette).enhance(0.58)
                 vignette = add_rounded_corners(vignette, radius=CORNER_RADIUS)
                 
                 r_idx = count // cols
                 c_idx = count % cols
                 
-                x = c_idx * (cell_w + CARD_GAP) + 30
-                y = r_idx * (cell_h + CARD_GAP) + 30
+                # Problème 4 : Décalage de 50% sur une ligne sur deux
+                base_x = -150  # On commence en négatif pour bien saturer la gauche suite aux décalages
+                x = base_x + c_idx * (cell_w + CARD_GAP)
+                if r_idx % 2 == 1:
+                    x += (cell_w + CARD_GAP) // 2
+                
+                y = 30 + r_idx * (cell_h + CARD_GAP)
                 
                 grid_layer.paste(vignette, (x, y), vignette)
                 count += 1
@@ -210,7 +223,7 @@ def generate_grid_backdrop(genre_name, config):
 
     print(f" -> Grille construite : {count} visuels assemblés.")
     
-    # Application de la rotation à -10° (Bilinear pour conserver le lissage des arrondis)
+    # Application de la rotation à -10°
     rotated_grid = grid_layer.rotate(TILT_ANGLE, resample=Image.Resampling.BILINEAR, expand=False)
     
     # Centrage et fusion de la grille inclinée sur le fond dégradé principal
@@ -221,7 +234,7 @@ def generate_grid_backdrop(genre_name, config):
     
     background.paste(final_grid_cropped, (0, 0), final_grid_cropped)
     
-    # Masque dégradé linéaire noir (vignette) pour l'intégration du texte
+    # Masque dégradé linéaire noir
     gradient_overlay = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
     g_draw = ImageDraw.Draw(gradient_overlay)
     for y in range(250, canvas_h):
@@ -230,7 +243,7 @@ def generate_grid_backdrop(genre_name, config):
         
     final_img = Image.alpha_composite(background.convert("RGBA"), gradient_overlay)
     
-    # Typographie premium (Alignée sur la charte posters-genres.py)
+    # Typographie premium
     text_layer = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
     shadow_layer = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
     t_draw = ImageDraw.Draw(text_layer)
@@ -267,7 +280,7 @@ def generate_grid_backdrop(genre_name, config):
     final_output = Image.alpha_composite(final_img, shadow_layer)
     final_output = Image.alpha_composite(final_output, text_layer).convert("RGB")
     
-    # Sauvegarde des fichiers finaux
+    # Sauvegarde des fichiers finaux directement dans OUTPUT_DIR (écrase l'existant)
     final_output.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=94)
     final_output.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=94)
 
