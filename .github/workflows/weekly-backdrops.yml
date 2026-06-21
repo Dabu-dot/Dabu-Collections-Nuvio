@@ -38,6 +38,9 @@ jobs:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
           FANART_API_KEY: ${{ secrets.FANART_API_KEY }}
         run: |
+          # Suppression préventive du sous-dossier indésirable pour forcer la propreté dans Genres/
+          rm -rf "Ressources/Collections Covers/Genres/Weekly Backdrops"
+
           # 1. Action
           python3 -B .github/scripts/backdrop.py --api-key "$TMDB_API_KEY" --fanart-key "$FANART_API_KEY" --preferred-language "fr" --profile compressed --size 1080p --label "Action" --tmdb-request "movie:with_genres=28&sort_by=popularity.desc" --tmdb-request "tv:with_genres=10759&sort_by=popularity.desc" --output "Ressources/Collections Covers/Genres/action.jpg"
 
