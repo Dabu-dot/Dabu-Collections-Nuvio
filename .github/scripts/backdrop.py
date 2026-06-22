@@ -75,7 +75,7 @@ def get_trending_media(config):
     m_genre = f"&with_genres={config['movie_genre']}" if config.get('movie_genre') else ""
     t_genre = f"&with_genres={config['tv_genre']}" if config.get('tv_genre') else ""
 
-    # Correction 2 : Exploration étendue à 10 pages pour maximiser la découverte de films et séries
+    # Exploration massive étendue à 10 pages complètes (Films et Séries) pour maximiser le choix original
     for page in range(1, 11):
         try:
             res = tmdb_api_call(f"/discover/movie?sort_by=popularity.desc{m_genre}{config.get('extra', '')}&page={page}&include_adult=false")
@@ -115,13 +115,12 @@ def get_best_backdrop(media_type, media_id, fallback_path):
     return fallback_path
 
 def create_premium_gradient(width, height, base_color):
-    # Correction 6 : Dégradé linéaire orienté à 40° (Sombre bas-gauche vers Clair haut-droit)
+    # Dégradé linéaire orienté à 40° (Sombre bas-gauche vers Clair haut-droit)
     r, g, b = base_color
     c_light = (min(255, int(r * 1.35)), min(255, int(g * 1.35)), min(255, int(b * 1.35)))
     c_mid = (r, g, b)
     c_dark = (max(15, int(r * 0.30)), max(15, int(g * 0.30)), max(15, int(b * 0.30)))
     
-    # Génération via matrice sous-échantillonnée pour un lissage parfait ultra-rapide
     sw, sh = 192, 108
     grad_img = Image.new("RGB", (sw, sh))
     pixels = []
@@ -169,45 +168,65 @@ def generate_grid_backdrop(genre_name, config):
     background = create_premium_gradient(canvas_w, canvas_h, config["color"])
     
     raw_candidates = get_trending_media(config)
+    # Tri absolu par popularité TMDB décroissante pour assurer la priorité au haut du panier
+    raw_candidates.sort(key=lambda x: x.get("popularity", 0), reverse=True)
+    
     scoring_keywords = set(config.get("scoring_keywords", []))
     current_year = datetime.now().year
     
+    cell_w, cell_h = 444, 250  
+    cols, rows = 7, 6          
+    max_vignettes = cols * rows
+    
     processed_candidates = []
     seen_ids = set()
-    min_pop = config.get("min_popularity", 15)
     
-    for item in raw_candidates:
-        composite_key = f"{item['media_type']}_{item['id']}"
-        if composite_key in seen_ids or item.get("adult"): continue
-        if item.get("popularity", 0) < min_pop: continue
-        if not config.get("override_lang", False) and item.get("original_language", "") not in ALLOWED_LANGUAGES: continue
-        if genre_name == "animation" and item.get("original_language", "") not in WESTERN_LANGUAGES: continue
-        
-        keywords = get_media_keywords(item["media_type"], item["id"])
-        if keywords.intersection(BANNED_KEYWORDS): continue
-        if genre_name == "famille" and keywords.intersection(FAMILY_BANNED_KEYWORDS): continue
-        
-        score = len(keywords.intersection(scoring_keywords)) * 30
-        score += min(item.get("popularity", 0) / 1.8, 180)
-        
-        release_date = item.get("release_date") or item.get("first_air_date") or ""
-        if release_date and len(release_date) >= 4 and release_date[:4].isdigit():
-            if int(release_date[:4]) >= (current_year - 10): score += 150
-            else: score -= 100
-        
-        if genre_name != "animation-japonaise" and item.get("original_language", "") in WESTERN_LANGUAGES:
-            score += 75
+    # --- ENTONNOIR ADAPTATIF DYNAMIQUE ---
+    # On commence par le min_popularity cible configuré. Si le pool filtré est trop petit, 
+    # on diminue le seuil de 15 en 15 jusqu'à un plancher absolu de 5 pour forcer la diversité unique.
+    target_pop = config.get("min_popularity", 15)
+    while target_pop >= 5:
+        for item in raw_candidates:
+            composite_key = f"{item['media_type']}_{item['id']}"
+            if composite_key in seen_ids or item.get("adult"): continue
+            if item.get("popularity", 0) < target_pop: continue
             
-        processed_candidates.append((score, item))
-        seen_ids.add(composite_key)
+            # Application des restrictions linguistiques structurelles
+            if not config.get("override_lang", False) and item.get("original_language", "") not in ALLOWED_LANGUAGES: continue
+            if genre_name == "animation" and item.get("original_language", "") not in WESTERN_LANGUAGES: continue
+            
+            keywords = get_media_keywords(item["media_type"], item["id"])
+            if keywords.intersection(BANNED_KEYWORDS): 
+                seen_ids.add(composite_key)
+                continue
+            if genre_name == "famille" and keywords.intersection(FAMILY_BANNED_KEYWORDS):
+                seen_ids.add(composite_key)
+                continue
+            
+            # Calcul qualitatif du score de positionnement
+            score = len(keywords.intersection(scoring_keywords)) * 30
+            score += min(item.get("popularity", 0) / 1.8, 180)
+            
+            release_date = item.get("release_date") or item.get("first_air_date") or ""
+            if release_date and len(release_date) >= 4 and release_date[:4].isdigit():
+                if int(release_date[:4]) >= (current_year - 10): score += 150
+                else: score -= 100
+            
+            if genre_name != "animation-japonaise" and item.get("original_language", "") in WESTERN_LANGUAGES:
+                score += 75
+                
+            processed_candidates.append((score, item))
+            seen_ids.add(composite_key)
+            
+        # Si on dispose d'un pool suffisant avec une marge de +10 candidats (en cas de liens morts au téléchargement)
+        if len(processed_candidates) >= (max_vignettes + 10):
+            break
+        if target_pop == 5: 
+            break
+        target_pop = max(5, target_pop - 15)
         
+    # Tri définitif du pool adaptatif extrait selon le score qualitatif décroissant
     processed_candidates.sort(key=lambda x: x[0], reverse=True)
-    
-    # Corrections 3 & 4 : Recadrage de la grille pour supprimer l'overdraw inutile. 
-    # Une grille de 6x6 (36 visuels) est amplement suffisante pour saturer l'espace 1920x1080 à -10°.
-    cell_w, cell_h = 444, 250  
-    cols, rows = 6, 6          
-    max_vignettes = cols * rows
     
     grid_w, grid_h = 3600, 2400
     grid_layer = Image.new("RGBA", (grid_w, grid_h), (0, 0, 0, 0))
@@ -217,7 +236,7 @@ def generate_grid_backdrop(genre_name, config):
     start_x = (grid_w - grid_total_w) // 2
     start_y = (grid_h - grid_total_h) // 2
     
-    # Téléchargement et préparation en flux
+    # Téléchargement effectif des images uniques récoltées
     successful_vignettes = []
     for score, item in processed_candidates:
         if len(successful_vignettes) >= max_vignettes: break
@@ -234,7 +253,7 @@ def generate_grid_backdrop(genre_name, config):
         except:
             continue
 
-    # Correction 4 (Sécurité) : Si le pool filtré est trop court, on complète la grille par duplication locale
+    # Sécurité absolue : Si le réseau subit des pertes massives, on duplique localement pour éviter les trous
     if successful_vignettes and len(successful_vignettes) < max_vignettes:
         base_vignettes = list(successful_vignettes)
         idx = 0
@@ -242,7 +261,7 @@ def generate_grid_backdrop(genre_name, config):
             successful_vignettes.append(base_vignettes[idx % len(base_vignettes)])
             idx += 1
 
-    # Correction 5 : Préparation de l'ombre portée premium individualisée sous chaque vignette
+    # Préparation de l'ombre premium individualisée sous chaque vignette
     shadow_blur = 12
     shadow_offset_x = 4
     shadow_offset_y = 6
@@ -262,12 +281,12 @@ def generate_grid_backdrop(genre_name, config):
         
         y = start_y + r_idx * (cell_h + CARD_GAP)
         
-        # Application séquentielle Ombre -> Image
+        # Collage séquentiel Ombre -> Vignette
         grid_layer.paste(card_shadow, (x - shadow_blur + shadow_offset_x, y - shadow_blur + shadow_offset_y), card_shadow)
         grid_layer.paste(vignette, (x, y), vignette)
         count += 1
 
-    print(f" -> Grille XXL stabilisée : {count}/{max_vignettes} visuels assemblés.")
+    print(f" -> Grille XXL diversifiée stabilisée : {count}/{max_vignettes} visuels uniques assemblés.")
     
     rotated_grid = grid_layer.rotate(TILT_ANGLE, resample=Image.Resampling.BILINEAR, expand=False)
     
@@ -291,4 +310,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-        
