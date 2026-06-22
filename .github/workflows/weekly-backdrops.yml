@@ -2,7 +2,7 @@ name: Weekly Backdrops
 
 on:
   schedule:
-    - cron: "0 4 * * 0" # Automatisation complète chaque dimanche à 4h00 UTC
+    - cron: "0 6 * * 0" # Automatisation complète chaque dimanche à 4h00 UTC
   workflow_dispatch: # Permet de forcer manuellement le run depuis GitHub
 
 permissions:
