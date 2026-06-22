@@ -1,1 +1,110 @@
-
+{
+    "movie_460465": {
+        "title": "Mortal Kombat",
+        "genre": "action",
+        "date": "2026-06-22",
+        "backdrop_path": "/9yBVqNruk6Ykrwc32qrK2TIE5xw.jpg"
+    },
+    "tv_95479": {
+        "title": "JUJUTSU KAISEN",
+        "genre": "animation-japonaise",
+        "date": "2026-06-22",
+        "backdrop_path": "/gmECX1DvFgdUPjtio2zaL8BPYPu.jpg"
+    },
+    "movie_1226863": {
+        "title": "The Super Mario Galaxy Movie",
+        "genre": "animation",
+        "date": "2026-06-22",
+        "backdrop_path": "/9Z2uDYXqJrlmePznQQJhL6d92Rq.jpg"
+    },
+    "tv_94997": {
+        "title": "House of the Dragon",
+        "genre": "aventure",
+        "date": "2026-06-22",
+        "backdrop_path": "/etj8E2o0Bud0HkONVQPjyCkIvpv.jpg"
+    },
+    "tv_111803": {
+        "title": "The White Lotus",
+        "genre": "comedie",
+        "date": "2026-06-22",
+        "backdrop_path": "/rCTLaPwuApDx8vLGjYZ9pRl7zRB.jpg"
+    },
+    "movie_1159559": {
+        "title": "Scream 7",
+        "genre": "crime",
+        "date": "2026-06-22",
+        "backdrop_path": "/hz7TdCrpLLt2Dz7S3PS2HG9rpAO.jpg"
+    },
+    "tv_10029": {
+        "title": "Great Performances",
+        "genre": "documentaire",
+        "date": "2026-06-22",
+        "backdrop_path": "/ylnSMSXs7TWjld6FT3laCfhAHzq.jpg"
+    },
+    "movie_936075": {
+        "title": "Michael",
+        "genre": "drame",
+        "date": "2026-06-22",
+        "backdrop_path": "/ufSwlnECLoUbBjPrFqEQcWBzHwc.jpg"
+    },
+    "tv_82452": {
+        "title": "Avatar the Last Airbender",
+        "genre": "famille",
+        "date": "2026-06-22",
+        "backdrop_path": "/imlTCObfzISogbvcwB1dokoXAIc.jpg"
+    },
+    "tv_124364": {
+        "title": "FROM",
+        "genre": "fantastique",
+        "date": "2026-06-22",
+        "backdrop_path": "/q3UGWifvIpdey1T2efX4dSmbZpU.jpg"
+    },
+    "tv_87917": {
+        "title": "For All Mankind",
+        "genre": "guerre",
+        "date": "2026-06-22",
+        "backdrop_path": "/vi0TpQbbZ8FWTRBmawbvegMRbtc.jpg"
+    },
+    "movie_872585": {
+        "title": "Oppenheimer",
+        "genre": "histoire",
+        "date": "2026-06-22",
+        "backdrop_path": "/ycnO0cjsAROSGJKuMODgRtWsHQw.jpg"
+    },
+    "movie_1339713": {
+        "title": "Obsession",
+        "genre": "horreur",
+        "date": "2026-06-22",
+        "backdrop_path": "/5lTZyuBTNOfawsfPT8Q0cIg6qAF.jpg"
+    },
+    "movie_1358005": {
+        "title": "Office Romance",
+        "genre": "romance",
+        "date": "2026-06-22",
+        "backdrop_path": "/1N5yz1IDw6Ci8le1YgeM6xtBijA.jpg"
+    },
+    "tv_67198": {
+        "title": "Star Trek: Discovery",
+        "genre": "science-fiction",
+        "date": "2026-06-22",
+        "backdrop_path": "/p3McpsDNTNmpbkNBKdNxOFZJeKX.jpg"
+    },
+    "movie_911430": {
+        "title": "F1",
+        "genre": "sport",
+        "date": "2026-06-22",
+        "backdrop_path": "/rZWkXnIyTLzUJpHSUpOb7vgB0BL.jpg"
+    },
+    "movie_1275779": {
+        "title": "Disclosure Day",
+        "genre": "thriller",
+        "date": "2026-06-22",
+        "backdrop_path": "/5p6BsJtnPbglYN15MuiUEppPl0f.jpg"
+    },
+    "tv_299167": {
+        "title": "Dutton Ranch",
+        "genre": "western",
+        "date": "2026-06-22",
+        "backdrop_path": "/wh5agdl3b7fqC7mSjsCkHx4fMAs.jpg"
+    }
+}
