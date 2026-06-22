@@ -93,7 +93,7 @@
         "title": "F1",
         "genre": "sport",
         "date": "2026-06-22",
-        "backdrop_path": "/lkDYN0whyE82mcM20rwtwjbniKF.jpg"
+        "backdrop_path": "/rZWkXnIyTLzUJpHSUpOb7vgB0BL.jpg"
     },
     "movie_1275779": {
         "title": "Disclosure Day",
@@ -208,5 +208,107 @@
         "genre": "western",
         "date": "2026-06-22",
         "backdrop_path": "/yGNnjoIGOdQy3douq60tULY8teK.jpg"
+    },
+    "movie_603692": {
+        "title": "John Wick: Chapter 4",
+        "genre": "action",
+        "date": "2026-06-22",
+        "backdrop_path": "/i8dshLvq4LE3s0v8PrkDdUyb1ae.jpg"
+    },
+    "tv_120089": {
+        "title": "SPY x FAMILY",
+        "genre": "animation-japonaise",
+        "date": "2026-06-22",
+        "backdrop_path": "/lysUnU6V0VfcthDbviuVlIqgHOR.jpg"
+    },
+    "movie_1327819": {
+        "title": "Hoppers",
+        "genre": "animation",
+        "date": "2026-06-22",
+        "backdrop_path": "/u53UYu5XG2hNgWGvs3xGhAVzypl.jpg"
+    },
+    "tv_71912": {
+        "title": "The Witcher",
+        "genre": "aventure",
+        "date": "2026-06-22",
+        "backdrop_path": "/s56eyXy8rADp5DpZknfe2HXq4u4.jpg"
+    },
+    "tv_119051": {
+        "title": "Wednesday",
+        "genre": "comedie",
+        "date": "2026-06-22",
+        "backdrop_path": "/iHSwvRVsRyxpX7FE7GbviaDvgGZ.jpg"
+    },
+    "tv_70523": {
+        "title": "Dark",
+        "genre": "crime",
+        "date": "2026-06-22",
+        "backdrop_path": "/2VpSajCTI26zddsp5cSjqfCBKEa.jpg"
+    },
+    "local_Castle2.jpg": {
+        "title": "Curation : Castle2.jpg",
+        "genre": "documentaire",
+        "date": "2026-06-22",
+        "backdrop_path": "Ressources/Collections Covers/Genres/Static Covers/References/Castle2.jpg"
+    },
+    "tv_85552": {
+        "title": "Euphoria",
+        "genre": "drame",
+        "date": "2026-06-22",
+        "backdrop_path": "/9KnIzPCv9XpWA0MqmwiKBZvV1Sj.jpg"
+    },
+    "movie_939243": {
+        "title": "Sonic the Hedgehog 3",
+        "genre": "famille",
+        "date": "2026-06-22",
+        "backdrop_path": "/zOpe0eHsq0A2NvNyBbtT6sj53qV.jpg"
+    },
+    "tv_66732": {
+        "title": "Stranger Things",
+        "genre": "fantastique",
+        "date": "2026-06-22",
+        "backdrop_path": "/56v2KjBlU4XaOv9rVYEQypROD7P.jpg"
+    },
+    "tv_126308": {
+        "title": "Shōgun",
+        "genre": "guerre",
+        "date": "2026-06-22",
+        "backdrop_path": "/5zmiBoMzeeVdQ62no55JOJMY498.jpg"
+    },
+    "movie_1530510": {
+        "title": "Mexico 86",
+        "genre": "histoire",
+        "date": "2026-06-22",
+        "backdrop_path": "/sbIjF8VygkC8tI8dj2wZ6KMXhOu.jpg"
+    },
+    "movie_1430077": {
+        "title": "Hokum",
+        "genre": "horreur",
+        "date": "2026-06-22",
+        "backdrop_path": "/arNKUmatyuAjDsO8y3BNfu7jJZc.jpg"
+    },
+    "movie_1010581": {
+        "title": "My Fault",
+        "genre": "romance",
+        "date": "2026-06-22",
+        "backdrop_path": "/lntyt4OVDbcxA1l7LtwITbrD3FI.jpg"
+    },
+    "tv_85949": {
+        "title": "Star Trek: Picard",
+        "genre": "science-fiction",
+        "date": "2026-06-22",
+        "backdrop_path": "/u9eaoVrvPd921vCqaHY8gtfnKFp.jpg"
+    },
+    "tv_76669": {
+        "title": "Elite",
+        "genre": "thriller",
+        "date": "2026-06-22",
+        "backdrop_path": "/eNPpCa7vxO6EYL1Z3H00JoeO4jL.jpg"
+    },
+    "tv_157744": {
+        "title": "1923",
+        "genre": "western",
+        "date": "2026-06-22",
+        "backdrop_path": "/vIioWssbxRtEkIzgj8r0pCWYkYM.jpg"
     }
 }
