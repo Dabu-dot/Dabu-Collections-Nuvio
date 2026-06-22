@@ -3,6 +3,7 @@ import sys
 import time
 import json
 import requests
+import random  # Ajout pour la sélection aléatoire des documentaires
 from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageOps, ImageFilter
 
@@ -42,8 +43,8 @@ GENRES_CONFIG = {
     "aventure": {"label": "Aventure", "color": (20, 130, 70), "movie_genre": 12, "tv_genre": 10759, "extra": "&without_genres=16", "scoring_keywords": [195114, 161176, 818, 4152, 170362, 210246, 10364, 41586, 6956, 269233]},
     "comedie": {"label": "Comédie", "color": (220, 110, 10), "movie_genre": 35, "tv_genre": 35, "extra": "&without_genres=16", "scoring_keywords": [8201, 9755, 9964, 375047, 6241, 9253]},
     "crime": {"label": "Crime", "color": (70, 85, 105), "movie_genre": 80, "tv_genre": 80, "extra": "&without_genres=16", "scoring_keywords": [2095, 9748, 181644, 157241, 206958, 268067, 703, 5340, 6149, 9826, 155790, 207046]},
-    # Correction Point 1 : min_backdrops abaissé à 1 pour Documentaire afin de libérer les chefs-d'œuvre récents (BBC, NatGeo) souvent pauvres en assets communautaires
-    "documentaire": {"label": "Documentaire", "color": (20, 140, 60), "movie_genre": 99, "tv_genre": 99, "extra": "&without_genres=16", "min_backdrops": 1, "scoring_keywords": [210002, 283115, 6432, 209250, 9714, 9672, 221355, 18330, 18165, 272851, 270, 9902, 305903, 252105, 211505, 284176, 160330, 9882]},
+    # Note : Le genre Documentaire n'utilise plus l'API grâce au court-circuit local dans la boucle principale
+    "documentaire": {"label": "Documentaire", "color": (20, 140, 60), "movie_genre": 99, "tv_genre": 99, "extra": "&without_genres=16", "scoring_keywords": []},
     "drame": {"label": "Drame", "color": (30, 90, 170), "movie_genre": 18, "tv_genre": 18, "extra": "&without_genres=16", "scoring_keywords": []},
     "famille": {"label": "Famille", "color": (170, 25, 150), "movie_genre": 10751, "tv_genre": 10751, "extra": "&without_genres=16", "scoring_keywords": []},
     "fantastique": {"label": "Fantastique", "color": (110, 30, 190), "movie_genre": 14, "tv_genre": 10765, "extra": "&without_genres=16", "scoring_keywords": []},
@@ -254,9 +255,59 @@ def main():
         print(f"\n--- Analyse Algorithmique : {config['label']} ---")
         
         success_genre = False
-        base_min_pop = config.get("min_popularity", 20)
-        required_backdrops_limit = config.get("min_backdrops", 5)
         
+        # ------------------------------------------------------------------
+        # TRICHE ET MANAGEMENT LOCAL EXCLUSIF POUR LE GENRE DOCUMENTAIRE
+        # ------------------------------------------------------------------
+        if genre_name == "documentaire":
+            print(" -> [MODE CHEAT] Interception locale activée pour Documentaire.")
+            ref_dir = os.path.join(OUTPUT_DIR, "References")
+            
+            if os.path.exists(ref_dir):
+                valid_extensions = (".jpg", ".jpeg", ".png", ".webp")
+                local_files = [f for f in os.listdir(ref_dir) if f.lower().endswith(valid_extensions)]
+                
+                if local_files:
+                    # Anti-doublon consécutif intelligent basé sur l'historique local
+                    fresh_local_files = [f for f in local_files if f"local_{f}" not in excluded_keys]
+                    if not fresh_local_files:
+                        fresh_local_files = local_files  # Reset si tout a été vu
+                        
+                    chosen_file = random.choice(fresh_local_files)
+                    file_path = os.path.join(ref_dir, chosen_file)
+                    
+                    try:
+                        raw_img = Image.open(file_path).convert("RGB")
+                        print(f" -> [IMAGE LOCALE] Sélectionnée aléatoirement : {chosen_file}")
+                        
+                        final_banner = finalize_landscape_banner(raw_img, config["label"], config["color"])
+                        final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=94)
+                        final_banner.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=94)
+                        
+                        composite_key = f"local_{chosen_file}"
+                        RUN_PROCESSED_IDS.add(composite_key)
+                        
+                        history[composite_key] = {
+                            "title": f"Curation : {chosen_file}", 
+                            "genre": genre_name, 
+                            "date": datetime.now().strftime("%Y-%m-%d"),
+                            "backdrop_path": file_path
+                        }
+                        success_genre = True
+                    except Exception as e:
+                        print(f" Échec du traitement de la photo locale : {e}")
+                else:
+                    print(f" [⚠️ ERREUR] Le dossier {ref_dir} est vide ou ne contient pas d'images valides.")
+            else:
+                print(f" [⚠️ ERREUR] Le dossier de référence n'existe pas encore à l'emplacement : {ref_dir}")
+            
+            if success_genre:
+                continue  # Court-circuit complet, on saute la recherche TMDB pour Documentaire
+                
+        # ------------------------------------------------------------------
+        # ROUTINE STANDARD VIA API TMDB POUR TOUS LES AUTRES GENRES
+        # ------------------------------------------------------------------
+        base_min_pop = config.get("min_popularity", 20)
         pop_paliers = [base_min_pop, max(20, int(base_min_pop * 0.75)), max(15, int(base_min_pop * 0.5)), 15]
         pop_paliers = sorted(list(set(pop_paliers)), reverse=True)
         
@@ -276,13 +327,6 @@ def main():
                 if genre_name == "animation" and item.get("original_language", "") not in WESTERN_LANGUAGES:
                     continue
                     
-                # Correction Point 2 : Exclusion absolue et définitive de l'ancien contenu pour Documentaire (Bannissement des archives obsolètes pré-2016)
-                release_date_str = item.get("release_date") or item.get("first_air_date") or ""
-                if release_date_str and len(release_date_str) >= 4 and release_date_str[:4].isdigit():
-                    release_year = int(release_date_str[:4])
-                    if genre_name == "documentaire" and release_year < (current_year - 10):
-                        continue
-                
                 media_keywords = get_media_keywords(item["media_type"], item["id"])
                 
                 if media_keywords.intersection(BANNED_KEYWORDS): continue
@@ -292,6 +336,7 @@ def main():
                 pop_score = min(item.get("popularity", 0) / 2.5, 140)
                 total_score = kw_score + pop_score
                 
+                release_date_str = item.get("release_date") or item.get("first_air_date") or ""
                 if release_date_str and len(release_date_str) >= 4 and release_date_str[:4].isdigit():
                     if int(release_date_str[:4]) >= (current_year - 10):
                         total_score += 150  
@@ -311,17 +356,13 @@ def main():
                 if c not in candidates_pool_all_paliers:
                     candidates_pool_all_paliers.append(c)
             
-            # ------------------------------------------------------------------
-            # PASSE N°1 : RECHERCHE D'UNE IMAGE ULTRA-FRAÎCHE (INÉDITE)
-            # ------------------------------------------------------------------
             for candidate in scored_candidates:
                 media = candidate["item"]
                 media_title = media.get('title') or media.get('name')
                 
                 backdrops = get_best_textless_backdrops(media["media_type"], media["id"], media["backdrop_path"])
                 
-                # Utilisation de la limite dynamique (5 par défaut, 1 pour Documentaire)
-                if len(backdrops) < required_backdrops_limit:
+                if len(backdrops) < 5:
                     continue
                 
                 fresh_backdrops = [b for b in backdrops if b["file_path"] not in excluded_backdrops]
@@ -357,18 +398,15 @@ def main():
             
             if success_genre: break
             
-        # ------------------------------------------------------------------
-        # PASSE N°2 : RECYCLAGE EN ULTIME RECOURS (Sécurité anti-échec critique)
-        # ------------------------------------------------------------------
         if not success_genre and candidates_pool_all_paliers:
-            print(f" [⚠️ INFO] Aucun asset inédit de haute notoriété disponible. Recours au pool de secours stabilisé...")
+            print(f" [⚠️ INFO] Aucun asset inédit disponible. Recours au pool de secours...")
             candidates_pool_all_paliers.sort(key=lambda x: x["score"], reverse=True)
             
             for candidate in candidates_pool_all_paliers:
                 media = candidate["item"]
                 backdrops = get_best_textless_backdrops(media["media_type"], media["id"], media["backdrop_path"])
                 
-                if len(backdrops) < required_backdrops_limit:
+                if len(backdrops) < 5:
                     continue
                     
                 best_bg = score_and_select_backdrop(backdrops)
