@@ -19,43 +19,18 @@ if not TMDB_API_KEY:
 OUTPUT_DIR = "Ressources/Collections Covers/Genres/Static Covers"
 HISTORY_FILE = ".github/scripts/posters_history.json"
 
-# Périmètres linguistiques
 ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it", "ja", "ko", "zh"}
 WESTERN_LANGUAGES = {"fr", "en", "es", "de", "it"}
 
-# BANNED_KEYWORDS : Protection absolue contre le contenu adulte, NSFW et Talk-Shows (NE JAMAIS MODIFIER OU RETIRER)
+# BANNED_KEYWORDS : Protection absolue (STRICTEMENT INCHANGÉE)
 BANNED_KEYWORDS = {
-    195669,  # ecchi
-    155477,  # softcore
-    198385,  # hentai
-    256466,  # erotic
-    155716,  # erotic movie
-    190340,  # softcore pornography
-    156201,  # softcore erotica
-    291195,  # adult animation
-    242216,  # late night show / talk-show
-    33998,   # lesbian sex
-    190370,  # erotic movie alt
-    186107,  # sexual exploration
-    10053,   # sexploitation
-    910,     # bondage
-    348517,  # roman porno
-    9835,    # sexual fantasy
-    18321,   # porn industry (Point 2)
-    267122,  # sex (Point 2)
-    356759,  # porn (Point 2)
+    195669, 155477, 198385, 256466, 155716, 190340, 156201, 291195, 
+    242216, 33998, 190370, 186107, 10053, 910, 348517, 9835, 18321, 
+    267122, 356759
 }
 
-# FAMILY_BANNED_KEYWORDS : Exclusion des dynamiques religieuses/bibliques du genre Famille (NE JAMAIS MODIFIER OU RETIRER)
-FAMILY_BANNED_KEYWORDS = {
-    3036,    # bible
-    11001,   # religion
-    192947,  # religious film
-    273060,  # christian faith
-    282071,  # biblical
-    243261,  # new testament
-    279473,  # jews
-}
+# FAMILY_BANNED_KEYWORDS : Protection absolue Famille (STRICTEMENT INCHANGÉE)
+FAMILY_BANNED_KEYWORDS = {3036, 11001, 192947, 273060, 282071, 243261, 279473}
 
 RUN_PROCESSED_IDS = set()
 
@@ -74,7 +49,8 @@ GENRES_CONFIG = {
     "famille": {"label": "Famille", "color": (170, 25, 150), "movie_genre": 10751, "tv_genre": 10751, "extra": "&without_genres=16", "scoring_keywords": []},
     "fantastique": {"label": "Fantastique", "color": (110, 30, 190), "movie_genre": 14, "tv_genre": 10765, "extra": "&without_genres=16", "scoring_keywords": []},
     "guerre": {"label": "Guerre", "color": (90, 80, 70), "movie_genre": 10752, "tv_genre": 10768, "extra": "&without_genres=16", "scoring_keywords": []},
-    "histoire": {"label": "Histoire", "color": (140, 70, 30), "movie_genre": 36, "tv_genre": 10768, "extra": "&without_genres=16", "scoring_keywords": []},
+    # Correction Point 3 : Suppression du tv_genre (10768 - War & Politics) qui polluait Histoire avec des séries d'action modernes (ex: Shooter)
+    "histoire": {"label": "Histoire", "color": (140, 70, 30), "movie_genre": 36, "tv_genre": None, "extra": "&without_genres=16", "scoring_keywords": []},
     "horreur": {"label": "Horreur", "color": (180, 20, 20), "movie_genre": 27, "tv_genre": 27, "extra": "&without_genres=16", "scoring_keywords": [3358, 9748, 6152]},
     "romance": {"label": "Romance", "color": (180, 35, 90), "movie_genre": 10749, "tv_genre": 10749, "extra": "&without_genres=16&without_original_language=ko|ja|zh", "scoring_keywords": []},
     "science-fiction": {"label": "Science-Fiction", "color": (15, 60, 160), "movie_genre": 878, "tv_genre": 10765, "extra": "&without_genres=16", "scoring_keywords": [4565, 9882]},
@@ -116,32 +92,35 @@ def get_trending_media_for_genre(genre_name, config, excluded_keys, current_min_
     movie_genre_param = f"&with_genres={config['movie_genre']}" if config.get('movie_genre') else ""
     tv_genre_param = f"&with_genres={config['tv_genre']}" if config.get('tv_genre') else ""
 
-    # Correction Point 2 : Extension de la profondeur de recherche à 8 pages (320 résultats bruts analysés)
     for page in range(1, 9):
         try:
             res = tmdb_api_call(f"/discover/movie?sort_by=popularity.desc{movie_genre_param}{config.get('extra', '')}&page={page}&include_adult=false")
             for item in res.get("results", []):
                 if item.get("backdrop_path"): item["media_type"] = "movie"; movie_pool.append(item)
         except: break
-        time.sleep(0.1) # Respect du rate-limiting de TMDB
-        
-    for page in range(1, 9):
-        try:
-            res = tmdb_api_call(f"/discover/tv?sort_by=popularity.desc{tv_genre_param}{config.get('extra', '')}&page={page}&include_adult=false")
-            for item in res.get("results", []):
-                if item.get("backdrop_path"): item["media_type"] = "tv"; tv_pool.append(item)
-        except: break
         time.sleep(0.1)
+        
+    if config.get('tv_genre'):
+        for page in range(1, 9):
+            try:
+                res = tmdb_api_call(f"/discover/tv?sort_by=popularity.desc{tv_genre_param}{config.get('extra', '')}&page={page}&include_adult=false")
+                for item in res.get("results", []):
+                    if item.get("backdrop_path"): item["media_type"] = "tv"; tv_pool.append(item)
+            except: break
+            time.sleep(0.1)
     
     combined = tv_pool + movie_pool if config.get("prefer_tv", False) else movie_pool + tv_pool
     filtered = []
     
-    # Correction Point 1 : Utilisation de la popularité dynamique reçue
     min_pop = current_min_pop if current_min_pop is not None else config.get("min_popularity", 20)
     
     for item in combined:
         composite_key = f"{item['media_type']}_{item['id']}"
         if item.get("adult") or item.get("popularity", 0) < min_pop: continue
+        
+        # Correction Point 2 : Sécurité "Anti-Néant" - Rejet immédiat si le média possède moins de 15 votes de la communauté
+        if item.get("vote_count", 0) < 15: continue
+        
         if not config.get("override_lang", False) and item.get("original_language", "") not in ALLOWED_LANGUAGES: continue
         
         if genre_name not in ["documentaire", "sport"]:
@@ -282,9 +261,9 @@ def main():
         success_genre = False
         base_min_pop = config.get("min_popularity", 20)
         
-        # Correction Point 1 : Définition des paliers de dégradation de la popularité (100% -> 75% -> 50% -> 25% -> Plancher à 5)
-        pop_paliers = [base_min_pop, max(15, int(base_min_pop * 0.75)), max(10, int(base_min_pop * 0.5)), max(5, int(base_min_pop * 0.25)), 5]
-        pop_paliers = sorted(list(set(pop_paliers)), reverse=True) # Nettoyage des doublons éventuels
+        # Correction Points 1 & 2 : Rehaussement du plancher absolu à 15 (au lieu de 5) pour esquiver le contenu amateur / inconnu
+        pop_paliers = [base_min_pop, max(20, int(base_min_pop * 0.75)), max(15, int(base_min_pop * 0.5)), 15]
+        pop_paliers = sorted(list(set(pop_paliers)), reverse=True)
         
         candidates_pool_all_paliers = []
         
@@ -304,7 +283,6 @@ def main():
                     
                 media_keywords = get_media_keywords(item["media_type"], item["id"])
                 
-                # SÉCURITÉ INVIOLABLE : Les mots-clés interdits provoquent toujours un rejet immédiat
                 if media_keywords.intersection(BANNED_KEYWORDS): continue
                 if genre_name == "famille" and media_keywords.intersection(FAMILY_BANNED_KEYWORDS): continue
                 
@@ -328,22 +306,26 @@ def main():
                 
             scored_candidates.sort(key=lambda x: x["score"], reverse=True)
             
-            # Stockage dans le pool global de secours en cas d'impasse totale sur les images neuves
             for c in scored_candidates:
                 if c not in candidates_pool_all_paliers:
                     candidates_pool_all_paliers.append(c)
             
             # ------------------------------------------------------------------
-            # PASSE N°1 : RECHERCHE PRIORITAIRE D'UNE IMAGE ULTRA-FRAÎCHE (INÉDITE)
+            # PASSE N°1 : RECHERCHE D'UNE IMAGE ULTRA-FRAÎCHE (INÉDITE)
             # ------------------------------------------------------------------
             for candidate in scored_candidates:
                 media = candidate["item"]
+                media_title = media.get('title') or media.get('name')
+                
                 backdrops = get_best_textless_backdrops(media["media_type"], media["id"], media["backdrop_path"])
                 
-                # Extraction stricte des visuels n'ayant jamais été affichés par le passé
+                # Correction Point 4 : Un volume faible (< 5) démontre un manque crucial de notoriété/assets. On rejette.
+                if len(backdrops) < 5:
+                    continue
+                
                 fresh_backdrops = [b for b in backdrops if b["file_path"] not in excluded_backdrops]
                 if not fresh_backdrops: 
-                    continue # On passe directement au média suivant pour forcer l'apparition de nouveautés
+                    continue 
                 
                 best_bg = score_and_select_backdrop(fresh_backdrops)
                 
@@ -351,8 +333,7 @@ def main():
                     res = requests.get(f"https://image.tmdb.org/t/p/original{best_bg['file_path']}", stream=True, timeout=10)
                     if res.status_code == 200:
                         raw_img = Image.open(res.raw).convert("RGB")
-                        media_title = media.get('title') or media.get('name')
-                        print(f" -> [IMAGE INÉDITE] Sélectionnée ({best_bg.get('width')}x{best_bg.get('height')} - Score: {candidate['score']:.1f}) : {media_title}")
+                        print(f" -> [IMAGE INÉDITE] Sélectionnée ({best_bg.get('width')}x{best_bg.get('height')} - {len(backdrops)} bds available) : {media_title}")
                         
                         final_banner = finalize_landscape_banner(raw_img, config["label"], config["color"])
                         final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=94)
@@ -379,13 +360,18 @@ def main():
         # PASSE N°2 : RECYCLAGE EN ULTIME RECOURS (Sécurité anti-échec critique)
         # ------------------------------------------------------------------
         if not success_genre and candidates_pool_all_paliers:
-            print(f" [⚠️ INFO] Aucune image inédite disponible sur l'ensemble des paliers pour '{config['label']}'. Utilisation du pool de secours...")
+            print(f" [⚠️ INFO] Aucun asset inédit de haute notoriété disponible. Recours au pool de secours stabilisé...")
             candidates_pool_all_paliers.sort(key=lambda x: x["score"], reverse=True)
             
             for candidate in candidates_pool_all_paliers:
                 media = candidate["item"]
                 backdrops = get_best_textless_backdrops(media["media_type"], media["id"], media["backdrop_path"])
-                best_bg = score_and_select_backdrop(backdrops) # Réutilisation autorisée en dernier recours
+                
+                # Même en secours, la barrière de notoriété des 5 backdrops s'applique !
+                if len(backdrops) < 5:
+                    continue
+                    
+                best_bg = score_and_select_backdrop(backdrops)
                 
                 try:
                     res = requests.get(f"https://image.tmdb.org/t/p/original{best_bg['file_path']}", stream=True, timeout=10)
