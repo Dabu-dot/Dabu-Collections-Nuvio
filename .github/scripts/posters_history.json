@@ -2,14 +2,104 @@
     "movie_911430": {
         "title": "F1",
         "genre": "sport",
-        "date": "2026-06-21",
-        "backdrop_path": "/lkDYN0whyE82mcM20rwtwjbniKF.jpg"
+        "date": "2026-06-22",
+        "backdrop_path": "/rZWkXnIyTLzUJpHSUpOb7vgB0BL.jpg"
     },
     "tv_14951": {
         "title": "Nature",
         "genre": "documentaire",
-        "date": "2026-06-21",
+        "date": "2026-06-22",
         "backdrop_path": "/j6aCSIjK4N7SpkSPBBNv7vbDvJo.jpg"
+    },
+    "movie_1318447": {
+        "title": "Apex",
+        "genre": "action",
+        "date": "2026-06-22",
+        "backdrop_path": "/9nzfyiYbmTUXWC4B2kwjl4NAlqO.jpg"
+    },
+    "movie_1539104": {
+        "title": "JUJUTSU KAISEN: Execution",
+        "genre": "animation-japonaise",
+        "date": "2026-06-22",
+        "backdrop_path": "/gtKglOSEq3d4MgQE4VsrT1sRkd0.jpg"
+    },
+    "movie_1202033": {
+        "title": "Enola Holmes 3",
+        "genre": "aventure",
+        "date": "2026-06-22",
+        "backdrop_path": "/rA0L7b7WZ0Ql25UJAhNicEll1cv.jpg"
+    },
+    "movie_1292695": {
+        "title": "They Will Kill You",
+        "genre": "comedie",
+        "date": "2026-06-22",
+        "backdrop_path": "/q05WV8DwEiyLbCgSVtg55RbUzou.jpg"
+    },
+    "movie_385687": {
+        "title": "Fast X",
+        "genre": "crime",
+        "date": "2026-06-22",
+        "backdrop_path": "/fSd5MjJNcauyEbHuzUdCE1TKttK.jpg"
+    },
+    "movie_1314481": {
+        "title": "The Devil Wears Prada 2",
+        "genre": "drame",
+        "date": "2026-06-22",
+        "backdrop_path": "/2cr7imTLVSSrzgL3bFKAMCMdgKw.jpg"
+    },
+    "movie_1129104": {
+        "title": "Flavia",
+        "genre": "famille",
+        "date": "2026-06-22",
+        "backdrop_path": "/6t9nSqZpD1mlT9DLugyZNmC3SsQ.jpg"
+    },
+    "tv_70523": {
+        "title": "Dark",
+        "genre": "fantastique",
+        "date": "2026-06-22",
+        "backdrop_path": "/2VpSajCTI26zddsp5cSjqfCBKEa.jpg"
+    },
+    "tv_4613": {
+        "title": "Band of Brothers",
+        "genre": "guerre",
+        "date": "2026-06-22",
+        "backdrop_path": "/2yDV0xLyqW88dn5qE7YCRnoYmfy.jpg"
+    },
+    "movie_424": {
+        "title": "Schindler's List",
+        "genre": "histoire",
+        "date": "2026-06-22",
+        "backdrop_path": "/zb6fM1CX41D9rF9hdgclu0peUmy.jpg"
+    },
+    "movie_1430077": {
+        "title": "Hokum",
+        "genre": "horreur",
+        "date": "2026-06-22",
+        "backdrop_path": "/arNKUmatyuAjDsO8y3BNfu7jJZc.jpg"
+    },
+    "movie_1316092": {
+        "title": "\"Wuthering Heights\"",
+        "genre": "romance",
+        "date": "2026-06-22",
+        "backdrop_path": "/vSQSYd2zZTqc0zmHImwWEGGluMI.jpg"
+    },
+    "movie_949536": {
+        "title": "Kill Code",
+        "genre": "science-fiction",
+        "date": "2026-06-22",
+        "backdrop_path": "/zyqAhNJqwiop5yUOJ8SHV27labY.jpg"
+    },
+    "tv_226637": {
+        "title": "High Potential",
+        "genre": "thriller",
+        "date": "2026-06-22",
+        "backdrop_path": "/yVP12H81dwaay5B7GVqgO893q2c.jpg"
+    },
+    "tv_4324": {
+        "title": "Dr. Quinn, Medicine Woman",
+        "genre": "western",
+        "date": "2026-06-22",
+        "backdrop_path": "/tXJf6radpACrCQPYIU0ARFsVV7z.jpg"
     },
     "movie_1168190": {
         "title": "The Wrecking Crew",
