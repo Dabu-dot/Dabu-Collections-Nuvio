@@ -2,8 +2,104 @@
     "movie_911430": {
         "title": "F1",
         "genre": "sport",
-        "date": "2026-06-23",
-        "backdrop_path": "/lkDYN0whyE82mcM20rwtwjbniKF.jpg"
+        "date": "2026-06-24",
+        "backdrop_path": "/rZWkXnIyTLzUJpHSUpOb7vgB0BL.jpg"
+    },
+    "tv_77169": {
+        "title": "Cobra Kai",
+        "genre": "action",
+        "date": "2026-06-24",
+        "backdrop_path": "/pazdVerQyCdWM9Qn12qUWkdp4ZM.jpg"
+    },
+    "tv_240411": {
+        "title": "Dan Da Dan",
+        "genre": "animation-japonaise",
+        "date": "2026-06-24",
+        "backdrop_path": "/uNTrRKIOyKYISthoeizghtXPEOK.jpg"
+    },
+    "tv_456": {
+        "title": "The Simpsons",
+        "genre": "animation",
+        "date": "2026-06-24",
+        "backdrop_path": "/hpU2cHC9tk90hswCFEpf5AtbqoL.jpg"
+    },
+    "movie_693134": {
+        "title": "Dune: Part Two",
+        "genre": "aventure",
+        "date": "2026-06-24",
+        "backdrop_path": "/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg"
+    },
+    "tv_110492": {
+        "title": "Peacemaker",
+        "genre": "comedie",
+        "date": "2026-06-24",
+        "backdrop_path": "/ctxm191q5o3axFzQsvNPlbKoSYv.jpg"
+    },
+    "tv_290856": {
+        "title": "Marshals",
+        "genre": "crime",
+        "date": "2026-06-24",
+        "backdrop_path": "/ihT4s15wPjqXLblKlE6cwBhJVz4.jpg"
+    },
+    "local_Flower3.jpg": {
+        "title": "Curation : Flower3.jpg",
+        "genre": "documentaire",
+        "date": "2026-06-24",
+        "backdrop_path": "Ressources/Collections Covers/Genres/Static Covers/References/Flower3.jpg"
+    },
+    "tv_71712": {
+        "title": "The Good Doctor",
+        "genre": "drame",
+        "date": "2026-06-24",
+        "backdrop_path": "/f3cin9kOz4nOrlYEMxGFQhv4bdN.jpg"
+    },
+    "movie_1087192": {
+        "title": "How to Train Your Dragon",
+        "genre": "famille",
+        "date": "2026-06-24",
+        "backdrop_path": "/7HqLLVjdjhXS0Qoz1SgZofhkIpE.jpg"
+    },
+    "tv_63174": {
+        "title": "Lucifer",
+        "genre": "fantastique",
+        "date": "2026-06-24",
+        "backdrop_path": "/wbiPjTWpZMIB8ffBq7HvzAph4Ft.jpg"
+    },
+    "tv_63333": {
+        "title": "The Last Kingdom",
+        "genre": "guerre",
+        "date": "2026-06-24",
+        "backdrop_path": "/QbtctI8EzlhsyFDMUMyG3fli8B.jpg"
+    },
+    "movie_1292695": {
+        "title": "They Will Kill You",
+        "genre": "horreur",
+        "date": "2026-06-24",
+        "backdrop_path": "/q05WV8DwEiyLbCgSVtg55RbUzou.jpg"
+    },
+    "movie_337167": {
+        "title": "Fifty Shades Freed",
+        "genre": "romance",
+        "date": "2026-06-24",
+        "backdrop_path": "/9ywA15OAiwjSTvg3cBs9B7kOCBF.jpg"
+    },
+    "movie_1081003": {
+        "title": "Supergirl",
+        "genre": "science-fiction",
+        "date": "2026-06-24",
+        "backdrop_path": "/6nlqYWDUpNem3v2bDCxQNSg41aY.jpg"
+    },
+    "tv_245927": {
+        "title": "Paradise",
+        "genre": "thriller",
+        "date": "2026-06-24",
+        "backdrop_path": "/5QsLvWh8J1mXl1W05wNJknMmhzR.jpg"
+    },
+    "tv_1406": {
+        "title": "Deadwood",
+        "genre": "western",
+        "date": "2026-06-24",
+        "backdrop_path": "/AcVCp1RVilFKT3DWre0GjP7vzsq.jpg"
     },
     "tv_69478": {
         "title": "The Handmaid's Tale",
