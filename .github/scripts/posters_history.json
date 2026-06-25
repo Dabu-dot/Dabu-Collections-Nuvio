@@ -105,7 +105,7 @@
         "title": "For All Mankind",
         "genre": "histoire",
         "date": "2026-06-25",
-        "backdrop_path": "/9OQ5BIITkJwRJo9JA6AlCfJIGBQ.jpg"
+        "backdrop_path": "/vi0TpQbbZ8FWTRBmawbvegMRbtc.jpg"
     },
     "tv_299167": {
         "title": "Dutton Ranch",
@@ -208,6 +208,108 @@
         "genre": "thriller",
         "date": "2026-06-25",
         "backdrop_path": "/nHxWyy18SvAZ8jJeemtS8k1UNjM.jpg"
+    },
+    "tv_44217": {
+        "title": "Vikings",
+        "genre": "guerre",
+        "date": "2026-06-25",
+        "backdrop_path": "/nwgDxRY7cA7hUwsbACXuDoKDm7L.jpg"
+    },
+    "movie_1339713": {
+        "title": "Obsession",
+        "genre": "horreur",
+        "date": "2026-06-25",
+        "backdrop_path": "/fnASfC4pJ4NSzJ1ch7FBD99PiaZ.jpg"
+    },
+    "movie_1358005": {
+        "title": "Office Romance",
+        "genre": "romance",
+        "date": "2026-06-25",
+        "backdrop_path": "/ixjsQuOhdx6mKlyeMMzd80WjT6K.jpg"
+    },
+    "movie_1280738": {
+        "title": "The Furious",
+        "genre": "action",
+        "date": "2026-06-25",
+        "backdrop_path": "/b94Br0pFWR0gKIBgP5I6fGneUAl.jpg"
+    },
+    "tv_65942": {
+        "title": "Re:ZERO -Starting Life in Another World-",
+        "genre": "animation-japonaise",
+        "date": "2026-06-25",
+        "backdrop_path": "/x6y59dJBE1o0r4YRsWVQXE2nnlB.jpg"
+    },
+    "tv_1433": {
+        "title": "American Dad!",
+        "genre": "animation",
+        "date": "2026-06-25",
+        "backdrop_path": "/mc3rG5M9dFVjMfaCFNfbD5gu2pK.jpg"
+    },
+    "tv_1399": {
+        "title": "Game of Thrones",
+        "genre": "aventure",
+        "date": "2026-06-25",
+        "backdrop_path": "/rIe3PnM6S7IBUmvNwDkBMX0i9EZ.jpg"
+    },
+    "tv_34307": {
+        "title": "Shameless",
+        "genre": "comedie",
+        "date": "2026-06-25",
+        "backdrop_path": "/5s9XHTB9SLPdg3mNU6BlSLnZ9Qq.jpg"
+    },
+    "tv_41956": {
+        "title": "Death in Paradise",
+        "genre": "crime",
+        "date": "2026-06-25",
+        "backdrop_path": "/bcfy6SWROCtSScV0lvFOGf5S0b1.jpg"
+    },
+    "local_Castle.jpg": {
+        "title": "Curation : Castle.jpg",
+        "genre": "documentaire",
+        "date": "2026-06-25",
+        "backdrop_path": "Ressources/Collections Covers/Genres/Static Covers/References/Castle.jpg"
+    },
+    "tv_288603": {
+        "title": "Never-Ending Summer",
+        "genre": "drame",
+        "date": "2026-06-25",
+        "backdrop_path": "/80vo7eYhAXPJltu32lG5JGrGPzG.jpg"
+    },
+    "tv_1508": {
+        "title": "Dancing with the Stars",
+        "genre": "famille",
+        "date": "2026-06-25",
+        "backdrop_path": "/acDIozZUCXohK5NQYTiuZUJ2Yfb.jpg"
+    },
+    "tv_60735": {
+        "title": "The Flash",
+        "genre": "fantastique",
+        "date": "2026-06-25",
+        "backdrop_path": "/gFkHcIh7iE5G0oVOgpmY8ONQjhl.jpg"
+    },
+    "movie_157336": {
+        "title": "Interstellar",
+        "genre": "science-fiction",
+        "date": "2026-06-25",
+        "backdrop_path": "/vgnoBSVzWAV9sNQUORaDGvDp7wx.jpg"
+    },
+    "movie_385687": {
+        "title": "Fast X",
+        "genre": "sport",
+        "date": "2026-06-25",
+        "backdrop_path": "/fSd5MjJNcauyEbHuzUdCE1TKttK.jpg"
+    },
+    "tv_1396": {
+        "title": "Breaking Bad",
+        "genre": "thriller",
+        "date": "2026-06-25",
+        "backdrop_path": "/63FA8vwSZnXkGxedrDQwni4JuZN.jpg"
+    },
+    "tv_73544": {
+        "title": "Warrior",
+        "genre": "western",
+        "date": "2026-06-25",
+        "backdrop_path": "/akshc6F3VmhJpvniRRlgqDt1ndT.jpg"
     },
     "tv_77169": {
         "title": "Cobra Kai",
@@ -365,12 +467,6 @@
         "date": "2026-06-23",
         "backdrop_path": "/iN41Ccw4DctL8npfmYg1j5Tr1eb.jpg"
     },
-    "tv_44217": {
-        "title": "Vikings",
-        "genre": "guerre",
-        "date": "2026-06-23",
-        "backdrop_path": "/qsYgsPVYAzGYAPZuo2NkVctVFsd.jpg"
-    },
     "movie_1495": {
         "title": "Kingdom of Heaven",
         "genre": "histoire",
@@ -472,18 +568,6 @@
         "genre": "histoire",
         "date": "2026-06-22",
         "backdrop_path": "/ycnO0cjsAROSGJKuMODgRtWsHQw.jpg"
-    },
-    "movie_1339713": {
-        "title": "Obsession",
-        "genre": "horreur",
-        "date": "2026-06-22",
-        "backdrop_path": "/5lTZyuBTNOfawsfPT8Q0cIg6qAF.jpg"
-    },
-    "movie_1358005": {
-        "title": "Office Romance",
-        "genre": "romance",
-        "date": "2026-06-22",
-        "backdrop_path": "/1N5yz1IDw6Ci8le1YgeM6xtBijA.jpg"
     },
     "tv_67198": {
         "title": "Star Trek: Discovery",
