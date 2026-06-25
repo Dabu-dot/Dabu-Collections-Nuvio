@@ -101,6 +101,114 @@
         "date": "2026-06-25",
         "backdrop_path": "/sIl7mUbkhnyFbuQxRXrC2aFqBlt.jpg"
     },
+    "tv_87917": {
+        "title": "For All Mankind",
+        "genre": "histoire",
+        "date": "2026-06-25",
+        "backdrop_path": "/9OQ5BIITkJwRJo9JA6AlCfJIGBQ.jpg"
+    },
+    "tv_299167": {
+        "title": "Dutton Ranch",
+        "genre": "western",
+        "date": "2026-06-25",
+        "backdrop_path": "/ewlmL0nxo2lLqBj69upgp2gjHpV.jpg"
+    },
+    "movie_617126": {
+        "title": "The Fantastic 4: First Steps",
+        "genre": "action",
+        "date": "2026-06-25",
+        "backdrop_path": "/s94NjfKkcSczZ1FembwmQZwsuwY.jpg"
+    },
+    "tv_154743": {
+        "title": "The Angel Next Door Spoils Me Rotten",
+        "genre": "animation-japonaise",
+        "date": "2026-06-25",
+        "backdrop_path": "/xT61K3zhGTix0O3H5BEcDLGDkk9.jpg"
+    },
+    "tv_1434": {
+        "title": "Family Guy",
+        "genre": "animation",
+        "date": "2026-06-25",
+        "backdrop_path": "/jbTqU6BJMufoMnPSlO4ThrcXs3Y.jpg"
+    },
+    "movie_969681": {
+        "title": "Spider-Man: Brand New Day",
+        "genre": "aventure",
+        "date": "2026-06-25",
+        "backdrop_path": "/vjMvFSmGUxEtqVdaZgvFee9XkZl.jpg"
+    },
+    "tv_76331": {
+        "title": "Succession",
+        "genre": "comedie",
+        "date": "2026-06-25",
+        "backdrop_path": "/brC6qt6QLcWhVl1wsDp1dX9Lim.jpg"
+    },
+    "tv_87940": {
+        "title": "Hudson & Rex",
+        "genre": "crime",
+        "date": "2026-06-25",
+        "backdrop_path": "/eEOx2lpnWm4lVF5jfqtKsWlyuJX.jpg"
+    },
+    "local_Elephants.jpg": {
+        "title": "Curation : Elephants.jpg",
+        "genre": "documentaire",
+        "date": "2026-06-25",
+        "backdrop_path": "Ressources/Collections Covers/Genres/Static Covers/References/Elephants.jpg"
+    },
+    "movie_1340206": {
+        "title": "Tuner",
+        "genre": "drame",
+        "date": "2026-06-25",
+        "backdrop_path": "/dpHoPHMSMkFZWt44FGkpEZ61Ptd.jpg"
+    },
+    "tv_106": {
+        "title": "The Andy Griffith Show",
+        "genre": "famille",
+        "date": "2026-06-25",
+        "backdrop_path": "/r7tc43rSsxTq9HnTamK7ynb1W7k.jpg"
+    },
+    "tv_93740": {
+        "title": "Foundation",
+        "genre": "fantastique",
+        "date": "2026-06-25",
+        "backdrop_path": "/7NNNXo0qG2SqH4JoG7GPvJ2hzes.jpg"
+    },
+    "tv_4613": {
+        "title": "Band of Brothers",
+        "genre": "guerre",
+        "date": "2026-06-25",
+        "backdrop_path": "/2yDV0xLyqW88dn5qE7YCRnoYmfy.jpg"
+    },
+    "movie_1463681": {
+        "title": "Southern Scares",
+        "genre": "horreur",
+        "date": "2026-06-25",
+        "backdrop_path": "/2wssSN9oE8kr2pXTKiidcqZrH0A.jpg"
+    },
+    "movie_1329471": {
+        "title": "Carolina Caroline",
+        "genre": "romance",
+        "date": "2026-06-25",
+        "backdrop_path": "/112sW296vEx3d71C8fzOqoFIomN.jpg"
+    },
+    "tv_83867": {
+        "title": "Andor",
+        "genre": "science-fiction",
+        "date": "2026-06-25",
+        "backdrop_path": "/q8qNN1voEOYzxWhBezHZG9soWWW.jpg"
+    },
+    "tv_97546": {
+        "title": "Ted Lasso",
+        "genre": "sport",
+        "date": "2026-06-25",
+        "backdrop_path": "/8rDij8tYynUfu2hMVXynAp2pSjY.jpg"
+    },
+    "movie_1290821": {
+        "title": "Shelter",
+        "genre": "thriller",
+        "date": "2026-06-25",
+        "backdrop_path": "/nHxWyy18SvAZ8jJeemtS8k1UNjM.jpg"
+    },
     "tv_77169": {
         "title": "Cobra Kai",
         "genre": "action",
@@ -359,12 +467,6 @@
         "date": "2026-06-22",
         "backdrop_path": "/q3UGWifvIpdey1T2efX4dSmbZpU.jpg"
     },
-    "tv_87917": {
-        "title": "For All Mankind",
-        "genre": "guerre",
-        "date": "2026-06-22",
-        "backdrop_path": "/vi0TpQbbZ8FWTRBmawbvegMRbtc.jpg"
-    },
     "movie_872585": {
         "title": "Oppenheimer",
         "genre": "histoire",
@@ -394,12 +496,6 @@
         "genre": "thriller",
         "date": "2026-06-22",
         "backdrop_path": "/5p6BsJtnPbglYN15MuiUEppPl0f.jpg"
-    },
-    "tv_299167": {
-        "title": "Dutton Ranch",
-        "genre": "western",
-        "date": "2026-06-22",
-        "backdrop_path": "/wh5agdl3b7fqC7mSjsCkHx4fMAs.jpg"
     },
     "tv_111110": {
         "title": "ONE PIECE",
