@@ -2,8 +2,104 @@
     "movie_911430": {
         "title": "F1",
         "genre": "sport",
-        "date": "2026-06-24",
-        "backdrop_path": "/rZWkXnIyTLzUJpHSUpOb7vgB0BL.jpg"
+        "date": "2026-06-25",
+        "backdrop_path": "/lkDYN0whyE82mcM20rwtwjbniKF.jpg"
+    },
+    "tv_52814": {
+        "title": "Halo",
+        "genre": "action",
+        "date": "2026-06-25",
+        "backdrop_path": "/1qpUk27LVI9UoTS7S0EixUBj5aR.jpg"
+    },
+    "tv_203737": {
+        "title": "【OSHI NO KO】",
+        "genre": "animation-japonaise",
+        "date": "2026-06-25",
+        "backdrop_path": "/gArCVC4ML529WMCEqOXbALdQbUq.jpg"
+    },
+    "tv_60625": {
+        "title": "Rick and Morty",
+        "genre": "animation",
+        "date": "2026-06-25",
+        "backdrop_path": "/5BDNWWHweQL0q1fmTv7gmRXfnl4.jpg"
+    },
+    "tv_82856": {
+        "title": "The Mandalorian",
+        "genre": "aventure",
+        "date": "2026-06-25",
+        "backdrop_path": "/o7qi2v4uWQ8bZ1tW3KI0Ztn2epk.jpg"
+    },
+    "movie_1314481": {
+        "title": "The Devil Wears Prada 2",
+        "genre": "comedie",
+        "date": "2026-06-25",
+        "backdrop_path": "/2cr7imTLVSSrzgL3bFKAMCMdgKw.jpg"
+    },
+    "tv_67178": {
+        "title": "Marvel's The Punisher",
+        "genre": "crime",
+        "date": "2026-06-25",
+        "backdrop_path": "/bWuXk1MtLAeYJrR3UdqnJhMwhXP.jpg"
+    },
+    "local_Mountain2.jpg": {
+        "title": "Curation : Mountain2.jpg",
+        "genre": "documentaire",
+        "date": "2026-06-25",
+        "backdrop_path": "Ressources/Collections Covers/Genres/Static Covers/References/Mountain2.jpg"
+    },
+    "tv_211288": {
+        "title": "Tracker",
+        "genre": "drame",
+        "date": "2026-06-25",
+        "backdrop_path": "/5C5cMYUlmX6BU5YxBqhp7ZpSd3Q.jpg"
+    },
+    "movie_1671548": {
+        "title": "Dear You",
+        "genre": "famille",
+        "date": "2026-06-25",
+        "backdrop_path": "/dzWGnIAjUafpmY57F6vnm44FwWB.jpg"
+    },
+    "tv_125988": {
+        "title": "Silo",
+        "genre": "fantastique",
+        "date": "2026-06-25",
+        "backdrop_path": "/n5FPNMJ0eRoiQrKGfUQQRAZeaxg.jpg"
+    },
+    "tv_918": {
+        "title": "M*A*S*H",
+        "genre": "guerre",
+        "date": "2026-06-25",
+        "backdrop_path": "/8nkOWsMtWZvp7IGuYdVbJeoWzQx.jpg"
+    },
+    "movie_1272837": {
+        "title": "28 Years Later: The Bone Temple",
+        "genre": "horreur",
+        "date": "2026-06-25",
+        "backdrop_path": "/cwX1koqx0UsN0naDGxKFMs3raUZ.jpg"
+    },
+    "movie_11012": {
+        "title": "Damage",
+        "genre": "romance",
+        "date": "2026-06-25",
+        "backdrop_path": "/krhj4Fhb0G3QCmyBtEADxgFFmRX.jpg"
+    },
+    "movie_299536": {
+        "title": "Avengers: Infinity War",
+        "genre": "science-fiction",
+        "date": "2026-06-25",
+        "backdrop_path": "/bOGkgRGdhrBYJSLpXaxhXVstddV.jpg"
+    },
+    "movie_933260": {
+        "title": "The Substance",
+        "genre": "thriller",
+        "date": "2026-06-25",
+        "backdrop_path": "/7h6TqPB3ESmjuVbxCxAeB1c9OB1.jpg"
+    },
+    "tv_3713": {
+        "title": "Gunsmoke",
+        "genre": "western",
+        "date": "2026-06-25",
+        "backdrop_path": "/sIl7mUbkhnyFbuQxRXrC2aFqBlt.jpg"
     },
     "tv_77169": {
         "title": "Cobra Kai",
