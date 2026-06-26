@@ -2,8 +2,110 @@
     "movie_911430": {
         "title": "F1",
         "genre": "sport",
-        "date": "2026-06-25",
-        "backdrop_path": "/rZWkXnIyTLzUJpHSUpOb7vgB0BL.jpg"
+        "date": "2026-06-26",
+        "backdrop_path": "/lkDYN0whyE82mcM20rwtwjbniKF.jpg"
+    },
+    "tv_14951": {
+        "title": "Nature",
+        "genre": "documentaire",
+        "date": "2026-06-26",
+        "backdrop_path": "/j6aCSIjK4N7SpkSPBBNv7vbDvJo.jpg"
+    },
+    "movie_1419406": {
+        "title": "The Shadow's Edge",
+        "genre": "action",
+        "date": "2026-06-26",
+        "backdrop_path": "/4BtL2vvEufDXDP4u6xQjjQ1Y2aT.jpg"
+    },
+    "tv_259140": {
+        "title": "Ranma1/2",
+        "genre": "animation-japonaise",
+        "date": "2026-06-26",
+        "backdrop_path": "/xvD9urN8lUtWw5fm4a87Rl3dCZn.jpg"
+    },
+    "movie_301528": {
+        "title": "Toy Story 4",
+        "genre": "animation",
+        "date": "2026-06-26",
+        "backdrop_path": "/q62bpQ67qaXY0u6b2wFEnQYIbPd.jpg"
+    },
+    "tv_73375": {
+        "title": "Tom Clancy's Jack Ryan",
+        "genre": "aventure",
+        "date": "2026-06-26",
+        "backdrop_path": "/mDVIU9Y2TYeK2W29a2HRBiWt3JA.jpg"
+    },
+    "tv_79744": {
+        "title": "The Rookie",
+        "genre": "comedie",
+        "date": "2026-06-26",
+        "backdrop_path": "/6iNWfGVCEfASDdlNb05TP5nG0ll.jpg"
+    },
+    "movie_1439930": {
+        "title": "The Punisher: One Last Kill",
+        "genre": "crime",
+        "date": "2026-06-26",
+        "backdrop_path": "/fAhLjW8W9PU08KHBbRK3Vek9k4L.jpg"
+    },
+    "tv_71790": {
+        "title": "S.W.A.T.",
+        "genre": "drame",
+        "date": "2026-06-26",
+        "backdrop_path": "/jD7rNZDOrTP0ESP7S7Lmq6zYSAP.jpg"
+    },
+    "tv_71728": {
+        "title": "Young Sheldon",
+        "genre": "famille",
+        "date": "2026-06-26",
+        "backdrop_path": "/nlDBlCtorM7nx130wYnfR5ZmyLX.jpg"
+    },
+    "tv_95057": {
+        "title": "Superman & Lois",
+        "genre": "fantastique",
+        "date": "2026-06-26",
+        "backdrop_path": "/pPKiIJEEcV0E1hpVcWRXyp73ZpX.jpg"
+    },
+    "movie_1207162": {
+        "title": "Rise of the Conqueror",
+        "genre": "guerre",
+        "date": "2026-06-26",
+        "backdrop_path": "/9gWrxuOJeArUbvnqrZALSjhPv9Y.jpg"
+    },
+    "tv_67026": {
+        "title": "Designated Survivor",
+        "genre": "histoire",
+        "date": "2026-06-26",
+        "backdrop_path": "/AhufsCP0kYIkpr0Iy2GrLSM1noL.jpg"
+    },
+    "movie_1480387": {
+        "title": "undertone",
+        "genre": "horreur",
+        "date": "2026-06-26",
+        "backdrop_path": "/abqhPVQsEj7hoCiltlDTotgNgwr.jpg"
+    },
+    "movie_614945": {
+        "title": "Voicemails for Isabelle",
+        "genre": "romance",
+        "date": "2026-06-26",
+        "backdrop_path": "/2WU6Y6aonzD6uAaCmNnEFlesxxJ.jpg"
+    },
+    "movie_1116201": {
+        "title": "Iron Lung",
+        "genre": "science-fiction",
+        "date": "2026-06-26",
+        "backdrop_path": "/seuG9UslSFybML8C4enbrE6Hsyz.jpg"
+    },
+    "movie_976912": {
+        "title": "Graphic Desires",
+        "genre": "thriller",
+        "date": "2026-06-26",
+        "backdrop_path": "/uN8GPpotW0tDbgxG4SRluZhHWa5.jpg"
+    },
+    "tv_1018": {
+        "title": "Bonanza",
+        "genre": "western",
+        "date": "2026-06-26",
+        "backdrop_path": "/61OxoiBHvGFOB4gufYfypHyCbI4.jpg"
     },
     "tv_52814": {
         "title": "Halo",
@@ -346,12 +448,6 @@
         "genre": "crime",
         "date": "2026-06-25",
         "backdrop_path": "/5DFvscYGpcFaQMJljCic5gbzVe6.jpg"
-    },
-    "tv_14951": {
-        "title": "Nature",
-        "genre": "documentaire",
-        "date": "2026-06-25",
-        "backdrop_path": "/j6aCSIjK4N7SpkSPBBNv7vbDvJo.jpg"
     },
     "tv_273240": {
         "title": "Off Campus",
