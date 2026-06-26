@@ -23,7 +23,7 @@ HISTORY_FILE = ".github/scripts/posters_history.json"
 ALLOWED_LANGUAGES = {"fr", "en", "es", "de", "it", "ja", "ko", "zh"}
 WESTERN_LANGUAGES = {"fr", "en", "es", "de", "it"}
 
-# BANNED_KEYWORDS : Protection absolue contre le contenu adulte, NSFW et Talk-Shows
+# BANNED_KEYWORDS : Protection absolue contre le contenu adulte, NSFW, Talk-Shows et Thrillers Érotiques
 BANNED_KEYWORDS = {
     195669,  # ecchi
     155477,  # softcore
@@ -44,6 +44,7 @@ BANNED_KEYWORDS = {
     18321,   # porn industry
     267122,  # sex
     356759,  # porn
+    207767,  # erotic thriller
 }
 
 # FAMILY_BANNED_KEYWORDS : Exclusion des dynamiques religieuses/bibliques du genre Famille
