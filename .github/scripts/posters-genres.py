@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import json
+import random
 import requests
 from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageOps, ImageFilter
@@ -17,6 +18,7 @@ if not TMDB_API_KEY:
     sys.exit(1)
 
 OUTPUT_DIR = "Ressources/Collections Covers/Genres/Static Covers"
+REFERENCES_DIR = "Ressources/Collections Covers/Genres/Static Covers/References"
 HISTORY_FILE = ".github/scripts/posters_history.json"
 
 # Périmètres linguistiques
@@ -117,14 +119,19 @@ def get_trending_media_for_genre(genre_name, config, excluded_keys):
     movie_genre_param = f"&with_genres={config['movie_genre']}" if config.get('movie_genre') else ""
     tv_genre_param = f"&with_genres={config['tv_genre']}" if config.get('tv_genre') else ""
 
-    for page in range(1, 4):
+    # Exploration poussée : On passe de 3 à 10 pages pour élargir grandement le pool de recherche
+    MAX_PAGES = 10
+
+    for page in range(1, MAX_PAGES + 1):
         try:
             res = tmdb_api_call(f"/discover/movie?sort_by=popularity.desc{movie_genre_param}{config.get('extra', '')}&page={page}&include_adult=false")
-            for item in res.get("results", []):
+            results = res.get("results", [])
+            if not results: break
+            for item in results:
                 if item.get("backdrop_path"): item["media_type"] = "movie"; movie_pool.append(item)
         except: break
         
-    for page in range(1, 4):
+    for page in range(1, MAX_PAGES + 1):
         try:
             # VERROU API 1 : Injection dynamique de l'exclusion du genre Télé-réalité (10764)
             tv_extra = config.get('extra', '')
@@ -134,7 +141,9 @@ def get_trending_media_for_genre(genre_name, config, excluded_keys):
                 tv_extra += "&without_genres=10764"
 
             res = tmdb_api_call(f"/discover/tv?sort_by=popularity.desc{tv_genre_param}{tv_extra}&page={page}&include_adult=false")
-            for item in res.get("results", []):
+            results = res.get("results", [])
+            if not results: break
+            for item in results:
                 if item.get("backdrop_path"): item["media_type"] = "tv"; tv_pool.append(item)
         except: break
     
@@ -151,9 +160,8 @@ def get_trending_media_for_genre(genre_name, config, excluded_keys):
         if item["media_type"] == "tv" and 10764 in item.get("genre_ids", []):
             continue
         
-        # Clause de Dérogation Historique : Documentaire et Sport contournent le lock des 14 jours
-        if genre_name not in ["documentaire", "sport"]:
-            if composite_key in excluded_keys: continue
+        # CORRECTION SÉCURITÉ : Plus aucune dérogation historique. Sport respecte maintenant strictement le verrou des 14 jours.
+        if composite_key in excluded_keys: continue
             
         if composite_key in RUN_PROCESSED_IDS: continue
         filtered.append(item)
@@ -225,7 +233,7 @@ def apply_premium_duotone(img, base_color):
     
     y_img = ImageEnhance.Brightness(y_img).enhance(0.96)
     final_ycbcr = Image.merge("YCbCr", (y_img, cb_color, cr_color))
-    return final_ycbcr.convert("RGB").filter(ImageFilter.SHARPEN)
+    return final_ycbcr.convert("RGB").filter(ImageFilter.SHAPEREN)
 
 def finalize_landscape_banner(img, label, color):
     img = ImageOps.fit(img, (1920, 1080), method=Image.Resampling.LANCZOS)
@@ -286,6 +294,32 @@ def main():
     current_year = datetime.now().year
 
     for genre_name, config in GENRES_CONFIG.items():
+        # CORRECTION MODE LOCAL : Gestion exclusive du genre Documentaire via le dossier References
+        if genre_name == "documentaire":
+            print(f"\n--- Sélection Locale Aléatoire : {config['label']} ---")
+            if os.path.exists(REFERENCES_DIR):
+                valid_extensions = (".jpg", ".jpeg", ".png", ".webp")
+                local_files = [f for f in os.listdir(REFERENCES_DIR) if f.lower().endswith(valid_extensions)]
+                
+                if local_files:
+                    chosen_file = random.choice(local_files)
+                    local_file_path = os.path.join(REFERENCES_DIR, chosen_file)
+                    try:
+                        raw_img = Image.open(local_file_path).convert("RGB")
+                        print(f" -> Sélectionné (Local) : {chosen_file}")
+                        
+                        final_banner = finalize_landscape_banner(raw_img, config["label"], config["color"])
+                        final_banner.save(f"{OUTPUT_DIR}/{genre_name}.jpg", "JPEG", quality=94)
+                        final_banner.save(f"{OUTPUT_DIR}/{genre_name}.webp", "WEBP", quality=94)
+                        continue # Succès, on passe directement au genre suivant sans toucher à l'API
+                    except Exception as e:
+                        print(f" Échec du traitement de l'image locale {chosen_file} : {e}")
+                else:
+                    print(f" [ALERTE] Aucun fichier image trouvé dans le dossier References ({REFERENCES_DIR}).")
+            else:
+                print(f" [ALERTE] Le dossier des références local n'existe pas : {REFERENCES_DIR}")
+            continue
+
         print(f"\n--- Analyse Algorithmique : {config['label']} ---")
         candidates = get_trending_media_for_genre(genre_name, config, excluded_keys)
         if not candidates: continue
