@@ -31,14 +31,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pillow requests
 
-      - name: Download Apple San Francisco Font
-        run: |
-          mkdir -p .github/assets/fonts
-          curl -sL "https://github.com/AndrewFontenot/SF-Pro-Fonts/raw/master/SF-Pro-Display-Bold.otf" -o .github/assets/fonts/SF-Pro-Display-Bold.otf
-
       - name: Execute Backdrop Renderer
         env:
-          BINGECAT_CATALOG_URL: ${{ secrets.BINGECAT_CATALOG_URL }}
+          BINGECAT_FILMS_URL: ${{ secrets.BINGECAT_FILMS_URL }}
           PYTHONDONTWRITEBYTECODE: "1"
         run: python3 .github/scripts/backdrop_selection.py
 
@@ -47,14 +42,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # Indexation ciblée du dossier contenant votre image finale
+          # Indexation globale du dossier de sortie (gère toutes les images d'un coup)
           git add "Ressources/backdrops/"
           
-          # Vérification intelligente : On commit et push uniquement si l'image a changé
+          # Push uniquement s'il y a des changements visuels dans les sélections
           if ! git diff --cached --exit-code; then
-            git commit -m "🎨 Update backdrop_selection : $(date +'%Y-%m-%d') [Skip CI]"
+            git commit -m "🎨 Update backdrop_selections : $(date +'%Y-%m-%d') [Skip CI]"
             git push origin main
           else
-            echo "Aucune modification de contenu détectée aujourd'hui."
+            echo "Aucun changement visuel détecté aujourd'hui."
           fi
-          
