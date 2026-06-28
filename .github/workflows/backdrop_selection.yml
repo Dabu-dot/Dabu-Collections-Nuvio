@@ -2,50 +2,59 @@ name: Backdrop Selection Generator
 
 on:
   schedule:
-    - cron: '0 5 * * *' # Déclenchement automatique tous les jours à 05h00 UTC
-  workflow_dispatch: # Autorise un lancement manuel depuis l'onglet Actions sur GitHub
+    - cron: "0 5 * * *"  # S'exécute automatiquement tous les jours à 5h00 UTC
+  workflow_dispatch:      # Permet un déclenchement manuel depuis l'interface GitHub
 
 permissions:
   contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
   build-and-render:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-        cache: 'pip'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install requests pillow
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pillow requests
 
-    - name: Download Apple San Francisco Font
-      run: |
-        mkdir -p .github/assets/fonts
-        # Téléchargement sécurisé de la police SF Pro Display Bold
-        curl -sL "https://github.com/AndrewFontenot/SF-Pro-Fonts/raw/master/SF-Pro-Display-Bold.otf" -o .github/assets/fonts/SF-Pro-Display-Bold.otf
+      - name: Download Apple San Francisco Font
+        run: |
+          mkdir -p .github/assets/fonts
+          curl -sL "https://github.com/AndrewFontenot/SF-Pro-Fonts/raw/master/SF-Pro-Display-Bold.otf" -o .github/assets/fonts/SF-Pro-Display-Bold.otf
 
-    - name: Execute Backdrop Renderer
-      env:
-        BINGECAT_CATALOG_URL: ${{ secrets.BINGECAT_CATALOG_URL }}
-      run: python .github/scripts/backdrop_selection.py
+      - name: Execute Backdrop Renderer
+        env:
+          BINGECAT_CATALOG_URL: ${{ secrets.BINGECAT_CATALOG_URL }}
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python3 .github/scripts/backdrop_selection.py
 
-    - name: Commit and Push Backdrop
-      run: |
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        git add Ressources/backdrops/
-        if ! git diff-index --quiet HEAD; then
-          git commit -m "🎨 Update backdrop_selection : $(date +'%Y-%m-%d')"
-          git push
-        else
-          echo "Aucune modification de contenu détectée aujourd'hui."
-        fi
+      - name: Commit and Push Changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # Indexation ciblée du dossier contenant votre image finale
+          git add "Ressources/backdrops/"
+          
+          # Vérification intelligente : On commit et push uniquement si l'image a changé
+          if ! git diff --cached --exit-code; then
+            git commit -m "🎨 Update backdrop_selection : $(date +'%Y-%m-%d') [Skip CI]"
+            git push origin main
+          else
+            echo "Aucune modification de contenu détectée aujourd'hui."
+          fi
+          
