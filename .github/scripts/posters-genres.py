@@ -233,7 +233,7 @@ def apply_premium_duotone(img, base_color):
     
     y_img = ImageEnhance.Brightness(y_img).enhance(0.96)
     final_ycbcr = Image.merge("YCbCr", (y_img, cb_color, cr_color))
-    return final_ycbcr.convert("RGB").filter(ImageFilter.SHAPEREN)
+    return final_ycbcr.convert("RGB").filter(ImageFilter.SHARPEN)
 
 def finalize_landscape_banner(img, label, color):
     img = ImageOps.fit(img, (1920, 1080), method=Image.Resampling.LANCZOS)
