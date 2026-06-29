@@ -1,4 +1,106 @@
 {
+    "movie_1168190": {
+        "title": "The Wrecking Crew",
+        "genre": "action",
+        "date": "2026-06-29",
+        "backdrop_path": "/cz4vLJrmaV1zJlRYbxqtvLzeLWB.jpg"
+    },
+    "tv_245842": {
+        "title": "Wistoria: Wand and Sword",
+        "genre": "animation-japonaise",
+        "date": "2026-06-29",
+        "backdrop_path": "/n4VljCX22hbw3RwfxaY8FX8eLzN.jpg"
+    },
+    "movie_1315772": {
+        "title": "Minions & Monsters",
+        "genre": "animation",
+        "date": "2026-06-29",
+        "backdrop_path": "/xMoXsOgF0hBP7iVj7ZPIrFtTeL3.jpg"
+    },
+    "tv_224372": {
+        "title": "A Knight of the Seven Kingdoms",
+        "genre": "aventure",
+        "date": "2026-06-29",
+        "backdrop_path": "/7mkUu1F2hVUNgz24xO8HPx0D6mK.jpg"
+    },
+    "movie_1397385": {
+        "title": "Little Brother",
+        "genre": "comedie",
+        "date": "2026-06-29",
+        "backdrop_path": "/qMH7k09jDnIFMKCHqfidIdbP5MF.jpg"
+    },
+    "tv_19885": {
+        "title": "Sherlock",
+        "genre": "crime",
+        "date": "2026-06-29",
+        "backdrop_path": "/hmLTIRtVyTHShJl2Wb8LHmvUgJm.jpg"
+    },
+    "tv_136315": {
+        "title": "The Bear",
+        "genre": "drame",
+        "date": "2026-06-29",
+        "backdrop_path": "/wHNwlE6ftEpgjVbdhLXOtv1hLs0.jpg"
+    },
+    "movie_1591834": {
+        "title": "Familia a la deriva",
+        "genre": "famille",
+        "date": "2026-06-29",
+        "backdrop_path": "/rdvqpkgyG3oGPZPj4U5Inpcnuhi.jpg"
+    },
+    "tv_95396": {
+        "title": "Severance",
+        "genre": "fantastique",
+        "date": "2026-06-29",
+        "backdrop_path": "/npD65vPa4vvn1ZHpp3o05A5vdKT.jpg"
+    },
+    "movie_324786": {
+        "title": "Hacksaw Ridge",
+        "genre": "guerre",
+        "date": "2026-06-29",
+        "backdrop_path": "/vDKRMZGFTKP9nQolzeSB1rB1w6p.jpg"
+    },
+    "tv_82670": {
+        "title": "World War Two",
+        "genre": "histoire",
+        "date": "2026-06-29",
+        "backdrop_path": "/dfWbyhujRsX6B0AcQE0f3QtUhxk.jpg"
+    },
+    "movie_1363387": {
+        "title": "Saccharine",
+        "genre": "horreur",
+        "date": "2026-06-29",
+        "backdrop_path": "/7NUx7bQAD4lo9yMDbprvIblhWo2.jpg"
+    },
+    "movie_1156594": {
+        "title": "Our Fault",
+        "genre": "romance",
+        "date": "2026-06-29",
+        "backdrop_path": "/7QirCB1o80NEFpQGlQRZerZbQEp.jpg"
+    },
+    "tv_225171": {
+        "title": "Pluribus",
+        "genre": "science-fiction",
+        "date": "2026-06-29",
+        "backdrop_path": "/vNCNUxNHHgP0WsA19hxztUsG3yG.jpg"
+    },
+    "tv_301507": {
+        "title": "Heated Rivalry",
+        "genre": "sport",
+        "date": "2026-06-29",
+        "backdrop_path": "/QbRbCULZVBcrN2uydpmIOQLV5O.jpg"
+    },
+    "tv_125282": {
+        "title": "The Cleaning Lady",
+        "genre": "thriller",
+        "date": "2026-06-29",
+        "backdrop_path": "/eVGaiNUPhwKyiuWH6LfNa60JFyQ.jpg"
+    },
+    "movie_1601243": {
+        "title": "Oscar Shaw",
+        "genre": "western",
+        "date": "2026-06-29",
+        "backdrop_path": "/diKBJ2kJHHfm4nmHTHhprBgfHIF.jpg"
+    },
     "movie_911430": {
         "title": "F1",
         "genre": "sport",
