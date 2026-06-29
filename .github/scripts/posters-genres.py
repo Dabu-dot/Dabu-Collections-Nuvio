@@ -233,6 +233,7 @@ def apply_premium_duotone(img, base_color):
     
     y_img = ImageEnhance.Brightness(y_img).enhance(0.96)
     final_ycbcr = Image.merge("YCbCr", (y_img, cb_color, cr_color))
+    # FIX: Changement de SHAPEREN en SHARPEN
     return final_ycbcr.convert("RGB").filter(ImageFilter.SHARPEN)
 
 def finalize_landscape_banner(img, label, color):
@@ -332,6 +333,17 @@ def main():
             if genre_name == "animation" and item.get("original_language", "") not in WESTERN_LANGUAGES:
                 continue
                 
+            # FIX: Filtre d'exclusivité YouTube (Network ID 247) pour le format TV
+            if item["media_type"] == "tv":
+                try:
+                    tv_details = tmdb_api_call(f"/tv/{item['id']}")
+                    networks = tv_details.get("networks", [])
+                    if len(networks) == 1 and networks[0].get("id") == 247:
+                        print(f" -> Éliminé (Exclusivité YouTube) : {item.get('name')}")
+                        continue
+                except Exception:
+                    pass
+            
             media_keywords = get_media_keywords(item["media_type"], item["id"])
             
             # FILTRE SANITAIRE GLOBAL ADULTE / TALK-SHOW
