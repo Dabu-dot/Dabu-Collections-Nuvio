@@ -1,4 +1,106 @@
 {
+    "tv_239770": {
+        "title": "Doctor Who",
+        "genre": "action",
+        "date": "2026-06-30",
+        "backdrop_path": "/gDtZQmfzvErZpeXOVeCBQE9WkSF.jpg"
+    },
+    "tv_73833": {
+        "title": "The Ancient Magus' Bride",
+        "genre": "animation-japonaise",
+        "date": "2026-06-30",
+        "backdrop_path": "/KI2sFvqJHzc95WM7dcX9kM8tY1.jpg"
+    },
+    "tv_82728": {
+        "title": "Bluey",
+        "genre": "animation",
+        "date": "2026-06-30",
+        "backdrop_path": "/g88VMPtog8sl8riaIRtz4U80dMK.jpg"
+    },
+    "tv_129552": {
+        "title": "The Night Agent",
+        "genre": "aventure",
+        "date": "2026-06-30",
+        "backdrop_path": "/6VWu36UlyoMgnlZx3ECXXWLoTO0.jpg"
+    },
+    "movie_346698": {
+        "title": "Barbie",
+        "genre": "comedie",
+        "date": "2026-06-30",
+        "backdrop_path": "/ctMserH8g2SeOAnCw5gFjdQF8mo.jpg"
+    },
+    "tv_94372": {
+        "title": "FBI: Most Wanted",
+        "genre": "crime",
+        "date": "2026-06-30",
+        "backdrop_path": "/4BrWdbv2Cqe0zLqvNzkoednZQAb.jpg"
+    },
+    "tv_91239": {
+        "title": "Bridgerton",
+        "genre": "drame",
+        "date": "2026-06-30",
+        "backdrop_path": "/5NEegdKUJW0TtGt1Wi3Z5nL4SSd.jpg"
+    },
+    "movie_1108427": {
+        "title": "Moana",
+        "genre": "famille",
+        "date": "2026-06-30",
+        "backdrop_path": "/c6BPbkO5Npt1OdwttAxCFo06wtH.jpg"
+    },
+    "tv_62643": {
+        "title": "DC's Legends of Tomorrow",
+        "genre": "fantastique",
+        "date": "2026-06-30",
+        "backdrop_path": "/be8fOACxsVyaX6lZLlQOWNqF0g2.jpg"
+    },
+    "tv_66761": {
+        "title": "Medici: Masters of Florence",
+        "genre": "guerre",
+        "date": "2026-06-30",
+        "backdrop_path": "/oeCoI91iFnUzmrjVi3f9yuA093m.jpg"
+    },
+    "movie_1703965": {
+        "title": "Light Undying",
+        "genre": "histoire",
+        "date": "2026-06-30",
+        "backdrop_path": "/wSu74FkKHLrWWNFyCJsLa4akt2t.jpg"
+    },
+    "movie_1694978": {
+        "title": "Chum",
+        "genre": "horreur",
+        "date": "2026-06-30",
+        "backdrop_path": "/6kheApG5qPsKbiKDxsGpOb6i6i6.jpg"
+    },
+    "movie_744275": {
+        "title": "After We Fell",
+        "genre": "romance",
+        "date": "2026-06-30",
+        "backdrop_path": "/mxdiaM2tsx8M6W3zLgiPwAkhQfq.jpg"
+    },
+    "tv_79680": {
+        "title": "Snowpiercer",
+        "genre": "science-fiction",
+        "date": "2026-06-30",
+        "backdrop_path": "/dJBKKbrQIqcQ9EUbdM48dM8mso6.jpg"
+    },
+    "tv_82428": {
+        "title": "All American",
+        "genre": "sport",
+        "date": "2026-06-30",
+        "backdrop_path": "/6npymlbLc0SMqqktCpu7X7K4eJy.jpg"
+    },
+    "tv_247718": {
+        "title": "MobLand",
+        "genre": "thriller",
+        "date": "2026-06-30",
+        "backdrop_path": "/tQqbbxBAdW2ql8vbOqMOJbtSQ7O.jpg"
+    },
+    "tv_65988": {
+        "title": "Wynonna Earp",
+        "genre": "western",
+        "date": "2026-06-30",
+        "backdrop_path": "/qVu5MC7DiDOrlcKNZsb9rEJJ1UI.jpg"
+    },
     "movie_1168190": {
         "title": "The Wrecking Crew",
         "genre": "action",
