@@ -1,4 +1,106 @@
 {
+    "tv_88329": {
+        "title": "Hawkeye",
+        "genre": "action",
+        "date": "2026-07-01",
+        "backdrop_path": "/1R68vl3d5s86JsS2NPjl8UoMqIS.jpg"
+    },
+    "tv_114410": {
+        "title": "Chainsaw Man",
+        "genre": "animation-japonaise",
+        "date": "2026-07-01",
+        "backdrop_path": "/5DUMPBSnHOZsbBv81GFXZXvDpo6.jpg"
+    },
+    "movie_862": {
+        "title": "Toy Story",
+        "genre": "animation",
+        "date": "2026-07-01",
+        "backdrop_path": "/3Rfvhy1Nl6sSGJwyjb0QiZzZYlB.jpg"
+    },
+    "tv_222766": {
+        "title": "The Day of the Jackal",
+        "genre": "aventure",
+        "date": "2026-07-01",
+        "backdrop_path": "/enVrO8TRkdT8dmYXTfI4sEjR5Kp.jpg"
+    },
+    "movie_1217584": {
+        "title": "Torrente for President",
+        "genre": "comedie",
+        "date": "2026-07-01",
+        "backdrop_path": "/1I6QPJ2s6lch1WYO54Cv2j2Y8Z4.jpg"
+    },
+    "tv_208569": {
+        "title": "Will Trent",
+        "genre": "crime",
+        "date": "2026-07-01",
+        "backdrop_path": "/9pGzG5CYx2XM8JFFQvMk9Z3z9ze.jpg"
+    },
+    "tv_226637": {
+        "title": "High Potential",
+        "genre": "drame",
+        "date": "2026-07-01",
+        "backdrop_path": "/yVP12H81dwaay5B7GVqgO893q2c.jpg"
+    },
+    "tv_136228": {
+        "title": "Pa Quererte",
+        "genre": "famille",
+        "date": "2026-07-01",
+        "backdrop_path": "/va8cLePI0khniYu6luIHcdXrzMg.jpg"
+    },
+    "tv_75450": {
+        "title": "Titans",
+        "genre": "fantastique",
+        "date": "2026-07-01",
+        "backdrop_path": "/remQq0nfQoxY9fVglGGegHZjFxx.jpg"
+    },
+    "tv_1407": {
+        "title": "Homeland",
+        "genre": "guerre",
+        "date": "2026-07-01",
+        "backdrop_path": "/391ixi0wVbFtFLQnOy8ZncWv2io.jpg"
+    },
+    "tv_61378": {
+        "title": "Madam Secretary",
+        "genre": "histoire",
+        "date": "2026-07-01",
+        "backdrop_path": "/jzkTau3O7CfG3LkKopxkNWPZf8d.jpg"
+    },
+    "movie_1462591": {
+        "title": "Hot Line",
+        "genre": "horreur",
+        "date": "2026-07-01",
+        "backdrop_path": "/osUG3UqNGOJKXIHM2QGNWyKRyCm.jpg"
+    },
+    "movie_1712447": {
+        "title": "Fight Dirty",
+        "genre": "romance",
+        "date": "2026-07-01",
+        "backdrop_path": "/8Ke1LqfJBgoBwVrHnWiR5s9bWzu.jpg"
+    },
+    "tv_127235": {
+        "title": "Invasion",
+        "genre": "science-fiction",
+        "date": "2026-07-01",
+        "backdrop_path": "/i9IEOD1Li1y89xRHKH9kiE8dt9z.jpg"
+    },
+    "tv_127529": {
+        "title": "Bloodhounds",
+        "genre": "sport",
+        "date": "2026-07-01",
+        "backdrop_path": "/zhsEnDNCQX5dlI2wbKzV90pV0B9.jpg"
+    },
+    "movie_949536": {
+        "title": "Kill Code",
+        "genre": "thriller",
+        "date": "2026-07-01",
+        "backdrop_path": "/zyqAhNJqwiop5yUOJ8SHV27labY.jpg"
+    },
+    "tv_1781": {
+        "title": "Little House on the Prairie",
+        "genre": "western",
+        "date": "2026-07-01",
+        "backdrop_path": "/uCvpgfY4oTeZxEcFqm1ATJkDDmu.jpg"
+    },
     "tv_239770": {
         "title": "Doctor Who",
         "genre": "action",
