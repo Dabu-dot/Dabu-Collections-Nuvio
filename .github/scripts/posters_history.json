@@ -1,4 +1,106 @@
 {
+    "movie_333339": {
+        "title": "Ready Player One",
+        "genre": "action",
+        "date": "2026-07-03",
+        "backdrop_path": "/q7fXcrDPJcf6t3rzutaNwTzuKP1.jpg"
+    },
+    "tv_117465": {
+        "title": "Hell's Paradise",
+        "genre": "animation-japonaise",
+        "date": "2026-07-03",
+        "backdrop_path": "/vjiIuR3XGpoGSumQ7DziPAmxIYR.jpg"
+    },
+    "tv_323243": {
+        "title": "One Pace",
+        "genre": "animation",
+        "date": "2026-07-03",
+        "backdrop_path": "/g28rnZ3dGKNlNSSGUlnatzsMGYi.jpg"
+    },
+    "movie_497582": {
+        "title": "Enola Holmes",
+        "genre": "aventure",
+        "date": "2026-07-03",
+        "backdrop_path": "/pQQggUuDMleFSl2tQYxzTmKIiLU.jpg"
+    },
+    "tv_254420": {
+        "title": "Elle",
+        "genre": "comedie",
+        "date": "2026-07-03",
+        "backdrop_path": "/truh4rtTUdRVYGeT0n17dxvdv41.jpg"
+    },
+    "tv_259731": {
+        "title": "HIS & HERS",
+        "genre": "crime",
+        "date": "2026-07-03",
+        "backdrop_path": "/n4hJLZmBG8kZccNn7bNgBDsVQ6a.jpg"
+    },
+    "tv_250307": {
+        "title": "The Pitt",
+        "genre": "drame",
+        "date": "2026-07-03",
+        "backdrop_path": "/z3BkMbCy5ajZPMyKEUwsPHuz2cV.jpg"
+    },
+    "tv_73812": {
+        "title": "Las Estrellas",
+        "genre": "famille",
+        "date": "2026-07-03",
+        "backdrop_path": "/6dJneF6O7HKyJL6ujsBy8m2L9m5.jpg"
+    },
+    "movie_911345": {
+        "title": "Viking",
+        "genre": "fantastique",
+        "date": "2026-07-03",
+        "backdrop_path": "/pQ8pEfze9ToLfeJmyU3Bqfl9CsD.jpg"
+    },
+    "tv_314974": {
+        "title": "Putins Agenten",
+        "genre": "guerre",
+        "date": "2026-07-03",
+        "backdrop_path": "/pOfEw3eX5fEeFIy15OMINJi03g0.jpg"
+    },
+    "tv_4068": {
+        "title": "Hogan's Heroes",
+        "genre": "histoire",
+        "date": "2026-07-03",
+        "backdrop_path": "/9rMRMVNlSOgKNsR8UfDD5fEr3wC.jpg"
+    },
+    "movie_1309083": {
+        "title": "Dolly",
+        "genre": "horreur",
+        "date": "2026-07-03",
+        "backdrop_path": "/mlk2v9SwsOAPxfiIirxFnqP8FrJ.jpg"
+    },
+    "movie_1285366": {
+        "title": "Shape of My Heart",
+        "genre": "romance",
+        "date": "2026-07-03",
+        "backdrop_path": "/yjK3ardrgdS8suZG8KMU82Q7U38.jpg"
+    },
+    "tv_62858": {
+        "title": "Colony",
+        "genre": "science-fiction",
+        "date": "2026-07-03",
+        "backdrop_path": "/cAgRehPSCjCVrP25zfeffbuptYY.jpg"
+    },
+    "movie_1317288": {
+        "title": "Marty Supreme",
+        "genre": "sport",
+        "date": "2026-07-03",
+        "backdrop_path": "/qKWDHofjMHPSEOTLaixkC9ZmjTT.jpg"
+    },
+    "tv_39852": {
+        "title": "The Sinner",
+        "genre": "thriller",
+        "date": "2026-07-03",
+        "backdrop_path": "/AhhABp3IjJgb1q00ZSLwBO5VwMB.jpg"
+    },
+    "movie_1469164": {
+        "title": "Casa Grande",
+        "genre": "western",
+        "date": "2026-07-03",
+        "backdrop_path": "/mjwXj9EvxCGSeMXt1horgv1SNB4.jpg"
+    },
     "movie_588228": {
         "title": "The Tomorrow War",
         "genre": "action",
