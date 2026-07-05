@@ -1,4 +1,106 @@
 {
+    "movie_545611": {
+        "title": "Everything Everywhere All at Once",
+        "genre": "action",
+        "date": "2026-07-05",
+        "backdrop_path": "/tt79dbOPd9Z9ykEOpvckttgYXwH.jpg"
+    },
+    "tv_131041": {
+        "title": "BLUE LOCK",
+        "genre": "animation-japonaise",
+        "date": "2026-07-05",
+        "backdrop_path": "/seMRyWVwIVBWbC9xaMzDMZJ8fUH.jpg"
+    },
+    "tv_3022": {
+        "title": "Rugrats",
+        "genre": "animation",
+        "date": "2026-07-05",
+        "backdrop_path": "/fKpfCR3l0WukHTkI6Z2ySX1if4P.jpg"
+    },
+    "movie_1308767": {
+        "title": "Young Washington",
+        "genre": "aventure",
+        "date": "2026-07-05",
+        "backdrop_path": "/mj3RFamNUleZB94zMWgGnJkQCAH.jpg"
+    },
+    "movie_1248832": {
+        "title": "Digger",
+        "genre": "comedie",
+        "date": "2026-07-05",
+        "backdrop_path": "/hG1tXuommFDedfdrzaEHfMY1Q3W.jpg"
+    },
+    "tv_70613": {
+        "title": "Black Spot",
+        "genre": "crime",
+        "date": "2026-07-05",
+        "backdrop_path": "/oC1TjAXVEg0Xo41xlVh4QyICvi9.jpg"
+    },
+    "tv_219971": {
+        "title": "The Agency",
+        "genre": "drame",
+        "date": "2026-07-05",
+        "backdrop_path": "/9itOpkXcVrJDlGvRDMaLjUdTwrs.jpg"
+    },
+    "tv_66203": {
+        "title": "Soy Luna",
+        "genre": "famille",
+        "date": "2026-07-05",
+        "backdrop_path": "/mXVr88l7877i0P4cLQl1mUvaXGJ.jpg"
+    },
+    "tv_96580": {
+        "title": "Resident Alien",
+        "genre": "fantastique",
+        "date": "2026-07-05",
+        "backdrop_path": "/aCbOj4wc6vQUUVNKppssj2PYUy0.jpg"
+    },
+    "tv_203857": {
+        "title": "The Diplomat",
+        "genre": "guerre",
+        "date": "2026-07-05",
+        "backdrop_path": "/v6f9FUDDQfGIv8MLRQwlL0zvRjI.jpg"
+    },
+    "tv_4316": {
+        "title": "Combat!",
+        "genre": "histoire",
+        "date": "2026-07-05",
+        "backdrop_path": "/gRm6VeU3glb0bV0wPJYaTysdfbz.jpg"
+    },
+    "movie_1540365": {
+        "title": "Hippo's Revenge",
+        "genre": "horreur",
+        "date": "2026-07-05",
+        "backdrop_path": "/wURiYTfGDeRaEY57aoGeOMVWWrX.jpg"
+    },
+    "movie_39688": {
+        "title": "Like a Brother",
+        "genre": "romance",
+        "date": "2026-07-05",
+        "backdrop_path": "/hSVVwSFbgPMnrMKLu3hl4RtTKv1.jpg"
+    },
+    "tv_73157": {
+        "title": "Future Man",
+        "genre": "science-fiction",
+        "date": "2026-07-05",
+        "backdrop_path": "/migX5UM28N9QmV5n9Rk3wWiApiP.jpg"
+    },
+    "movie_39254": {
+        "title": "Real Steel",
+        "genre": "sport",
+        "date": "2026-07-05",
+        "backdrop_path": "/2t8uXcm5CuChOoX5gEKl918yv6I.jpg"
+    },
+    "movie_1122573": {
+        "title": "In the Grey",
+        "genre": "thriller",
+        "date": "2026-07-05",
+        "backdrop_path": "/mjlwr0He035AUmVZ2iH0DcRvcje.jpg"
+    },
+    "tv_6081": {
+        "title": "Wagon Train",
+        "genre": "western",
+        "date": "2026-07-05",
+        "backdrop_path": "/1Rzdd9VjqXOE7rzMlaMdwHOTmkr.jpg"
+    },
     "movie_866398": {
         "title": "The Beekeeper",
         "genre": "action",
