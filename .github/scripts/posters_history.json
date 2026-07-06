@@ -1,4 +1,106 @@
 {
+    "movie_460465": {
+        "title": "Mortal Kombat",
+        "genre": "action",
+        "date": "2026-07-06",
+        "backdrop_path": "/9yBVqNruk6Ykrwc32qrK2TIE5xw.jpg"
+    },
+    "tv_95479": {
+        "title": "JUJUTSU KAISEN",
+        "genre": "animation-japonaise",
+        "date": "2026-07-06",
+        "backdrop_path": "/gmECX1DvFgdUPjtio2zaL8BPYPu.jpg"
+    },
+    "movie_1084244": {
+        "title": "Toy Story 5",
+        "genre": "animation",
+        "date": "2026-07-06",
+        "backdrop_path": "/coyHrYHD2xHhDoYD6o4uwoJ2o7b.jpg"
+    },
+    "tv_94997": {
+        "title": "House of the Dragon",
+        "genre": "aventure",
+        "date": "2026-07-06",
+        "backdrop_path": "/etj8E2o0Bud0HkONVQPjyCkIvpv.jpg"
+    },
+    "tv_111803": {
+        "title": "The White Lotus",
+        "genre": "comedie",
+        "date": "2026-07-06",
+        "backdrop_path": "/rCTLaPwuApDx8vLGjYZ9pRl7zRB.jpg"
+    },
+    "tv_69050": {
+        "title": "Riverdale",
+        "genre": "crime",
+        "date": "2026-07-06",
+        "backdrop_path": "/kb9XvtEnDhBVVit4eeKygqll4EA.jpg"
+    },
+    "tv_124364": {
+        "title": "FROM",
+        "genre": "drame",
+        "date": "2026-07-06",
+        "backdrop_path": "/q3UGWifvIpdey1T2efX4dSmbZpU.jpg"
+    },
+    "tv_82452": {
+        "title": "Avatar: The Last Airbender",
+        "genre": "famille",
+        "date": "2026-07-06",
+        "backdrop_path": "/imlTCObfzISogbvcwB1dokoXAIc.jpg"
+    },
+    "tv_76479": {
+        "title": "The Boys",
+        "genre": "fantastique",
+        "date": "2026-07-06",
+        "backdrop_path": "/n6vVs6z8obNbExdD3QHTr4Utu1Z.jpg"
+    },
+    "tv_113962": {
+        "title": "Lioness",
+        "genre": "guerre",
+        "date": "2026-07-06",
+        "backdrop_path": "/r0Zg70jpcDAD7IMDhVqajSnG9vb.jpg"
+    },
+    "movie_872585": {
+        "title": "Oppenheimer",
+        "genre": "histoire",
+        "date": "2026-07-06",
+        "backdrop_path": "/ycnO0cjsAROSGJKuMODgRtWsHQw.jpg"
+    },
+    "movie_680493": {
+        "title": "Return to Silent Hill",
+        "genre": "horreur",
+        "date": "2026-07-06",
+        "backdrop_path": "/v0NEB75SZjxY8GS3ho8WeEvjIT3.jpg"
+    },
+    "movie_1010581": {
+        "title": "My Fault",
+        "genre": "romance",
+        "date": "2026-07-06",
+        "backdrop_path": "/lntyt4OVDbcxA1l7LtwITbrD3FI.jpg"
+    },
+    "movie_1275779": {
+        "title": "Disclosure Day",
+        "genre": "science-fiction",
+        "date": "2026-07-06",
+        "backdrop_path": "/5p6BsJtnPbglYN15MuiUEppPl0f.jpg"
+    },
+    "tv_1398": {
+        "title": "The Sopranos",
+        "genre": "sport",
+        "date": "2026-07-06",
+        "backdrop_path": "/lNpkvX2s8LGB0mjGODMT4o6Up7j.jpg"
+    },
+    "tv_78191": {
+        "title": "You",
+        "genre": "thriller",
+        "date": "2026-07-06",
+        "backdrop_path": "/gzOIymABxmetAECXtazEYCpMmfb.jpg"
+    },
+    "tv_73586": {
+        "title": "Yellowstone",
+        "genre": "western",
+        "date": "2026-07-06",
+        "backdrop_path": "/ynSOcgDLZfdLCZfRSYZGiTgYJVo.jpg"
+    },
     "movie_545611": {
         "title": "Everything Everywhere All at Once",
         "genre": "action",
@@ -1516,287 +1618,5 @@
         "genre": "western",
         "date": "2026-06-23",
         "backdrop_path": "/nh3n0jQeS0FgWH84kzyc8q5yLEp.jpg"
-    },
-    "movie_460465": {
-        "title": "Mortal Kombat",
-        "genre": "action",
-        "date": "2026-06-22",
-        "backdrop_path": "/9yBVqNruk6Ykrwc32qrK2TIE5xw.jpg"
-    },
-    "tv_95479": {
-        "title": "JUJUTSU KAISEN",
-        "genre": "animation-japonaise",
-        "date": "2026-06-22",
-        "backdrop_path": "/gmECX1DvFgdUPjtio2zaL8BPYPu.jpg"
-    },
-    "movie_1226863": {
-        "title": "The Super Mario Galaxy Movie",
-        "genre": "animation",
-        "date": "2026-06-22",
-        "backdrop_path": "/9Z2uDYXqJrlmePznQQJhL6d92Rq.jpg"
-    },
-    "tv_94997": {
-        "title": "House of the Dragon",
-        "genre": "aventure",
-        "date": "2026-06-22",
-        "backdrop_path": "/etj8E2o0Bud0HkONVQPjyCkIvpv.jpg"
-    },
-    "tv_111803": {
-        "title": "The White Lotus",
-        "genre": "comedie",
-        "date": "2026-06-22",
-        "backdrop_path": "/rCTLaPwuApDx8vLGjYZ9pRl7zRB.jpg"
-    },
-    "movie_1159559": {
-        "title": "Scream 7",
-        "genre": "crime",
-        "date": "2026-06-22",
-        "backdrop_path": "/hz7TdCrpLLt2Dz7S3PS2HG9rpAO.jpg"
-    },
-    "tv_10029": {
-        "title": "Great Performances",
-        "genre": "documentaire",
-        "date": "2026-06-22",
-        "backdrop_path": "/ylnSMSXs7TWjld6FT3laCfhAHzq.jpg"
-    },
-    "movie_936075": {
-        "title": "Michael",
-        "genre": "drame",
-        "date": "2026-06-22",
-        "backdrop_path": "/ufSwlnECLoUbBjPrFqEQcWBzHwc.jpg"
-    },
-    "tv_82452": {
-        "title": "Avatar the Last Airbender",
-        "genre": "famille",
-        "date": "2026-06-22",
-        "backdrop_path": "/imlTCObfzISogbvcwB1dokoXAIc.jpg"
-    },
-    "tv_124364": {
-        "title": "FROM",
-        "genre": "fantastique",
-        "date": "2026-06-22",
-        "backdrop_path": "/q3UGWifvIpdey1T2efX4dSmbZpU.jpg"
-    },
-    "movie_872585": {
-        "title": "Oppenheimer",
-        "genre": "histoire",
-        "date": "2026-06-22",
-        "backdrop_path": "/ycnO0cjsAROSGJKuMODgRtWsHQw.jpg"
-    },
-    "tv_67198": {
-        "title": "Star Trek: Discovery",
-        "genre": "science-fiction",
-        "date": "2026-06-22",
-        "backdrop_path": "/p3McpsDNTNmpbkNBKdNxOFZJeKX.jpg"
-    },
-    "movie_1275779": {
-        "title": "Disclosure Day",
-        "genre": "thriller",
-        "date": "2026-06-22",
-        "backdrop_path": "/5p6BsJtnPbglYN15MuiUEppPl0f.jpg"
-    },
-    "tv_111110": {
-        "title": "ONE PIECE",
-        "genre": "action",
-        "date": "2026-06-22",
-        "backdrop_path": "/qD211Hb5XwFxrszzBBe5EUYJerh.jpg"
-    },
-    "tv_209867": {
-        "title": "Frieren: Beyond Journey's End",
-        "genre": "animation-japonaise",
-        "date": "2026-06-22",
-        "backdrop_path": "/rBOnrVlck7BIlGeWVlzYiZeg4l2.jpg"
-    },
-    "movie_1084244": {
-        "title": "Toy Story 5",
-        "genre": "animation",
-        "date": "2026-06-22",
-        "backdrop_path": "/coyHrYHD2xHhDoYD6o4uwoJ2o7b.jpg"
-    },
-    "movie_1228710": {
-        "title": "The Mandalorian and Grogu",
-        "genre": "aventure",
-        "date": "2026-06-22",
-        "backdrop_path": "/7OedxK0BvSKJ0ZWCPRYADViTBx6.jpg"
-    },
-    "tv_284725": {
-        "title": "Not Suitable for Work",
-        "genre": "comedie",
-        "date": "2026-06-22",
-        "backdrop_path": "/ysYPo1JqzHiHoIHpW9wXCtvY1LW.jpg"
-    },
-    "tv_69050": {
-        "title": "Riverdale",
-        "genre": "crime",
-        "date": "2026-06-22",
-        "backdrop_path": "/kb9XvtEnDhBVVit4eeKygqll4EA.jpg"
-    },
-    "tv_91820": {
-        "title": "Couples Therapy",
-        "genre": "documentaire",
-        "date": "2026-06-22",
-        "backdrop_path": "/g1xroMyWzmMTedIdqG0UTisTZro.jpg"
-    },
-    "tv_73586": {
-        "title": "Yellowstone",
-        "genre": "drame",
-        "date": "2026-06-22",
-        "backdrop_path": "/ynSOcgDLZfdLCZfRSYZGiTgYJVo.jpg"
-    },
-    "movie_950387": {
-        "title": "A Minecraft Movie",
-        "genre": "famille",
-        "date": "2026-06-22",
-        "backdrop_path": "/2Nti3gYAX513wvhp8IiLL6ZDyOm.jpg"
-    },
-    "tv_76479": {
-        "title": "The Boys",
-        "genre": "fantastique",
-        "date": "2026-06-22",
-        "backdrop_path": "/n6vVs6z8obNbExdD3QHTr4Utu1Z.jpg"
-    },
-    "tv_113962": {
-        "title": "Lioness",
-        "genre": "guerre",
-        "date": "2026-06-22",
-        "backdrop_path": "/r0Zg70jpcDAD7IMDhVqajSnG9vb.jpg"
-    },
-    "movie_424": {
-        "title": "Schindler's List",
-        "genre": "histoire",
-        "date": "2026-06-22",
-        "backdrop_path": "/zb6fM1CX41D9rF9hdgclu0peUmy.jpg"
-    },
-    "movie_680493": {
-        "title": "Return to Silent Hill",
-        "genre": "horreur",
-        "date": "2026-06-22",
-        "backdrop_path": "/v0NEB75SZjxY8GS3ho8WeEvjIT3.jpg"
-    },
-    "movie_1294203": {
-        "title": "My Fault: London",
-        "genre": "romance",
-        "date": "2026-06-22",
-        "backdrop_path": "/uJK0jjJ8QDOQw5lcNBwu059ht4D.jpg"
-    },
-    "movie_438631": {
-        "title": "Dune",
-        "genre": "science-fiction",
-        "date": "2026-06-22",
-        "backdrop_path": "/jYEW5xZkZk2WTrdbMGAPFuBqbDc.jpg"
-    },
-    "tv_78191": {
-        "title": "You",
-        "genre": "thriller",
-        "date": "2026-06-22",
-        "backdrop_path": "/gzOIymABxmetAECXtazEYCpMmfb.jpg"
-    },
-    "tv_63247": {
-        "title": "Westworld",
-        "genre": "western",
-        "date": "2026-06-22",
-        "backdrop_path": "/yGNnjoIGOdQy3douq60tULY8teK.jpg"
-    },
-    "movie_603692": {
-        "title": "John Wick: Chapter 4",
-        "genre": "action",
-        "date": "2026-06-22",
-        "backdrop_path": "/i8dshLvq4LE3s0v8PrkDdUyb1ae.jpg"
-    },
-    "tv_120089": {
-        "title": "SPY x FAMILY",
-        "genre": "animation-japonaise",
-        "date": "2026-06-22",
-        "backdrop_path": "/lysUnU6V0VfcthDbviuVlIqgHOR.jpg"
-    },
-    "movie_1327819": {
-        "title": "Hoppers",
-        "genre": "animation",
-        "date": "2026-06-22",
-        "backdrop_path": "/u53UYu5XG2hNgWGvs3xGhAVzypl.jpg"
-    },
-    "tv_71912": {
-        "title": "The Witcher",
-        "genre": "aventure",
-        "date": "2026-06-22",
-        "backdrop_path": "/s56eyXy8rADp5DpZknfe2HXq4u4.jpg"
-    },
-    "tv_119051": {
-        "title": "Wednesday",
-        "genre": "comedie",
-        "date": "2026-06-22",
-        "backdrop_path": "/iHSwvRVsRyxpX7FE7GbviaDvgGZ.jpg"
-    },
-    "tv_70523": {
-        "title": "Dark",
-        "genre": "crime",
-        "date": "2026-06-22",
-        "backdrop_path": "/2VpSajCTI26zddsp5cSjqfCBKEa.jpg"
-    },
-    "local_Castle2.jpg": {
-        "title": "Curation : Castle2.jpg",
-        "genre": "documentaire",
-        "date": "2026-06-22",
-        "backdrop_path": "Ressources/Collections Covers/Genres/Static Covers/References/Castle2.jpg"
-    },
-    "tv_85552": {
-        "title": "Euphoria",
-        "genre": "drame",
-        "date": "2026-06-22",
-        "backdrop_path": "/9KnIzPCv9XpWA0MqmwiKBZvV1Sj.jpg"
-    },
-    "movie_939243": {
-        "title": "Sonic the Hedgehog 3",
-        "genre": "famille",
-        "date": "2026-06-22",
-        "backdrop_path": "/zOpe0eHsq0A2NvNyBbtT6sj53qV.jpg"
-    },
-    "tv_66732": {
-        "title": "Stranger Things",
-        "genre": "fantastique",
-        "date": "2026-06-22",
-        "backdrop_path": "/56v2KjBlU4XaOv9rVYEQypROD7P.jpg"
-    },
-    "tv_126308": {
-        "title": "Shōgun",
-        "genre": "guerre",
-        "date": "2026-06-22",
-        "backdrop_path": "/5zmiBoMzeeVdQ62no55JOJMY498.jpg"
-    },
-    "movie_1530510": {
-        "title": "Mexico 86",
-        "genre": "histoire",
-        "date": "2026-06-22",
-        "backdrop_path": "/sbIjF8VygkC8tI8dj2wZ6KMXhOu.jpg"
-    },
-    "movie_1430077": {
-        "title": "Hokum",
-        "genre": "horreur",
-        "date": "2026-06-22",
-        "backdrop_path": "/arNKUmatyuAjDsO8y3BNfu7jJZc.jpg"
-    },
-    "movie_1010581": {
-        "title": "My Fault",
-        "genre": "romance",
-        "date": "2026-06-22",
-        "backdrop_path": "/lntyt4OVDbcxA1l7LtwITbrD3FI.jpg"
-    },
-    "tv_85949": {
-        "title": "Star Trek: Picard",
-        "genre": "science-fiction",
-        "date": "2026-06-22",
-        "backdrop_path": "/u9eaoVrvPd921vCqaHY8gtfnKFp.jpg"
-    },
-    "tv_76669": {
-        "title": "Elite",
-        "genre": "thriller",
-        "date": "2026-06-22",
-        "backdrop_path": "/eNPpCa7vxO6EYL1Z3H00JoeO4jL.jpg"
-    },
-    "tv_157744": {
-        "title": "1923",
-        "genre": "western",
-        "date": "2026-06-22",
-        "backdrop_path": "/vIioWssbxRtEkIzgj8r0pCWYkYM.jpg"
     }
 }
