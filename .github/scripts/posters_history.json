@@ -1,4 +1,106 @@
 {
+    "tv_111110": {
+        "title": "ONE PIECE",
+        "genre": "action",
+        "date": "2026-07-07",
+        "backdrop_path": "/qD211Hb5XwFxrszzBBe5EUYJerh.jpg"
+    },
+    "tv_209867": {
+        "title": "Frieren: Beyond Journey's End",
+        "genre": "animation-japonaise",
+        "date": "2026-07-07",
+        "backdrop_path": "/rBOnrVlck7BIlGeWVlzYiZeg4l2.jpg"
+    },
+    "movie_1226863": {
+        "title": "The Super Mario Galaxy Movie",
+        "genre": "animation",
+        "date": "2026-07-07",
+        "backdrop_path": "/9Z2uDYXqJrlmePznQQJhL6d92Rq.jpg"
+    },
+    "movie_1228710": {
+        "title": "The Mandalorian and Grogu",
+        "genre": "aventure",
+        "date": "2026-07-07",
+        "backdrop_path": "/7OedxK0BvSKJ0ZWCPRYADViTBx6.jpg"
+    },
+    "tv_108255": {
+        "title": "All Creatures Great & Small",
+        "genre": "comedie",
+        "date": "2026-07-07",
+        "backdrop_path": "/l61sjSZCsf99abjlnt2ToG442ol.jpg"
+    },
+    "tv_70523": {
+        "title": "Dark",
+        "genre": "crime",
+        "date": "2026-07-07",
+        "backdrop_path": "/2VpSajCTI26zddsp5cSjqfCBKEa.jpg"
+    },
+    "movie_936075": {
+        "title": "Michael",
+        "genre": "drame",
+        "date": "2026-07-07",
+        "backdrop_path": "/ufSwlnECLoUbBjPrFqEQcWBzHwc.jpg"
+    },
+    "movie_950387": {
+        "title": "A Minecraft Movie",
+        "genre": "famille",
+        "date": "2026-07-07",
+        "backdrop_path": "/2Nti3gYAX513wvhp8IiLL6ZDyOm.jpg"
+    },
+    "tv_66732": {
+        "title": "Stranger Things",
+        "genre": "fantastique",
+        "date": "2026-07-07",
+        "backdrop_path": "/56v2KjBlU4XaOv9rVYEQypROD7P.jpg"
+    },
+    "tv_126308": {
+        "title": "Shōgun",
+        "genre": "guerre",
+        "date": "2026-07-07",
+        "backdrop_path": "/5zmiBoMzeeVdQ62no55JOJMY498.jpg"
+    },
+    "movie_1305672": {
+        "title": "I Know Who You Are",
+        "genre": "histoire",
+        "date": "2026-07-07",
+        "backdrop_path": "/kXXveIklCvTpJOGu16dszmZrcwD.jpg"
+    },
+    "movie_1368314": {
+        "title": "Passenger",
+        "genre": "horreur",
+        "date": "2026-07-07",
+        "backdrop_path": "/3pDfu71mrzSuFYyIfnKEjt8z4BC.jpg"
+    },
+    "movie_1246049": {
+        "title": "Dracula",
+        "genre": "romance",
+        "date": "2026-07-07",
+        "backdrop_path": "/be5SIsRGMckO8tU9lrLcIik70Dy.jpg"
+    },
+    "tv_67198": {
+        "title": "Star Trek: Discovery",
+        "genre": "science-fiction",
+        "date": "2026-07-07",
+        "backdrop_path": "/p3McpsDNTNmpbkNBKdNxOFZJeKX.jpg"
+    },
+    "tv_269": {
+        "title": "One Tree Hill",
+        "genre": "sport",
+        "date": "2026-07-07",
+        "backdrop_path": "/eDNSgT1xPMKYcEzJ5GG0PCE3NcN.jpg"
+    },
+    "tv_76669": {
+        "title": "Elite",
+        "genre": "thriller",
+        "date": "2026-07-07",
+        "backdrop_path": "/eNPpCa7vxO6EYL1Z3H00JoeO4jL.jpg"
+    },
+    "tv_63247": {
+        "title": "Westworld",
+        "genre": "western",
+        "date": "2026-07-07",
+        "backdrop_path": "/yGNnjoIGOdQy3douq60tULY8teK.jpg"
+    },
     "movie_460465": {
         "title": "Mortal Kombat",
         "genre": "action",
@@ -1522,101 +1624,5 @@
         "genre": "western",
         "date": "2026-06-24",
         "backdrop_path": "/AcVCp1RVilFKT3DWre0GjP7vzsq.jpg"
-    },
-    "tv_69478": {
-        "title": "The Handmaid's Tale",
-        "genre": "action",
-        "date": "2026-06-23",
-        "backdrop_path": "/jXB3OoWPkojsOP2O2OoLCeAIDRS.jpg"
-    },
-    "tv_216467": {
-        "title": "Mission: Yozakura Family",
-        "genre": "animation-japonaise",
-        "date": "2026-06-23",
-        "backdrop_path": "/evO64iw3A81JcUMlTnSlKKMTKxB.jpg"
-    },
-    "tv_65334": {
-        "title": "Miraculous: Tales of Ladybug & Cat Noir",
-        "genre": "animation",
-        "date": "2026-06-23",
-        "backdrop_path": "/lH22EnM0ofC7GsVGU8dAA2RXV1c.jpg"
-    },
-    "tv_84773": {
-        "title": "The Lord of the Rings: The Rings of Power",
-        "genre": "aventure",
-        "date": "2026-06-23",
-        "backdrop_path": "/vpRAeMi5VBZT3Kjykive6qan2Ui.jpg"
-    },
-    "movie_1198994": {
-        "title": "Send Help",
-        "genre": "comedie",
-        "date": "2026-06-23",
-        "backdrop_path": "/bpp58yHuQmpt6xwggI63mVRw7po.jpg"
-    },
-    "tv_75219": {
-        "title": "9-1-1",
-        "genre": "crime",
-        "date": "2026-06-23",
-        "backdrop_path": "/h050XJoiIobaH6bhj3MAhgilkpJ.jpg"
-    },
-    "local_Kangoroo.jpg": {
-        "title": "Curation : Kangoroo.jpg",
-        "genre": "documentaire",
-        "date": "2026-06-23",
-        "backdrop_path": "Ressources/Collections Covers/Genres/Static Covers/References/Kangoroo.jpg"
-    },
-    "tv_65494": {
-        "title": "The Crown",
-        "genre": "drame",
-        "date": "2026-06-23",
-        "backdrop_path": "/aWnEtYJn31swY2pC8cOtje98bYc.jpg"
-    },
-    "tv_103540": {
-        "title": "Percy Jackson and the Olympians",
-        "genre": "famille",
-        "date": "2026-06-23",
-        "backdrop_path": "/danN2NzJTMouaBEkDWTnyDjDxUt.jpg"
-    },
-    "movie_83533": {
-        "title": "Avatar: Fire and Ash",
-        "genre": "fantastique",
-        "date": "2026-06-23",
-        "backdrop_path": "/iN41Ccw4DctL8npfmYg1j5Tr1eb.jpg"
-    },
-    "movie_1495": {
-        "title": "Kingdom of Heaven",
-        "genre": "histoire",
-        "date": "2026-06-23",
-        "backdrop_path": "/1IaLIFCULTy4ooEKyKcdExVL6Po.jpg"
-    },
-    "movie_1246049": {
-        "title": "Dracula",
-        "genre": "horreur",
-        "date": "2026-06-23",
-        "backdrop_path": "/be5SIsRGMckO8tU9lrLcIik70Dy.jpg"
-    },
-    "movie_1156593": {
-        "title": "Your Fault",
-        "genre": "romance",
-        "date": "2026-06-23",
-        "backdrop_path": "/k24eZq5I3jyz4htPkZCRpnUmBzE.jpg"
-    },
-    "movie_687163": {
-        "title": "Project Hail Mary",
-        "genre": "science-fiction",
-        "date": "2026-06-23",
-        "backdrop_path": "/8Tfys3mDZVp4tNoH2ktm06a0Tau.jpg"
-    },
-    "movie_1266127": {
-        "title": "Ready or Not: Here I Come",
-        "genre": "thriller",
-        "date": "2026-06-23",
-        "backdrop_path": "/fx2cEuadZK28VHKkc0F1nFR96i0.jpg"
-    },
-    "tv_43901": {
-        "title": "Longmire",
-        "genre": "western",
-        "date": "2026-06-23",
-        "backdrop_path": "/nh3n0jQeS0FgWH84kzyc8q5yLEp.jpg"
     }
 }
