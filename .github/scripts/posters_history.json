@@ -1,4 +1,106 @@
 {
+    "tv_69478": {
+        "title": "The Handmaid's Tale",
+        "genre": "action",
+        "date": "2026-07-08",
+        "backdrop_path": "/jXB3OoWPkojsOP2O2OoLCeAIDRS.jpg"
+    },
+    "tv_312949": {
+        "title": "Chainsmoker Cat",
+        "genre": "animation-japonaise",
+        "date": "2026-07-08",
+        "backdrop_path": "/4ei68OmZr0XHnN82OjiV8GBqfyN.jpg"
+    },
+    "movie_1327819": {
+        "title": "Hoppers",
+        "genre": "animation",
+        "date": "2026-07-08",
+        "backdrop_path": "/u53UYu5XG2hNgWGvs3xGhAVzypl.jpg"
+    },
+    "tv_71912": {
+        "title": "The Witcher",
+        "genre": "aventure",
+        "date": "2026-07-08",
+        "backdrop_path": "/s56eyXy8rADp5DpZknfe2HXq4u4.jpg"
+    },
+    "tv_119051": {
+        "title": "Wednesday",
+        "genre": "comedie",
+        "date": "2026-07-08",
+        "backdrop_path": "/iHSwvRVsRyxpX7FE7GbviaDvgGZ.jpg"
+    },
+    "tv_128904": {
+        "title": "Dark Winds",
+        "genre": "crime",
+        "date": "2026-07-08",
+        "backdrop_path": "/aLC4Uh8v2VRmT1cRfNspFHp6OFj.jpg"
+    },
+    "tv_85552": {
+        "title": "Euphoria",
+        "genre": "drame",
+        "date": "2026-07-08",
+        "backdrop_path": "/9KnIzPCv9XpWA0MqmwiKBZvV1Sj.jpg"
+    },
+    "movie_1087192": {
+        "title": "How to Train Your Dragon",
+        "genre": "famille",
+        "date": "2026-07-08",
+        "backdrop_path": "/7HqLLVjdjhXS0Qoz1SgZofhkIpE.jpg"
+    },
+    "movie_83533": {
+        "title": "Avatar: Fire and Ash",
+        "genre": "fantastique",
+        "date": "2026-07-08",
+        "backdrop_path": "/iN41Ccw4DctL8npfmYg1j5Tr1eb.jpg"
+    },
+    "tv_63333": {
+        "title": "The Last Kingdom",
+        "genre": "guerre",
+        "date": "2026-07-08",
+        "backdrop_path": "/QbtctI8EzlhsyFDMUMyG3fli8B.jpg"
+    },
+    "tv_13905": {
+        "title": "12 O'Clock High",
+        "genre": "histoire",
+        "date": "2026-07-08",
+        "backdrop_path": "/kGa3yb1tRe4JKilMclfBUYdTBC9.jpg"
+    },
+    "movie_1645603": {
+        "title": "Night of the Living Dead",
+        "genre": "horreur",
+        "date": "2026-07-08",
+        "backdrop_path": "/h1x4YiBtQEGY2dMx7k0fvlErlSn.jpg"
+    },
+    "movie_1294203": {
+        "title": "My Fault: London",
+        "genre": "romance",
+        "date": "2026-07-08",
+        "backdrop_path": "/uJK0jjJ8QDOQw5lcNBwu059ht4D.jpg"
+    },
+    "movie_438631": {
+        "title": "Dune",
+        "genre": "science-fiction",
+        "date": "2026-07-08",
+        "backdrop_path": "/jYEW5xZkZk2WTrdbMGAPFuBqbDc.jpg"
+    },
+    "tv_823": {
+        "title": "WWF Superstars",
+        "genre": "sport",
+        "date": "2026-07-08",
+        "backdrop_path": "/f3Wt7IReyUhjiYJP6Yfm5PClF9O.jpg"
+    },
+    "movie_1266127": {
+        "title": "Ready or Not: Here I Come",
+        "genre": "thriller",
+        "date": "2026-07-08",
+        "backdrop_path": "/fx2cEuadZK28VHKkc0F1nFR96i0.jpg"
+    },
+    "tv_157744": {
+        "title": "1923",
+        "genre": "western",
+        "date": "2026-07-08",
+        "backdrop_path": "/vIioWssbxRtEkIzgj8r0pCWYkYM.jpg"
+    },
     "tv_111110": {
         "title": "ONE PIECE",
         "genre": "action",
@@ -1528,101 +1630,5 @@
         "genre": "western",
         "date": "2026-06-25",
         "backdrop_path": "/4zZ0VjYxGERjhf5FdTuB0Y215Pi.jpg"
-    },
-    "tv_77169": {
-        "title": "Cobra Kai",
-        "genre": "action",
-        "date": "2026-06-24",
-        "backdrop_path": "/pazdVerQyCdWM9Qn12qUWkdp4ZM.jpg"
-    },
-    "tv_240411": {
-        "title": "Dan Da Dan",
-        "genre": "animation-japonaise",
-        "date": "2026-06-24",
-        "backdrop_path": "/uNTrRKIOyKYISthoeizghtXPEOK.jpg"
-    },
-    "tv_456": {
-        "title": "The Simpsons",
-        "genre": "animation",
-        "date": "2026-06-24",
-        "backdrop_path": "/hpU2cHC9tk90hswCFEpf5AtbqoL.jpg"
-    },
-    "movie_693134": {
-        "title": "Dune: Part Two",
-        "genre": "aventure",
-        "date": "2026-06-24",
-        "backdrop_path": "/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg"
-    },
-    "tv_110492": {
-        "title": "Peacemaker",
-        "genre": "comedie",
-        "date": "2026-06-24",
-        "backdrop_path": "/ctxm191q5o3axFzQsvNPlbKoSYv.jpg"
-    },
-    "tv_290856": {
-        "title": "Marshals",
-        "genre": "crime",
-        "date": "2026-06-24",
-        "backdrop_path": "/ihT4s15wPjqXLblKlE6cwBhJVz4.jpg"
-    },
-    "local_Flower3.jpg": {
-        "title": "Curation : Flower3.jpg",
-        "genre": "documentaire",
-        "date": "2026-06-24",
-        "backdrop_path": "Ressources/Collections Covers/Genres/Static Covers/References/Flower3.jpg"
-    },
-    "tv_71712": {
-        "title": "The Good Doctor",
-        "genre": "drame",
-        "date": "2026-06-24",
-        "backdrop_path": "/f3cin9kOz4nOrlYEMxGFQhv4bdN.jpg"
-    },
-    "movie_1087192": {
-        "title": "How to Train Your Dragon",
-        "genre": "famille",
-        "date": "2026-06-24",
-        "backdrop_path": "/7HqLLVjdjhXS0Qoz1SgZofhkIpE.jpg"
-    },
-    "tv_63174": {
-        "title": "Lucifer",
-        "genre": "fantastique",
-        "date": "2026-06-24",
-        "backdrop_path": "/wbiPjTWpZMIB8ffBq7HvzAph4Ft.jpg"
-    },
-    "tv_63333": {
-        "title": "The Last Kingdom",
-        "genre": "guerre",
-        "date": "2026-06-24",
-        "backdrop_path": "/QbtctI8EzlhsyFDMUMyG3fli8B.jpg"
-    },
-    "movie_1292695": {
-        "title": "They Will Kill You",
-        "genre": "horreur",
-        "date": "2026-06-24",
-        "backdrop_path": "/q05WV8DwEiyLbCgSVtg55RbUzou.jpg"
-    },
-    "movie_337167": {
-        "title": "Fifty Shades Freed",
-        "genre": "romance",
-        "date": "2026-06-24",
-        "backdrop_path": "/9ywA15OAiwjSTvg3cBs9B7kOCBF.jpg"
-    },
-    "movie_1081003": {
-        "title": "Supergirl",
-        "genre": "science-fiction",
-        "date": "2026-06-24",
-        "backdrop_path": "/6nlqYWDUpNem3v2bDCxQNSg41aY.jpg"
-    },
-    "tv_245927": {
-        "title": "Paradise",
-        "genre": "thriller",
-        "date": "2026-06-24",
-        "backdrop_path": "/5QsLvWh8J1mXl1W05wNJknMmhzR.jpg"
-    },
-    "tv_1406": {
-        "title": "Deadwood",
-        "genre": "western",
-        "date": "2026-06-24",
-        "backdrop_path": "/AcVCp1RVilFKT3DWre0GjP7vzsq.jpg"
     }
 }
