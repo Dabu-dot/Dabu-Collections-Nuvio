@@ -1,4 +1,106 @@
 {
+    "movie_1613798": {
+        "title": "Vengeance",
+        "genre": "action",
+        "date": "2026-07-12",
+        "backdrop_path": "/xyW8rJO3rwG2EGcTO6eaUEa8b9d.jpg"
+    },
+    "movie_1545621": {
+        "title": "Detective Conan: Fallen Angel of the Highway",
+        "genre": "animation-japonaise",
+        "date": "2026-07-12",
+        "backdrop_path": "/tpeQzSqeDEnmeHapF1QA7GJgpxn.jpg"
+    },
+    "tv_65334": {
+        "title": "Miraculous: Tales of Ladybug & Cat Noir",
+        "genre": "animation",
+        "date": "2026-07-12",
+        "backdrop_path": "/lH22EnM0ofC7GsVGU8dAA2RXV1c.jpg"
+    },
+    "movie_1170608": {
+        "title": "Dune: Part Three",
+        "genre": "aventure",
+        "date": "2026-07-12",
+        "backdrop_path": "/fgISFNlz8ZBplHa5cNXDsPe6VYK.jpg"
+    },
+    "tv_226285": {
+        "title": "Elsbeth",
+        "genre": "comedie",
+        "date": "2026-07-12",
+        "backdrop_path": "/ezQSOeu9uj4bWulxHR7D5CSNv3r.jpg"
+    },
+    "movie_1159559": {
+        "title": "Scream 7",
+        "genre": "crime",
+        "date": "2026-07-12",
+        "backdrop_path": "/hz7TdCrpLLt2Dz7S3PS2HG9rpAO.jpg"
+    },
+    "tv_287976": {
+        "title": "Summer '36",
+        "genre": "drame",
+        "date": "2026-07-12",
+        "backdrop_path": "/8KDxgfQ4JHgnEozwToRQaUgNAmP.jpg"
+    },
+    "tv_103540": {
+        "title": "Percy Jackson and the Olympians",
+        "genre": "famille",
+        "date": "2026-07-12",
+        "backdrop_path": "/danN2NzJTMouaBEkDWTnyDjDxUt.jpg"
+    },
+    "tv_82856": {
+        "title": "The Mandalorian",
+        "genre": "fantastique",
+        "date": "2026-07-12",
+        "backdrop_path": "/o7qi2v4uWQ8bZ1tW3KI0Ztn2epk.jpg"
+    },
+    "tv_116135": {
+        "title": "Vikings: Valhalla",
+        "genre": "guerre",
+        "date": "2026-07-12",
+        "backdrop_path": "/k47JEUTQsSMN532HRg6RCzZKBdB.jpg"
+    },
+    "movie_858024": {
+        "title": "Hamnet",
+        "genre": "histoire",
+        "date": "2026-07-12",
+        "backdrop_path": "/yt9m5CiU2MZkQoNl1kqLPODNR4t.jpg"
+    },
+    "movie_1304313": {
+        "title": "Lee Cronin's The Mummy",
+        "genre": "horreur",
+        "date": "2026-07-12",
+        "backdrop_path": "/s3tHm62ohyb0I5vSnPrpczCBtSX.jpg"
+    },
+    "movie_1089791": {
+        "title": "The Trace of Your Lips",
+        "genre": "romance",
+        "date": "2026-07-12",
+        "backdrop_path": "/qPIvV0Mt2n5lON9YG49K31I2exd.jpg"
+    },
+    "movie_263115": {
+        "title": "Logan",
+        "genre": "science-fiction",
+        "date": "2026-07-12",
+        "backdrop_path": "/qTdCfGyDisY9e8BLycszlyTsPWx.jpg"
+    },
+    "tv_585": {
+        "title": "WWF Wrestling Challenge",
+        "genre": "sport",
+        "date": "2026-07-12",
+        "backdrop_path": "/8uQVLnfKZSGS9ab8BeqtLwZ7mdH.jpg"
+    },
+    "movie_933260": {
+        "title": "The Substance",
+        "genre": "thriller",
+        "date": "2026-07-12",
+        "backdrop_path": "/7h6TqPB3ESmjuVbxCxAeB1c9OB1.jpg"
+    },
+    "tv_953": {
+        "title": "Maverick",
+        "genre": "western",
+        "date": "2026-07-12",
+        "backdrop_path": "/o0X11m9s7rmiJULBaV6A11hwxe2.jpg"
+    },
     "movie_1280738": {
         "title": "The Furious",
         "genre": "action",
