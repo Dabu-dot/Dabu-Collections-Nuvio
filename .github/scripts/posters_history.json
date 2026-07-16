@@ -1,4 +1,106 @@
 {
+    "movie_1306368": {
+        "title": "The Rip",
+        "genre": "action",
+        "date": "2026-07-16",
+        "backdrop_path": "/3F2EXWF1thX0BdrVaKvnm6mAhqh.jpg"
+    },
+    "tv_96316": {
+        "title": "Rent-a-Girlfriend",
+        "genre": "animation-japonaise",
+        "date": "2026-07-16",
+        "backdrop_path": "/ullfy98STkno11rDGi44SK6llwx.jpg"
+    },
+    "tv_57532": {
+        "title": "PAW Patrol",
+        "genre": "animation",
+        "date": "2026-07-16",
+        "backdrop_path": "/7OrV2aAH5Yp7hA9zCCvUloLvZtl.jpg"
+    },
+    "tv_235685": {
+        "title": "The Pendragon Cycle: Rise of the Merlin",
+        "genre": "aventure",
+        "date": "2026-07-16",
+        "backdrop_path": "/lDmFwAaHL1kXnAfZeUTieAdUTko.jpg"
+    },
+    "tv_113266": {
+        "title": "Kaatelal & Sons",
+        "genre": "comedie",
+        "date": "2026-07-16",
+        "backdrop_path": "/97uGOtjEQjTRcdm5WV7yW52foWL.jpg"
+    },
+    "tv_119769": {
+        "title": "Taxi Driver",
+        "genre": "crime",
+        "date": "2026-07-16",
+        "backdrop_path": "/lkXfu1hXIRjXWkMKUNEtSC7uWWw.jpg"
+    },
+    "tv_278624": {
+        "title": "Lucky",
+        "genre": "drame",
+        "date": "2026-07-16",
+        "backdrop_path": "/hKXMOOvQwXiL01hfYG5nrkH0tEP.jpg"
+    },
+    "movie_1440050": {
+        "title": "The Breadwinner",
+        "genre": "famille",
+        "date": "2026-07-16",
+        "backdrop_path": "/dgqBcgTzaUiSLvKJPDF9AbdFEMO.jpg"
+    },
+    "tv_95057": {
+        "title": "Superman & Lois",
+        "genre": "fantastique",
+        "date": "2026-07-16",
+        "backdrop_path": "/pPKiIJEEcV0E1hpVcWRXyp73ZpX.jpg"
+    },
+    "movie_855": {
+        "title": "Black Hawk Down",
+        "genre": "guerre",
+        "date": "2026-07-16",
+        "backdrop_path": "/7jaNOECZG8uS1tlq69HsY5xY8P9.jpg"
+    },
+    "movie_1301310": {
+        "title": "Zombies of the Third Reich",
+        "genre": "histoire",
+        "date": "2026-07-16",
+        "backdrop_path": "/7OjUOEWRoASbsmngmS96CpYfH3C.jpg"
+    },
+    "movie_1363387": {
+        "title": "Saccharine",
+        "genre": "horreur",
+        "date": "2026-07-16",
+        "backdrop_path": "/7NUx7bQAD4lo9yMDbprvIblhWo2.jpg"
+    },
+    "movie_950396": {
+        "title": "The Gorge",
+        "genre": "romance",
+        "date": "2026-07-16",
+        "backdrop_path": "/9nhjGaFLKtddDPtPaX5EmKqsWdH.jpg"
+    },
+    "tv_79680": {
+        "title": "Snowpiercer",
+        "genre": "science-fiction",
+        "date": "2026-07-16",
+        "backdrop_path": "/dJBKKbrQIqcQ9EUbdM48dM8mso6.jpg"
+    },
+    "tv_127529": {
+        "title": "Bloodhounds",
+        "genre": "sport",
+        "date": "2026-07-16",
+        "backdrop_path": "/zhsEnDNCQX5dlI2wbKzV90pV0B9.jpg"
+    },
+    "tv_199318": {
+        "title": "Bad Sisters",
+        "genre": "thriller",
+        "date": "2026-07-16",
+        "backdrop_path": "/aAVRi7XqkJZE6uUEn2Enbhj8rPx.jpg"
+    },
+    "tv_11388": {
+        "title": "Yancy Derringer",
+        "genre": "western",
+        "date": "2026-07-16",
+        "backdrop_path": "/iGjRmUhYi2s5nNwoRi2P9M6QlvR.jpg"
+    },
     "tv_52814": {
         "title": "Halo",
         "genre": "action",
@@ -1324,107 +1426,5 @@
         "genre": "western",
         "date": "2026-07-03",
         "backdrop_path": "/mjwXj9EvxCGSeMXt1horgv1SNB4.jpg"
-    },
-    "movie_588228": {
-        "title": "The Tomorrow War",
-        "genre": "action",
-        "date": "2026-07-02",
-        "backdrop_path": "/yizL4cEKsVvl17Wc1mGEIrQtM2F.jpg"
-    },
-    "tv_96316": {
-        "title": "Rent-a-Girlfriend",
-        "genre": "animation-japonaise",
-        "date": "2026-07-02",
-        "backdrop_path": "/ullfy98STkno11rDGi44SK6llwx.jpg"
-    },
-    "tv_57532": {
-        "title": "PAW Patrol",
-        "genre": "animation",
-        "date": "2026-07-02",
-        "backdrop_path": "/7OrV2aAH5Yp7hA9zCCvUloLvZtl.jpg"
-    },
-    "movie_1202033": {
-        "title": "Enola Holmes 3",
-        "genre": "aventure",
-        "date": "2026-07-02",
-        "backdrop_path": "/AsaeoBF2xIXnSwQ1oT4rbhthozv.jpg"
-    },
-    "tv_95480": {
-        "title": "Slow Horses",
-        "genre": "comedie",
-        "date": "2026-07-02",
-        "backdrop_path": "/bDfboQUb45Cv9MYyVBDZw8M8xSM.jpg"
-    },
-    "movie_1306368": {
-        "title": "The Rip",
-        "genre": "crime",
-        "date": "2026-07-02",
-        "backdrop_path": "/3F2EXWF1thX0BdrVaKvnm6mAhqh.jpg"
-    },
-    "tv_85077": {
-        "title": "The Chosen",
-        "genre": "drame",
-        "date": "2026-07-02",
-        "backdrop_path": "/3siv3RaQrdr2tQiv9jHq71sLlzo.jpg"
-    },
-    "tv_235685": {
-        "title": "The Pendragon Cycle: Rise of the Merlin",
-        "genre": "famille",
-        "date": "2026-07-02",
-        "backdrop_path": "/lDmFwAaHL1kXnAfZeUTieAdUTko.jpg"
-    },
-    "tv_106379": {
-        "title": "Fallout",
-        "genre": "fantastique",
-        "date": "2026-07-02",
-        "backdrop_path": "/coaPCIqQBPUZsOnJcWZxhaORcDT.jpg"
-    },
-    "tv_66857": {
-        "title": "Shooter",
-        "genre": "guerre",
-        "date": "2026-07-02",
-        "backdrop_path": "/of7m6LNpaaxsnmffPbVioxswsz9.jpg"
-    },
-    "movie_1301310": {
-        "title": "Zombies of the Third Reich",
-        "genre": "histoire",
-        "date": "2026-07-02",
-        "backdrop_path": "/7OjUOEWRoASbsmngmS96CpYfH3C.jpg"
-    },
-    "movie_419430": {
-        "title": "Get Out",
-        "genre": "horreur",
-        "date": "2026-07-02",
-        "backdrop_path": "/vZ7EVk7FaNEWYqlVWbFLHP8Z0LU.jpg"
-    },
-    "movie_950396": {
-        "title": "The Gorge",
-        "genre": "romance",
-        "date": "2026-07-02",
-        "backdrop_path": "/9nhjGaFLKtddDPtPaX5EmKqsWdH.jpg"
-    },
-    "tv_103516": {
-        "title": "Star Trek: Strange New Worlds",
-        "genre": "science-fiction",
-        "date": "2026-07-02",
-        "backdrop_path": "/627K48naKH2Y3Rz47Ydra4qktdI.jpg"
-    },
-    "tv_224": {
-        "title": "Match of the Day",
-        "genre": "sport",
-        "date": "2026-07-02",
-        "backdrop_path": "/qI2o5l4fJq2GY70DljFrshlNIwG.jpg"
-    },
-    "tv_199318": {
-        "title": "Bad Sisters",
-        "genre": "thriller",
-        "date": "2026-07-02",
-        "backdrop_path": "/aAVRi7XqkJZE6uUEn2Enbhj8rPx.jpg"
-    },
-    "tv_13795": {
-        "title": "Tales of Wells Fargo",
-        "genre": "western",
-        "date": "2026-07-02",
-        "backdrop_path": "/rekcQrWBA9y2mwZ3rT1azLgTdKP.jpg"
     }
 }
