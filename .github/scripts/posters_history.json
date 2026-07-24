@@ -1,4 +1,106 @@
 {
+    "movie_1081003": {
+        "title": "Supergirl",
+        "genre": "action",
+        "date": "2026-07-24",
+        "backdrop_path": "/6nlqYWDUpNem3v2bDCxQNSg41aY.jpg"
+    },
+    "movie_1311031": {
+        "title": "Demon Slayer: Kimetsu no Yaiba Infinity Castle",
+        "genre": "animation-japonaise",
+        "date": "2026-07-24",
+        "backdrop_path": "/1RgPyOhN4DRs225BGTlHJqCudII.jpg"
+    },
+    "tv_2122": {
+        "title": "King of the Hill",
+        "genre": "animation",
+        "date": "2026-07-24",
+        "backdrop_path": "/4CSdS9p0AhLhxCo1hGuQINiE2Sa.jpg"
+    },
+    "tv_84773": {
+        "title": "The Lord of the Rings: The Rings of Power",
+        "genre": "aventure",
+        "date": "2026-07-24",
+        "backdrop_path": "/vpRAeMi5VBZT3Kjykive6qan2Ui.jpg"
+    },
+    "tv_79744": {
+        "title": "The Rookie",
+        "genre": "comedie",
+        "date": "2026-07-24",
+        "backdrop_path": "/6iNWfGVCEfASDdlNb05TP5nG0ll.jpg"
+    },
+    "movie_1439930": {
+        "title": "The Punisher: One Last Kill",
+        "genre": "crime",
+        "date": "2026-07-24",
+        "backdrop_path": "/fAhLjW8W9PU08KHBbRK3Vek9k4L.jpg"
+    },
+    "movie_1314481": {
+        "title": "The Devil Wears Prada 2",
+        "genre": "drame",
+        "date": "2026-07-24",
+        "backdrop_path": "/Af907x5h9W1wVis8XrSd7ynTWuy.jpg"
+    },
+    "tv_71728": {
+        "title": "Young Sheldon",
+        "genre": "famille",
+        "date": "2026-07-24",
+        "backdrop_path": "/nlDBlCtorM7nx130wYnfR5ZmyLX.jpg"
+    },
+    "tv_63174": {
+        "title": "Lucifer",
+        "genre": "fantastique",
+        "date": "2026-07-24",
+        "backdrop_path": "/wbiPjTWpZMIB8ffBq7HvzAph4Ft.jpg"
+    },
+    "tv_126308": {
+        "title": "Shōgun",
+        "genre": "guerre",
+        "date": "2026-07-24",
+        "backdrop_path": "/5zmiBoMzeeVdQ62no55JOJMY498.jpg"
+    },
+    "movie_1318413": {
+        "title": "Pressure",
+        "genre": "histoire",
+        "date": "2026-07-24",
+        "backdrop_path": "/apfyLCPVFttB8oXcsLJ7q0NSFLx.jpg"
+    },
+    "movie_1038392": {
+        "title": "The Conjuring: Last Rites",
+        "genre": "horreur",
+        "date": "2026-07-24",
+        "backdrop_path": "/i8MupUe4xgmYXoRNAQMYvuoexSU.jpg"
+    },
+    "movie_614945": {
+        "title": "Voicemails for Isabelle",
+        "genre": "romance",
+        "date": "2026-07-24",
+        "backdrop_path": "/2WU6Y6aonzD6uAaCmNnEFlesxxJ.jpg"
+    },
+    "tv_103516": {
+        "title": "Star Trek: Strange New Worlds",
+        "genre": "science-fiction",
+        "date": "2026-07-24",
+        "backdrop_path": "/627K48naKH2Y3Rz47Ydra4qktdI.jpg"
+    },
+    "tv_97546": {
+        "title": "Ted Lasso",
+        "genre": "sport",
+        "date": "2026-07-24",
+        "backdrop_path": "/8rDij8tYynUfu2hMVXynAp2pSjY.jpg"
+    },
+    "tv_245927": {
+        "title": "Paradise",
+        "genre": "thriller",
+        "date": "2026-07-24",
+        "backdrop_path": "/5QsLvWh8J1mXl1W05wNJknMmhzR.jpg"
+    },
+    "tv_240993": {
+        "title": "Ransom Canyon",
+        "genre": "western",
+        "date": "2026-07-24",
+        "backdrop_path": "/29P64FqDp0UVa9oJsIl49PHn5tH.jpg"
+    },
     "movie_931285": {
         "title": "Mortal Kombat II",
         "genre": "action",
@@ -1300,107 +1402,5 @@
         "genre": "western",
         "date": "2026-07-11",
         "backdrop_path": "/61OxoiBHvGFOB4gufYfypHyCbI4.jpg"
-    },
-    "movie_1419406": {
-        "title": "The Shadow's Edge",
-        "genre": "action",
-        "date": "2026-07-10",
-        "backdrop_path": "/4BtL2vvEufDXDP4u6xQjjQ1Y2aT.jpg"
-    },
-    "tv_285993": {
-        "title": "BLACK TORCH",
-        "genre": "animation-japonaise",
-        "date": "2026-07-10",
-        "backdrop_path": "/goTFoBxSyLybVvlGa2Ke9uTchdF.jpg"
-    },
-    "tv_138502": {
-        "title": "X-Men '97",
-        "genre": "animation",
-        "date": "2026-07-10",
-        "backdrop_path": "/jIyEmnBrZtl6SEWyBoMO2hZnzMa.jpg"
-    },
-    "movie_693134": {
-        "title": "Dune: Part Two",
-        "genre": "aventure",
-        "date": "2026-07-10",
-        "backdrop_path": "/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg"
-    },
-    "tv_79744": {
-        "title": "The Rookie",
-        "genre": "comedie",
-        "date": "2026-07-10",
-        "backdrop_path": "/6iNWfGVCEfASDdlNb05TP5nG0ll.jpg"
-    },
-    "movie_1439930": {
-        "title": "The Punisher: One Last Kill",
-        "genre": "crime",
-        "date": "2026-07-10",
-        "backdrop_path": "/fAhLjW8W9PU08KHBbRK3Vek9k4L.jpg"
-    },
-    "tv_273240": {
-        "title": "Off Campus",
-        "genre": "drame",
-        "date": "2026-07-10",
-        "backdrop_path": "/52sp0vPhLOWrZ1QoZIWiapronM.jpg"
-    },
-    "tv_71728": {
-        "title": "Young Sheldon",
-        "genre": "famille",
-        "date": "2026-07-10",
-        "backdrop_path": "/nlDBlCtorM7nx130wYnfR5ZmyLX.jpg"
-    },
-    "tv_63174": {
-        "title": "Lucifer",
-        "genre": "fantastique",
-        "date": "2026-07-10",
-        "backdrop_path": "/wbiPjTWpZMIB8ffBq7HvzAph4Ft.jpg"
-    },
-    "movie_1318413": {
-        "title": "Pressure",
-        "genre": "guerre",
-        "date": "2026-07-10",
-        "backdrop_path": "/apfyLCPVFttB8oXcsLJ7q0NSFLx.jpg"
-    },
-    "tv_67026": {
-        "title": "Designated Survivor",
-        "genre": "histoire",
-        "date": "2026-07-10",
-        "backdrop_path": "/AhufsCP0kYIkpr0Iy2GrLSM1noL.jpg"
-    },
-    "movie_1038392": {
-        "title": "The Conjuring: Last Rites",
-        "genre": "horreur",
-        "date": "2026-07-10",
-        "backdrop_path": "/i8MupUe4xgmYXoRNAQMYvuoexSU.jpg"
-    },
-    "movie_614945": {
-        "title": "Voicemails for Isabelle",
-        "genre": "romance",
-        "date": "2026-07-10",
-        "backdrop_path": "/2WU6Y6aonzD6uAaCmNnEFlesxxJ.jpg"
-    },
-    "movie_1081003": {
-        "title": "Supergirl",
-        "genre": "science-fiction",
-        "date": "2026-07-10",
-        "backdrop_path": "/6nlqYWDUpNem3v2bDCxQNSg41aY.jpg"
-    },
-    "movie_385687": {
-        "title": "Fast X",
-        "genre": "sport",
-        "date": "2026-07-10",
-        "backdrop_path": "/fSd5MjJNcauyEbHuzUdCE1TKttK.jpg"
-    },
-    "tv_245927": {
-        "title": "Paradise",
-        "genre": "thriller",
-        "date": "2026-07-10",
-        "backdrop_path": "/5QsLvWh8J1mXl1W05wNJknMmhzR.jpg"
-    },
-    "tv_283304": {
-        "title": "Little House on the Prairie",
-        "genre": "western",
-        "date": "2026-07-10",
-        "backdrop_path": "/fBieUo3SdItUrXZE16YxbpjwXIe.jpg"
     }
 }
