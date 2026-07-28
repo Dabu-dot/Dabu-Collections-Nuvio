@@ -1,4 +1,106 @@
 {
+    "tv_77169": {
+        "title": "Cobra Kai",
+        "genre": "action",
+        "date": "2026-07-28",
+        "backdrop_path": "/pazdVerQyCdWM9Qn12qUWkdp4ZM.jpg"
+    },
+    "tv_259140": {
+        "title": "Ranma1/2",
+        "genre": "animation-japonaise",
+        "date": "2026-07-28",
+        "backdrop_path": "/xvD9urN8lUtWw5fm4a87Rl3dCZn.jpg"
+    },
+    "tv_212989": {
+        "title": "LEGO Ninjago: Dragons Rising",
+        "genre": "animation",
+        "date": "2026-07-28",
+        "backdrop_path": "/aqrhE3FPSKTPWwr9jTK1dnyhtFD.jpg"
+    },
+    "movie_1108427": {
+        "title": "Moana",
+        "genre": "aventure",
+        "date": "2026-07-28",
+        "backdrop_path": "/c6BPbkO5Npt1OdwttAxCFo06wtH.jpg"
+    },
+    "tv_136315": {
+        "title": "The Bear",
+        "genre": "comedie",
+        "date": "2026-07-28",
+        "backdrop_path": "/wHNwlE6ftEpgjVbdhLXOtv1hLs0.jpg"
+    },
+    "tv_94372": {
+        "title": "FBI: Most Wanted",
+        "genre": "crime",
+        "date": "2026-07-28",
+        "backdrop_path": "/4BrWdbv2Cqe0zLqvNzkoednZQAb.jpg"
+    },
+    "tv_85552": {
+        "title": "Euphoria",
+        "genre": "drame",
+        "date": "2026-07-28",
+        "backdrop_path": "/9KnIzPCv9XpWA0MqmwiKBZvV1Sj.jpg"
+    },
+    "tv_245026": {
+        "title": "Wizards Beyond Waverly Place",
+        "genre": "famille",
+        "date": "2026-07-28",
+        "backdrop_path": "/ore4E3D1qfTH1Ollf4UDhzW3PtG.jpg"
+    },
+    "tv_194583": {
+        "title": "The Walking Dead: Dead City",
+        "genre": "fantastique",
+        "date": "2026-07-28",
+        "backdrop_path": "/vV5LKWmuysEe5wsuZJGbdiL5XJ2.jpg"
+    },
+    "tv_40619": {
+        "title": "The Young Turks",
+        "genre": "guerre",
+        "date": "2026-07-28",
+        "backdrop_path": "/dp5dQ4TnvNMfRxkiAonYD1YGfuv.jpg"
+    },
+    "tv_44217": {
+        "title": "Vikings",
+        "genre": "histoire",
+        "date": "2026-07-28",
+        "backdrop_path": "/qsYgsPVYAzGYAPZuo2NkVctVFsd.jpg"
+    },
+    "movie_1321008": {
+        "title": "Black Box",
+        "genre": "horreur",
+        "date": "2026-07-28",
+        "backdrop_path": "/ce0RjYfcgzQeiT3PjaARWv5PVQO.jpg"
+    },
+    "movie_950028": {
+        "title": "The Invite",
+        "genre": "romance",
+        "date": "2026-07-28",
+        "backdrop_path": "/kLA1GqiOEyVgXxgNqLoCr7bYcqu.jpg"
+    },
+    "movie_335984": {
+        "title": "Blade Runner 2049",
+        "genre": "science-fiction",
+        "date": "2026-07-28",
+        "backdrop_path": "/mVr0UiqyltcfqxbAUcLl9zWL8ah.jpg"
+    },
+    "tv_301507": {
+        "title": "Heated Rivalry",
+        "genre": "sport",
+        "date": "2026-07-28",
+        "backdrop_path": "/3vuBfAuAltIR6UdANUQ1lLXOeia.jpg"
+    },
+    "tv_247718": {
+        "title": "MobLand",
+        "genre": "thriller",
+        "date": "2026-07-28",
+        "backdrop_path": "/tQqbbxBAdW2ql8vbOqMOJbtSQ7O.jpg"
+    },
+    "tv_65493": {
+        "title": "The Ranch",
+        "genre": "western",
+        "date": "2026-07-28",
+        "backdrop_path": "/rIycDdkLET20EVW2LPytLNuyOp3.jpg"
+    },
     "movie_617126": {
         "title": "The Fantastic 4: First Steps",
         "genre": "action",
@@ -1300,107 +1402,5 @@
         "genre": "western",
         "date": "2026-07-15",
         "backdrop_path": "/uCvpgfY4oTeZxEcFqm1ATJkDDmu.jpg"
-    },
-    "movie_1168190": {
-        "title": "The Wrecking Crew",
-        "genre": "action",
-        "date": "2026-07-14",
-        "backdrop_path": "/cz4vLJrmaV1zJlRYbxqtvLzeLWB.jpg"
-    },
-    "tv_259140": {
-        "title": "Ranma1/2",
-        "genre": "animation-japonaise",
-        "date": "2026-07-14",
-        "backdrop_path": "/xvD9urN8lUtWw5fm4a87Rl3dCZn.jpg"
-    },
-    "tv_212989": {
-        "title": "LEGO Ninjago: Dragons Rising",
-        "genre": "animation",
-        "date": "2026-07-14",
-        "backdrop_path": "/aqrhE3FPSKTPWwr9jTK1dnyhtFD.jpg"
-    },
-    "movie_1108427": {
-        "title": "Moana",
-        "genre": "aventure",
-        "date": "2026-07-14",
-        "backdrop_path": "/c6U1Te0p0FK0BOB43hiwGlBKiVY.jpg"
-    },
-    "tv_136315": {
-        "title": "The Bear",
-        "genre": "comedie",
-        "date": "2026-07-14",
-        "backdrop_path": "/wHNwlE6ftEpgjVbdhLXOtv1hLs0.jpg"
-    },
-    "tv_94372": {
-        "title": "FBI: Most Wanted",
-        "genre": "crime",
-        "date": "2026-07-14",
-        "backdrop_path": "/4BrWdbv2Cqe0zLqvNzkoednZQAb.jpg"
-    },
-    "tv_298954": {
-        "title": "Antigang",
-        "genre": "drame",
-        "date": "2026-07-14",
-        "backdrop_path": "/d22rcSrAWU7BMFItDphrJ6Ube0I.jpg"
-    },
-    "movie_939243": {
-        "title": "Sonic the Hedgehog 3",
-        "genre": "famille",
-        "date": "2026-07-14",
-        "backdrop_path": "/zOpe0eHsq0A2NvNyBbtT6sj53qV.jpg"
-    },
-    "tv_79696": {
-        "title": "Manifest",
-        "genre": "fantastique",
-        "date": "2026-07-14",
-        "backdrop_path": "/3ib0uov9Qq9JtTIEGL39irTa3vZ.jpg"
-    },
-    "tv_732": {
-        "title": "L.A. Law",
-        "genre": "guerre",
-        "date": "2026-07-14",
-        "backdrop_path": "/o0oGr7JsdC6yzWLmMfc4PXHpJUj.jpg"
-    },
-    "tv_918": {
-        "title": "M*A*S*H",
-        "genre": "histoire",
-        "date": "2026-07-14",
-        "backdrop_path": "/8nkOWsMtWZvp7IGuYdVbJeoWzQx.jpg"
-    },
-    "movie_1321008": {
-        "title": "Black Box",
-        "genre": "horreur",
-        "date": "2026-07-14",
-        "backdrop_path": "/ce0RjYfcgzQeiT3PjaARWv5PVQO.jpg"
-    },
-    "movie_744275": {
-        "title": "After We Fell",
-        "genre": "romance",
-        "date": "2026-07-14",
-        "backdrop_path": "/mxdiaM2tsx8M6W3zLgiPwAkhQfq.jpg"
-    },
-    "movie_335984": {
-        "title": "Blade Runner 2049",
-        "genre": "science-fiction",
-        "date": "2026-07-14",
-        "backdrop_path": "/mVr0UiqyltcfqxbAUcLl9zWL8ah.jpg"
-    },
-    "tv_82428": {
-        "title": "All American",
-        "genre": "sport",
-        "date": "2026-07-14",
-        "backdrop_path": "/6npymlbLc0SMqqktCpu7X7K4eJy.jpg"
-    },
-    "tv_247718": {
-        "title": "MobLand",
-        "genre": "thriller",
-        "date": "2026-07-14",
-        "backdrop_path": "/tQqbbxBAdW2ql8vbOqMOJbtSQ7O.jpg"
-    },
-    "tv_10929": {
-        "title": "The Wild Wild West",
-        "genre": "western",
-        "date": "2026-07-14",
-        "backdrop_path": "/4iSl4y1gWZwXmjyS3Ho8HqLWXAK.jpg"
     }
 }
