@@ -1,4 +1,106 @@
 {
+    "tv_52814": {
+        "title": "Halo",
+        "genre": "action",
+        "date": "2026-07-29",
+        "backdrop_path": "/1qpUk27LVI9UoTS7S0EixUBj5aR.jpg"
+    },
+    "tv_117465": {
+        "title": "Hell's Paradise",
+        "genre": "animation-japonaise",
+        "date": "2026-07-29",
+        "backdrop_path": "/vjiIuR3XGpoGSumQ7DziPAmxIYR.jpg"
+    },
+    "tv_65334": {
+        "title": "Miraculous: Tales of Ladybug & Cat Noir",
+        "genre": "animation",
+        "date": "2026-07-29",
+        "backdrop_path": "/lH22EnM0ofC7GsVGU8dAA2RXV1c.jpg"
+    },
+    "tv_82856": {
+        "title": "The Mandalorian",
+        "genre": "aventure",
+        "date": "2026-07-29",
+        "backdrop_path": "/o7qi2v4uWQ8bZ1tW3KI0Ztn2epk.jpg"
+    },
+    "movie_346698": {
+        "title": "Barbie",
+        "genre": "comedie",
+        "date": "2026-07-29",
+        "backdrop_path": "/ctMserH8g2SeOAnCw5gFjdQF8mo.jpg"
+    },
+    "tv_208569": {
+        "title": "Will Trent",
+        "genre": "crime",
+        "date": "2026-07-29",
+        "backdrop_path": "/9pGzG5CYx2XM8JFFQvMk9Z3z9ze.jpg"
+    },
+    "tv_75219": {
+        "title": "9-1-1",
+        "genre": "drame",
+        "date": "2026-07-29",
+        "backdrop_path": "/h050XJoiIobaH6bhj3MAhgilkpJ.jpg"
+    },
+    "tv_136228": {
+        "title": "Pa Quererte",
+        "genre": "famille",
+        "date": "2026-07-29",
+        "backdrop_path": "/va8cLePI0khniYu6luIHcdXrzMg.jpg"
+    },
+    "tv_106379": {
+        "title": "Fallout",
+        "genre": "fantastique",
+        "date": "2026-07-29",
+        "backdrop_path": "/coaPCIqQBPUZsOnJcWZxhaORcDT.jpg"
+    },
+    "tv_4613": {
+        "title": "Band of Brothers",
+        "genre": "guerre",
+        "date": "2026-07-29",
+        "backdrop_path": "/2yDV0xLyqW88dn5qE7YCRnoYmfy.jpg"
+    },
+    "tv_1407": {
+        "title": "Homeland",
+        "genre": "histoire",
+        "date": "2026-07-29",
+        "backdrop_path": "/391ixi0wVbFtFLQnOy8ZncWv2io.jpg"
+    },
+    "movie_1564614": {
+        "title": "Leviticus",
+        "genre": "horreur",
+        "date": "2026-07-29",
+        "backdrop_path": "/xcGNm0JlkrGpDbgdPSW9mR52tbv.jpg"
+    },
+    "movie_1632181": {
+        "title": "Accidental Partners",
+        "genre": "romance",
+        "date": "2026-07-29",
+        "backdrop_path": "/iCML6fBe3X0y06P33bM7dyYXPKZ.jpg"
+    },
+    "movie_283995": {
+        "title": "Guardians of the Galaxy Vol. 2",
+        "genre": "science-fiction",
+        "date": "2026-07-29",
+        "backdrop_path": "/aJn9XeesqsrSLKcHfHP4u5985hn.jpg"
+    },
+    "tv_82428": {
+        "title": "All American",
+        "genre": "sport",
+        "date": "2026-07-29",
+        "backdrop_path": "/6npymlbLc0SMqqktCpu7X7K4eJy.jpg"
+    },
+    "movie_1266127": {
+        "title": "Ready or Not: Here I Come",
+        "genre": "thriller",
+        "date": "2026-07-29",
+        "backdrop_path": "/fx2cEuadZK28VHKkc0F1nFR96i0.jpg"
+    },
+    "tv_13859": {
+        "title": "The Rifleman",
+        "genre": "western",
+        "date": "2026-07-29",
+        "backdrop_path": "/4zZ0VjYxGERjhf5FdTuB0Y215Pi.jpg"
+    },
     "tv_77169": {
         "title": "Cobra Kai",
         "genre": "action",
@@ -1300,107 +1402,5 @@
         "genre": "western",
         "date": "2026-07-16",
         "backdrop_path": "/iGjRmUhYi2s5nNwoRi2P9M6QlvR.jpg"
-    },
-    "tv_52814": {
-        "title": "Halo",
-        "genre": "action",
-        "date": "2026-07-15",
-        "backdrop_path": "/1qpUk27LVI9UoTS7S0EixUBj5aR.jpg"
-    },
-    "tv_245842": {
-        "title": "Wistoria: Wand and Sword",
-        "genre": "animation-japonaise",
-        "date": "2026-07-15",
-        "backdrop_path": "/n4VljCX22hbw3RwfxaY8FX8eLzN.jpg"
-    },
-    "tv_257723": {
-        "title": "Maddie + Triggs",
-        "genre": "animation",
-        "date": "2026-07-15",
-        "backdrop_path": "/poDJP5e9JzyTSY1bYdcZkAjivVr.jpg"
-    },
-    "tv_129552": {
-        "title": "The Night Agent",
-        "genre": "aventure",
-        "date": "2026-07-15",
-        "backdrop_path": "/6VWu36UlyoMgnlZx3ECXXWLoTO0.jpg"
-    },
-    "movie_346698": {
-        "title": "Barbie",
-        "genre": "comedie",
-        "date": "2026-07-15",
-        "backdrop_path": "/ctMserH8g2SeOAnCw5gFjdQF8mo.jpg"
-    },
-    "tv_208569": {
-        "title": "Will Trent",
-        "genre": "crime",
-        "date": "2026-07-15",
-        "backdrop_path": "/9pGzG5CYx2XM8JFFQvMk9Z3z9ze.jpg"
-    },
-    "tv_226637": {
-        "title": "High Potential",
-        "genre": "drame",
-        "date": "2026-07-15",
-        "backdrop_path": "/yVP12H81dwaay5B7GVqgO893q2c.jpg"
-    },
-    "tv_136228": {
-        "title": "Pa Quererte",
-        "genre": "famille",
-        "date": "2026-07-15",
-        "backdrop_path": "/va8cLePI0khniYu6luIHcdXrzMg.jpg"
-    },
-    "tv_93740": {
-        "title": "Foundation",
-        "genre": "fantastique",
-        "date": "2026-07-15",
-        "backdrop_path": "/7NNNXo0qG2SqH4JoG7GPvJ2hzes.jpg"
-    },
-    "tv_1407": {
-        "title": "Homeland",
-        "genre": "guerre",
-        "date": "2026-07-15",
-        "backdrop_path": "/391ixi0wVbFtFLQnOy8ZncWv2io.jpg"
-    },
-    "movie_1397201": {
-        "title": "Golden Kamuy -The Abashiri Prison Raid-",
-        "genre": "histoire",
-        "date": "2026-07-15",
-        "backdrop_path": "/eeiZikJBrnx5H5AQOaTD9Lt6DU3.jpg"
-    },
-    "movie_713704": {
-        "title": "Evil Dead Rise",
-        "genre": "horreur",
-        "date": "2026-07-15",
-        "backdrop_path": "/7bWxAsNPv9CXHOhZbJVlj2KxgfP.jpg"
-    },
-    "movie_1632181": {
-        "title": "Accidental Partners",
-        "genre": "romance",
-        "date": "2026-07-15",
-        "backdrop_path": "/iCML6fBe3X0y06P33bM7dyYXPKZ.jpg"
-    },
-    "tv_127235": {
-        "title": "Invasion",
-        "genre": "science-fiction",
-        "date": "2026-07-15",
-        "backdrop_path": "/i9IEOD1Li1y89xRHKH9kiE8dt9z.jpg"
-    },
-    "movie_1491920": {
-        "title": "Kung Fu Soccer",
-        "genre": "sport",
-        "date": "2026-07-15",
-        "backdrop_path": "/vOrbq0qe3BMpGLcbYQPUP9VTN72.jpg"
-    },
-    "tv_75219": {
-        "title": "9-1-1",
-        "genre": "thriller",
-        "date": "2026-07-15",
-        "backdrop_path": "/h050XJoiIobaH6bhj3MAhgilkpJ.jpg"
-    },
-    "tv_1781": {
-        "title": "Little House on the Prairie",
-        "genre": "western",
-        "date": "2026-07-15",
-        "backdrop_path": "/uCvpgfY4oTeZxEcFqm1ATJkDDmu.jpg"
     }
 }
