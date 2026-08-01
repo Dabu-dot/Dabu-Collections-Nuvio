@@ -1,4 +1,106 @@
 {
+    "movie_603692": {
+        "title": "John Wick: Chapter 4",
+        "genre": "action",
+        "date": "2026-08-01",
+        "backdrop_path": "/i8dshLvq4LE3s0v8PrkDdUyb1ae.jpg"
+    },
+    "tv_240411": {
+        "title": "Dan Da Dan",
+        "genre": "animation-japonaise",
+        "date": "2026-08-01",
+        "backdrop_path": "/uNTrRKIOyKYISthoeizghtXPEOK.jpg"
+    },
+    "tv_60625": {
+        "title": "Rick and Morty",
+        "genre": "animation",
+        "date": "2026-08-01",
+        "backdrop_path": "/uGy4DCmM33I7l86W7iCskNkvmLD.jpg"
+    },
+    "movie_696506": {
+        "title": "Mickey 17",
+        "genre": "aventure",
+        "date": "2026-08-01",
+        "backdrop_path": "/hNA73rnG4PjSwgojaC2gbO1f8Rt.jpg"
+    },
+    "tv_124101": {
+        "title": "Hacks",
+        "genre": "comedie",
+        "date": "2026-08-01",
+        "backdrop_path": "/bbAR4qKxjnjyKAt4YMrL725Mtfw.jpg"
+    },
+    "tv_277439": {
+        "title": "Cape Fear",
+        "genre": "crime",
+        "date": "2026-08-01",
+        "backdrop_path": "/dz7p0quExY3L8R4aPj2QJUVhp74.jpg"
+    },
+    "tv_71712": {
+        "title": "The Good Doctor",
+        "genre": "drame",
+        "date": "2026-08-01",
+        "backdrop_path": "/f3cin9kOz4nOrlYEMxGFQhv4bdN.jpg"
+    },
+    "movie_1318621": {
+        "title": "Descendants: Wicked Wonderland",
+        "genre": "famille",
+        "date": "2026-08-01",
+        "backdrop_path": "/idRLKyu43mRhMWNjzd6FiEromNI.jpg"
+    },
+    "movie_1698856": {
+        "title": "Master of the Universe",
+        "genre": "fantastique",
+        "date": "2026-08-01",
+        "backdrop_path": "/uOQtyMV2G9yJvc0s14zmLoRC5H9.jpg"
+    },
+    "movie_652": {
+        "title": "Troy",
+        "genre": "guerre",
+        "date": "2026-08-01",
+        "backdrop_path": "/d3z8MH9OvTOOSxy5QwAG0cS6GKU.jpg"
+    },
+    "tv_61378": {
+        "title": "Madam Secretary",
+        "genre": "histoire",
+        "date": "2026-08-01",
+        "backdrop_path": "/jzkTau3O7CfG3LkKopxkNWPZf8d.jpg"
+    },
+    "movie_1481343": {
+        "title": "The Devil's Mouth",
+        "genre": "horreur",
+        "date": "2026-08-01",
+        "backdrop_path": "/hwnTaa6eT7c5xxOiJL2NhcVt8qX.jpg"
+    },
+    "movie_1468683": {
+        "title": "Heartstopper Forever",
+        "genre": "romance",
+        "date": "2026-08-01",
+        "backdrop_path": "/rwCWyhyM9Vun6GCHPwJ7Rj1WNmX.jpg"
+    },
+    "movie_1236153": {
+        "title": "Mercy",
+        "genre": "science-fiction",
+        "date": "2026-08-01",
+        "backdrop_path": "/gIClklFGYBe0uiOoiP2vtocJbss.jpg"
+    },
+    "tv_127529": {
+        "title": "Bloodhounds",
+        "genre": "sport",
+        "date": "2026-08-01",
+        "backdrop_path": "/zhsEnDNCQX5dlI2wbKzV90pV0B9.jpg"
+    },
+    "tv_39852": {
+        "title": "The Sinner",
+        "genre": "thriller",
+        "date": "2026-08-01",
+        "backdrop_path": "/AhhABp3IjJgb1q00ZSLwBO5VwMB.jpg"
+    },
+    "tv_10952": {
+        "title": "Rawhide",
+        "genre": "western",
+        "date": "2026-08-01",
+        "backdrop_path": "/aiprRusbCwJEkYCnfaxJY5bX7B8.jpg"
+    },
     "movie_969681": {
         "title": "Spider-Man: Brand New Day",
         "genre": "action",
@@ -1312,107 +1414,5 @@
         "genre": "western",
         "date": "2026-07-19",
         "backdrop_path": "/1Rzdd9VjqXOE7rzMlaMdwHOTmkr.jpg"
-    },
-    "movie_1279493": {
-        "title": "The Get Out",
-        "genre": "action",
-        "date": "2026-07-18",
-        "backdrop_path": "/mVHyU4pnu9b2LWByPGGM0GGCA1v.jpg"
-    },
-    "tv_207468": {
-        "title": "Kaiju No. 8",
-        "genre": "animation-japonaise",
-        "date": "2026-07-18",
-        "backdrop_path": "/htGeuCcNhlBe8GTx3izKOsd8frw.jpg"
-    },
-    "tv_60625": {
-        "title": "Rick and Morty",
-        "genre": "animation",
-        "date": "2026-07-18",
-        "backdrop_path": "/5BDNWWHweQL0q1fmTv7gmRXfnl4.jpg"
-    },
-    "tv_73375": {
-        "title": "Tom Clancy's Jack Ryan",
-        "genre": "aventure",
-        "date": "2026-07-18",
-        "backdrop_path": "/mDVIU9Y2TYeK2W29a2HRBiWt3JA.jpg"
-    },
-    "tv_254528": {
-        "title": "The Hawk",
-        "genre": "comedie",
-        "date": "2026-07-18",
-        "backdrop_path": "/fBVNJL85Q60njpKPD6YaLi6tEsX.jpg"
-    },
-    "tv_87940": {
-        "title": "Hudson & Rex",
-        "genre": "crime",
-        "date": "2026-07-18",
-        "backdrop_path": "/eEOx2lpnWm4lVF5jfqtKsWlyuJX.jpg"
-    },
-    "tv_71712": {
-        "title": "The Good Doctor",
-        "genre": "drame",
-        "date": "2026-07-18",
-        "backdrop_path": "/f3cin9kOz4nOrlYEMxGFQhv4bdN.jpg"
-    },
-    "movie_1318621": {
-        "title": "Descendants: Wicked Wonderland",
-        "genre": "famille",
-        "date": "2026-07-18",
-        "backdrop_path": "/idRLKyu43mRhMWNjzd6FiEromNI.jpg"
-    },
-    "tv_90802": {
-        "title": "The Sandman",
-        "genre": "fantastique",
-        "date": "2026-07-18",
-        "backdrop_path": "/i8taDLjpF8cCbp53N8kOFt1LSkW.jpg"
-    },
-    "movie_652": {
-        "title": "Troy",
-        "genre": "guerre",
-        "date": "2026-07-18",
-        "backdrop_path": "/d3z8MH9OvTOOSxy5QwAG0cS6GKU.jpg"
-    },
-    "tv_61378": {
-        "title": "Madam Secretary",
-        "genre": "histoire",
-        "date": "2026-07-18",
-        "backdrop_path": "/jzkTau3O7CfG3LkKopxkNWPZf8d.jpg"
-    },
-    "movie_1711175": {
-        "title": "Summerween",
-        "genre": "horreur",
-        "date": "2026-07-18",
-        "backdrop_path": "/25N840Us9DC7JY6WSxKCsHSjDsu.jpg"
-    },
-    "movie_1468683": {
-        "title": "Heartstopper Forever",
-        "genre": "romance",
-        "date": "2026-07-18",
-        "backdrop_path": "/vvE7zc2aie3ozZcy5xYbg5QTFrF.jpg"
-    },
-    "movie_755898": {
-        "title": "War of the Worlds",
-        "genre": "science-fiction",
-        "date": "2026-07-18",
-        "backdrop_path": "/iZLqwEwUViJdSkGVjePGhxYzbDb.jpg"
-    },
-    "tv_224": {
-        "title": "Match of the Day",
-        "genre": "sport",
-        "date": "2026-07-18",
-        "backdrop_path": "/qI2o5l4fJq2GY70DljFrshlNIwG.jpg"
-    },
-    "tv_153312": {
-        "title": "Tulsa King",
-        "genre": "thriller",
-        "date": "2026-07-18",
-        "backdrop_path": "/mNHRGO1gFpR2CYZdANe72kcKq7G.jpg"
-    },
-    "movie_1601243": {
-        "title": "Oscar Shaw",
-        "genre": "western",
-        "date": "2026-07-18",
-        "backdrop_path": "/diKBJ2kJHHfm4nmHTHhprBgfHIF.jpg"
     }
 }
