@@ -1,4 +1,106 @@
 {
+    "movie_603692": {
+        "title": "John Wick: Chapter 4",
+        "genre": "action",
+        "date": "2026-09-12",
+        "backdrop_path": "/i8dshLvq4LE3s0v8PrkDdUyb1ae.jpg"
+    },
+    "movie_1218925": {
+        "title": "Chainsaw Man - The Movie: Reze Arc",
+        "genre": "animation-japonaise",
+        "date": "2026-09-12",
+        "backdrop_path": "/kfXgo2rMF1A19celCwLyQ4Xwpf8.jpg"
+    },
+    "tv_51817": {
+        "title": "Teenage Mutant Ninja Turtles",
+        "genre": "animation",
+        "date": "2026-09-12",
+        "backdrop_path": "/7NWAe3Bc7s3hYDKdarkwGuxT1GM.jpg"
+    },
+    "tv_129552": {
+        "title": "The Night Agent",
+        "genre": "aventure",
+        "date": "2026-09-12",
+        "backdrop_path": "/6VWu36UlyoMgnlZx3ECXXWLoTO0.jpg"
+    },
+    "tv_236235": {
+        "title": "The Gentlemen",
+        "genre": "comedie",
+        "date": "2026-09-12",
+        "backdrop_path": "/PqIW7PA74YBURz5slZkxc0K5Pl.jpg"
+    },
+    "movie_1159559": {
+        "title": "Scream 7",
+        "genre": "crime",
+        "date": "2026-09-12",
+        "backdrop_path": "/hz7TdCrpLLt2Dz7S3PS2HG9rpAO.jpg"
+    },
+    "movie_860508": {
+        "title": "The Whisper Man",
+        "genre": "drame",
+        "date": "2026-09-12",
+        "backdrop_path": "/wxDIeosQo3gRS3KNiVgdwfD0tV1.jpg"
+    },
+    "tv_235685": {
+        "title": "The Pendragon Cycle: Rise of the Merlin",
+        "genre": "famille",
+        "date": "2026-09-12",
+        "backdrop_path": "/lDmFwAaHL1kXnAfZeUTieAdUTko.jpg"
+    },
+    "tv_196322": {
+        "title": "Dark Matter",
+        "genre": "fantastique",
+        "date": "2026-09-12",
+        "backdrop_path": "/572uSrnXM5uPVYMVqsxfNA41cT8.jpg"
+    },
+    "tv_44217": {
+        "title": "Vikings",
+        "genre": "guerre",
+        "date": "2026-09-12",
+        "backdrop_path": "/qsYgsPVYAzGYAPZuo2NkVctVFsd.jpg"
+    },
+    "tv_1407": {
+        "title": "Homeland",
+        "genre": "histoire",
+        "date": "2026-09-12",
+        "backdrop_path": "/391ixi0wVbFtFLQnOy8ZncWv2io.jpg"
+    },
+    "movie_419430": {
+        "title": "Get Out",
+        "genre": "horreur",
+        "date": "2026-09-12",
+        "backdrop_path": "/vZ7EVk7FaNEWYqlVWbFLHP8Z0LU.jpg"
+    },
+    "movie_321612": {
+        "title": "Beauty and the Beast",
+        "genre": "romance",
+        "date": "2026-09-12",
+        "backdrop_path": "/qM5BnuNyyR7PqE5DKoGLD7zUmTW.jpg"
+    },
+    "tv_79680": {
+        "title": "Snowpiercer",
+        "genre": "science-fiction",
+        "date": "2026-09-12",
+        "backdrop_path": "/dJBKKbrQIqcQ9EUbdM48dM8mso6.jpg"
+    },
+    "tv_82428": {
+        "title": "All American",
+        "genre": "sport",
+        "date": "2026-09-12",
+        "backdrop_path": "/w9c2tuwPGF1f219fFqhUMpqpOfw.jpg"
+    },
+    "tv_113988": {
+        "title": "DAHMER - Monster: The Jeffrey Dahmer Story",
+        "genre": "thriller",
+        "date": "2026-09-12",
+        "backdrop_path": "/5vUux2vNUTqwCzb7tVcH18XnsF.jpg"
+    },
+    "tv_1781": {
+        "title": "Little House on the Prairie",
+        "genre": "western",
+        "date": "2026-09-12",
+        "backdrop_path": "/uCvpgfY4oTeZxEcFqm1ATJkDDmu.jpg"
+    },
     "movie_969681": {
         "title": "Spider-Man: Brand New Day",
         "genre": "action",
@@ -1324,107 +1426,5 @@
         "genre": "western",
         "date": "2026-08-30",
         "backdrop_path": "/1Rzdd9VjqXOE7rzMlaMdwHOTmkr.jpg"
-    },
-    "movie_603692": {
-        "title": "John Wick: Chapter 4",
-        "genre": "action",
-        "date": "2026-08-29",
-        "backdrop_path": "/i8dshLvq4LE3s0v8PrkDdUyb1ae.jpg"
-    },
-    "tv_210879": {
-        "title": "Rurouni Kenshin",
-        "genre": "animation-japonaise",
-        "date": "2026-08-29",
-        "backdrop_path": "/xV0Xro8G20SgxYfGrXun26k7eVp.jpg"
-    },
-    "tv_60625": {
-        "title": "Rick and Morty",
-        "genre": "animation",
-        "date": "2026-08-29",
-        "backdrop_path": "/uGy4DCmM33I7l86W7iCskNkvmLD.jpg"
-    },
-    "movie_696506": {
-        "title": "Mickey 17",
-        "genre": "aventure",
-        "date": "2026-08-29",
-        "backdrop_path": "/hNA73rnG4PjSwgojaC2gbO1f8Rt.jpg"
-    },
-    "movie_1599993": {
-        "title": "Animals",
-        "genre": "comedie",
-        "date": "2026-08-29",
-        "backdrop_path": "/3jgATRIFenOrgNKEC9bFv5QqKGf.jpg"
-    },
-    "movie_1159559": {
-        "title": "Scream 7",
-        "genre": "crime",
-        "date": "2026-08-29",
-        "backdrop_path": "/hz7TdCrpLLt2Dz7S3PS2HG9rpAO.jpg"
-    },
-    "movie_860508": {
-        "title": "The Whisper Man",
-        "genre": "drame",
-        "date": "2026-08-29",
-        "backdrop_path": "/d0krmJICW2EL2rvmsQPotM9YJLR.jpg"
-    },
-    "movie_1318621": {
-        "title": "Descendants: Wicked Wonderland",
-        "genre": "famille",
-        "date": "2026-08-29",
-        "backdrop_path": "/qlfqDJ9Piv5ufzYA8j2319mwKZU.jpg"
-    },
-    "tv_196322": {
-        "title": "Dark Matter",
-        "genre": "fantastique",
-        "date": "2026-08-29",
-        "backdrop_path": "/lcyaTfX6KEMpWNnzPoGPKp7LwwC.jpg"
-    },
-    "tv_44217": {
-        "title": "Vikings",
-        "genre": "guerre",
-        "date": "2026-08-29",
-        "backdrop_path": "/qsYgsPVYAzGYAPZuo2NkVctVFsd.jpg"
-    },
-    "tv_1407": {
-        "title": "Homeland",
-        "genre": "histoire",
-        "date": "2026-08-29",
-        "backdrop_path": "/391ixi0wVbFtFLQnOy8ZncWv2io.jpg"
-    },
-    "movie_1173559": {
-        "title": "Insidious Inferno",
-        "genre": "horreur",
-        "date": "2026-08-29",
-        "backdrop_path": "/8HbNKB2pMiD3mfLgbxe7DgAKjdS.jpg"
-    },
-    "movie_1316092": {
-        "title": "\"Wuthering Heights\"",
-        "genre": "romance",
-        "date": "2026-08-29",
-        "backdrop_path": "/vSQSYd2zZTqc0zmHImwWEGGluMI.jpg"
-    },
-    "tv_79680": {
-        "title": "Snowpiercer",
-        "genre": "science-fiction",
-        "date": "2026-08-29",
-        "backdrop_path": "/dJBKKbrQIqcQ9EUbdM48dM8mso6.jpg"
-    },
-    "tv_82428": {
-        "title": "All American",
-        "genre": "sport",
-        "date": "2026-08-29",
-        "backdrop_path": "/w9c2tuwPGF1f219fFqhUMpqpOfw.jpg"
-    },
-    "tv_236235": {
-        "title": "The Gentlemen",
-        "genre": "thriller",
-        "date": "2026-08-29",
-        "backdrop_path": "/PqIW7PA74YBURz5slZkxc0K5Pl.jpg"
-    },
-    "tv_10929": {
-        "title": "The Wild Wild West",
-        "genre": "western",
-        "date": "2026-08-29",
-        "backdrop_path": "/4iSl4y1gWZwXmjyS3Ho8HqLWXAK.jpg"
     }
 }
