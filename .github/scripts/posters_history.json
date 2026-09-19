@@ -1,4 +1,106 @@
 {
+    "movie_1368337": {
+        "title": "The Odyssey",
+        "genre": "action",
+        "date": "2026-09-19",
+        "backdrop_path": "/twiVn9oFXOVR0uoYgawyEBlnFu8.jpg"
+    },
+    "tv_131041": {
+        "title": "BLUE LOCK",
+        "genre": "animation-japonaise",
+        "date": "2026-09-19",
+        "backdrop_path": "/seMRyWVwIVBWbC9xaMzDMZJ8fUH.jpg"
+    },
+    "tv_212989": {
+        "title": "LEGO Ninjago: Dragons Rising",
+        "genre": "animation",
+        "date": "2026-09-19",
+        "backdrop_path": "/np2vXezjwuPQ40bpSK6f9emQEQw.jpg"
+    },
+    "movie_335977": {
+        "title": "Indiana Jones and the Dial of Destiny",
+        "genre": "aventure",
+        "date": "2026-09-19",
+        "backdrop_path": "/35z8hWuzfFUZQaYog8E9LsXW3iI.jpg"
+    },
+    "movie_1035259": {
+        "title": "The Naked Gun",
+        "genre": "comedie",
+        "date": "2026-09-19",
+        "backdrop_path": "/1wi1hcbl6KYqARjdQ4qrBWZdiau.jpg"
+    },
+    "tv_70523": {
+        "title": "Dark",
+        "genre": "crime",
+        "date": "2026-09-19",
+        "backdrop_path": "/2VpSajCTI26zddsp5cSjqfCBKEa.jpg"
+    },
+    "tv_72879": {
+        "title": "Tomorrow Is Ours",
+        "genre": "drame",
+        "date": "2026-09-19",
+        "backdrop_path": "/g4qh9J4Z7d1kSTJN4ZorQr5JinH.jpg"
+    },
+    "movie_1506560": {
+        "title": "Clash of the Thundermans",
+        "genre": "famille",
+        "date": "2026-09-19",
+        "backdrop_path": "/tBZMwg5oCJn8P0pStfuOMhhSQD3.jpg"
+    },
+    "movie_83533": {
+        "title": "Avatar: Fire and Ash",
+        "genre": "fantastique",
+        "date": "2026-09-19",
+        "backdrop_path": "/iN41Ccw4DctL8npfmYg1j5Tr1eb.jpg"
+    },
+    "tv_67026": {
+        "title": "Designated Survivor",
+        "genre": "guerre",
+        "date": "2026-09-19",
+        "backdrop_path": "/AhufsCP0kYIkpr0Iy2GrLSM1noL.jpg"
+    },
+    "tv_203857": {
+        "title": "The Diplomat",
+        "genre": "histoire",
+        "date": "2026-09-19",
+        "backdrop_path": "/v6f9FUDDQfGIv8MLRQwlL0zvRjI.jpg"
+    },
+    "movie_406563": {
+        "title": "Insidious: The Last Key",
+        "genre": "horreur",
+        "date": "2026-09-19",
+        "backdrop_path": "/q1r0QUf4UVTqtkxOSMnTD8RyTaL.jpg"
+    },
+    "movie_1240889": {
+        "title": "Teenage Sex and Death at Camp Miasma",
+        "genre": "romance",
+        "date": "2026-09-19",
+        "backdrop_path": "/xS1JTVWuovzIem6tHXBtNBOptWz.jpg"
+    },
+    "movie_1081003": {
+        "title": "Supergirl",
+        "genre": "science-fiction",
+        "date": "2026-09-19",
+        "backdrop_path": "/6nlqYWDUpNem3v2bDCxQNSg41aY.jpg"
+    },
+    "movie_911430": {
+        "title": "F1",
+        "genre": "sport",
+        "date": "2026-09-19",
+        "backdrop_path": "/rZWkXnIyTLzUJpHSUpOb7vgB0BL.jpg"
+    },
+    "tv_299939": {
+        "title": "Monster: The Lizzie Borden Story",
+        "genre": "thriller",
+        "date": "2026-09-19",
+        "backdrop_path": "/mtxP1MsB452DeSe2eAuNsqnJQWf.jpg"
+    },
+    "tv_65988": {
+        "title": "Wynonna Earp",
+        "genre": "western",
+        "date": "2026-09-19",
+        "backdrop_path": "/qVu5MC7DiDOrlcKNZsb9rEJJ1UI.jpg"
+    },
     "movie_524434": {
         "title": "Eternals",
         "genre": "action",
@@ -1324,107 +1426,5 @@
         "genre": "western",
         "date": "2026-09-06",
         "backdrop_path": "/mwqxKmbW6ssqa5CKHrgocqbkL0C.jpg"
-    },
-    "movie_1368337": {
-        "title": "The Odyssey",
-        "genre": "action",
-        "date": "2026-09-05",
-        "backdrop_path": "/twiVn9oFXOVR0uoYgawyEBlnFu8.jpg"
-    },
-    "tv_120089": {
-        "title": "SPY x FAMILY",
-        "genre": "animation-japonaise",
-        "date": "2026-09-05",
-        "backdrop_path": "/lysUnU6V0VfcthDbviuVlIqgHOR.jpg"
-    },
-    "tv_95557": {
-        "title": "INVINCIBLE",
-        "genre": "animation",
-        "date": "2026-09-05",
-        "backdrop_path": "/6UH52Fmau8RPsMAbQbjwN3wJSCj.jpg"
-    },
-    "movie_83533": {
-        "title": "Avatar: Fire and Ash",
-        "genre": "aventure",
-        "date": "2026-09-05",
-        "backdrop_path": "/iN41Ccw4DctL8npfmYg1j5Tr1eb.jpg"
-    },
-    "movie_1035259": {
-        "title": "The Naked Gun",
-        "genre": "comedie",
-        "date": "2026-09-05",
-        "backdrop_path": "/1wi1hcbl6KYqARjdQ4qrBWZdiau.jpg"
-    },
-    "tv_70523": {
-        "title": "Dark",
-        "genre": "crime",
-        "date": "2026-09-05",
-        "backdrop_path": "/2VpSajCTI26zddsp5cSjqfCBKEa.jpg"
-    },
-    "tv_72879": {
-        "title": "Tomorrow Is Ours",
-        "genre": "drame",
-        "date": "2026-09-05",
-        "backdrop_path": "/g4qh9J4Z7d1kSTJN4ZorQr5JinH.jpg"
-    },
-    "movie_1506560": {
-        "title": "Clash of the Thundermans",
-        "genre": "famille",
-        "date": "2026-09-05",
-        "backdrop_path": "/6yT5O0g8ZXNOm9I5IXLZonZRBgx.jpg"
-    },
-    "tv_90802": {
-        "title": "The Sandman",
-        "genre": "fantastique",
-        "date": "2026-09-05",
-        "backdrop_path": "/i8taDLjpF8cCbp53N8kOFt1LSkW.jpg"
-    },
-    "tv_67026": {
-        "title": "Designated Survivor",
-        "genre": "guerre",
-        "date": "2026-09-05",
-        "backdrop_path": "/AhufsCP0kYIkpr0Iy2GrLSM1noL.jpg"
-    },
-    "movie_192139": {
-        "title": "The Brink of War",
-        "genre": "histoire",
-        "date": "2026-09-05",
-        "backdrop_path": "/E812GNXYQqjJwN0cVPY3icHpaj.jpg"
-    },
-    "movie_406563": {
-        "title": "Insidious: The Last Key",
-        "genre": "horreur",
-        "date": "2026-09-05",
-        "backdrop_path": "/q1r0QUf4UVTqtkxOSMnTD8RyTaL.jpg"
-    },
-    "movie_456931": {
-        "title": "Islands",
-        "genre": "romance",
-        "date": "2026-09-05",
-        "backdrop_path": "/bsqJUJ2psI0NwOFbhdQ8IPoavMj.jpg"
-    },
-    "movie_1081003": {
-        "title": "Supergirl",
-        "genre": "science-fiction",
-        "date": "2026-09-05",
-        "backdrop_path": "/6nlqYWDUpNem3v2bDCxQNSg41aY.jpg"
-    },
-    "movie_911430": {
-        "title": "F1",
-        "genre": "sport",
-        "date": "2026-09-05",
-        "backdrop_path": "/rZWkXnIyTLzUJpHSUpOb7vgB0BL.jpg"
-    },
-    "movie_1413976": {
-        "title": "Citizen Vigilante",
-        "genre": "thriller",
-        "date": "2026-09-05",
-        "backdrop_path": "/qJ2KSHJhlFvASBMLbGuP7OFMaFg.jpg"
-    },
-    "tv_65493": {
-        "title": "The Ranch",
-        "genre": "western",
-        "date": "2026-09-05",
-        "backdrop_path": "/rIycDdkLET20EVW2LPytLNuyOp3.jpg"
     }
 }
