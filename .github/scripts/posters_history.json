@@ -1,4 +1,106 @@
 {
+    "movie_1228834": {
+        "title": "The Fix",
+        "genre": "action",
+        "date": "2026-09-27",
+        "backdrop_path": "/dJTWIecL2vxsCRl5G0lRhPsfrhc.jpg"
+    },
+    "tv_96316": {
+        "title": "Rent-a-Girlfriend",
+        "genre": "animation-japonaise",
+        "date": "2026-09-27",
+        "backdrop_path": "/yNZTIhCmux27C8ZDOFlAB6LGOlg.jpg"
+    },
+    "movie_1465063": {
+        "title": "Forgotten Island",
+        "genre": "animation",
+        "date": "2026-09-27",
+        "backdrop_path": "/cNICUho5uiAGkfCAQq1ihyaMla4.jpg"
+    },
+    "movie_967941": {
+        "title": "Wicked: For Good",
+        "genre": "aventure",
+        "date": "2026-09-27",
+        "backdrop_path": "/cGbPBHKSFO7hSIjxkb3KOaGdOep.jpg"
+    },
+    "tv_70796": {
+        "title": "The Marvelous Mrs. Maisel",
+        "genre": "comedie",
+        "date": "2026-09-27",
+        "backdrop_path": "/cLLISvppHmCSMqcAxqFvsBvHyGy.jpg"
+    },
+    "movie_546554": {
+        "title": "Knives Out",
+        "genre": "crime",
+        "date": "2026-09-27",
+        "backdrop_path": "/AbRYlvwAKHs0YuyNO6NX9ofq4l6.jpg"
+    },
+    "movie_1492640": {
+        "title": "UNABOMBER",
+        "genre": "drame",
+        "date": "2026-09-27",
+        "backdrop_path": "/fADahnU1BPuErlIcALx65eJdtQo.jpg"
+    },
+    "movie_939243": {
+        "title": "Sonic the Hedgehog 3",
+        "genre": "famille",
+        "date": "2026-09-27",
+        "backdrop_path": "/zOpe0eHsq0A2NvNyBbtT6sj53qV.jpg"
+    },
+    "tv_71738": {
+        "title": "The Orville",
+        "genre": "fantastique",
+        "date": "2026-09-27",
+        "backdrop_path": "/2Qg2fViQzWenpUaMjhv0kNhCbE9.jpg"
+    },
+    "tv_206693": {
+        "title": "My Dearest",
+        "genre": "guerre",
+        "date": "2026-09-27",
+        "backdrop_path": "/uB8BP16lC6fP4gr0CKommoM75le.jpg"
+    },
+    "movie_1375441": {
+        "title": "Primetime",
+        "genre": "histoire",
+        "date": "2026-09-27",
+        "backdrop_path": "/4E5RVsSUG1A4Adwbqupu5w6kofZ.jpg"
+    },
+    "movie_1422011": {
+        "title": "It Ends",
+        "genre": "horreur",
+        "date": "2026-09-27",
+        "backdrop_path": "/9Wf1xwPOycnxvdVnpr6Di381Zf.jpg"
+    },
+    "movie_1325734": {
+        "title": "The Drama",
+        "genre": "romance",
+        "date": "2026-09-27",
+        "backdrop_path": "/1oKLEA9JOhvaBwLpqjROisvWMy7.jpg"
+    },
+    "movie_1384216": {
+        "title": "The Dog Stars",
+        "genre": "science-fiction",
+        "date": "2026-09-27",
+        "backdrop_path": "/yhCHnkidQdR3lksbdyFxduRXFPK.jpg"
+    },
+    "tv_301507": {
+        "title": "Heated Rivalry",
+        "genre": "sport",
+        "date": "2026-09-27",
+        "backdrop_path": "/3vuBfAuAltIR6UdANUQ1lLXOeia.jpg"
+    },
+    "tv_245927": {
+        "title": "Paradise",
+        "genre": "thriller",
+        "date": "2026-09-27",
+        "backdrop_path": "/5QsLvWh8J1mXl1W05wNJknMmhzR.jpg"
+    },
+    "tv_10980": {
+        "title": "Have Gun, Will Travel",
+        "genre": "western",
+        "date": "2026-09-27",
+        "backdrop_path": "/7z1QYCB1cu06u3oJwIupRlZ8SrX.jpg"
+    },
     "movie_603692": {
         "title": "John Wick: Chapter 4",
         "genre": "action",
@@ -1324,107 +1426,5 @@
         "genre": "western",
         "date": "2026-09-14",
         "backdrop_path": "/ynSOcgDLZfdLCZfRSYZGiTgYJVo.jpg"
-    },
-    "movie_617126": {
-        "title": "The Fantastic 4: First Steps",
-        "genre": "action",
-        "date": "2026-09-13",
-        "backdrop_path": "/s94NjfKkcSczZ1FembwmQZwsuwY.jpg"
-    },
-    "tv_260463": {
-        "title": "Daemons of the Shadow Realm",
-        "genre": "animation-japonaise",
-        "date": "2026-09-13",
-        "backdrop_path": "/qc30hdrxHQgN5wiopU4bkRZow5L.jpg"
-    },
-    "tv_15260": {
-        "title": "Adventure Time",
-        "genre": "animation",
-        "date": "2026-09-13",
-        "backdrop_path": "/pe4B3OYBb7qYCdkAz7nKWordbls.jpg"
-    },
-    "movie_967941": {
-        "title": "Wicked: For Good",
-        "genre": "aventure",
-        "date": "2026-09-13",
-        "backdrop_path": "/cGbPBHKSFO7hSIjxkb3KOaGdOep.jpg"
-    },
-    "movie_1599993": {
-        "title": "Animals",
-        "genre": "comedie",
-        "date": "2026-09-13",
-        "backdrop_path": "/3jgATRIFenOrgNKEC9bFv5QqKGf.jpg"
-    },
-    "movie_546554": {
-        "title": "Knives Out",
-        "genre": "crime",
-        "date": "2026-09-13",
-        "backdrop_path": "/AbRYlvwAKHs0YuyNO6NX9ofq4l6.jpg"
-    },
-    "tv_71712": {
-        "title": "The Good Doctor",
-        "genre": "drame",
-        "date": "2026-09-13",
-        "backdrop_path": "/f3cin9kOz4nOrlYEMxGFQhv4bdN.jpg"
-    },
-    "movie_939243": {
-        "title": "Sonic the Hedgehog 3",
-        "genre": "famille",
-        "date": "2026-09-13",
-        "backdrop_path": "/zOpe0eHsq0A2NvNyBbtT6sj53qV.jpg"
-    },
-    "tv_126027": {
-        "title": "Ghosts",
-        "genre": "fantastique",
-        "date": "2026-09-13",
-        "backdrop_path": "/3MmRal3Uw3O0TVMvhfM63Z3mPz3.jpg"
-    },
-    "tv_1905": {
-        "title": "The Situation Room with Wolf Blitzer",
-        "genre": "guerre",
-        "date": "2026-09-13",
-        "backdrop_path": "/wXwuFD00ygOaUemaCpdJb3AxrRY.jpg"
-    },
-    "movie_1471168": {
-        "title": "Barreda",
-        "genre": "histoire",
-        "date": "2026-09-13",
-        "backdrop_path": "/4pXBWLKMew7Xmtq3OgMQxTHp060.jpg"
-    },
-    "movie_1375646": {
-        "title": "Colony",
-        "genre": "horreur",
-        "date": "2026-09-13",
-        "backdrop_path": "/84FEpVVbSKYvKXDZJDZXOKBxCEm.jpg"
-    },
-    "movie_1379963": {
-        "title": "Tell Me Softly",
-        "genre": "romance",
-        "date": "2026-09-13",
-        "backdrop_path": "/rtv6da2U8poERiAZSAbCOePXzql.jpg"
-    },
-    "tv_223530": {
-        "title": "Star Trek: Starfleet Academy",
-        "genre": "science-fiction",
-        "date": "2026-09-13",
-        "backdrop_path": "/rXtSdCGmG07zjAg5h7GR1v52ogX.jpg"
-    },
-    "tv_125867": {
-        "title": "GRAND SUMO Highlights",
-        "genre": "sport",
-        "date": "2026-09-13",
-        "backdrop_path": "/zQcXJZdiX8mT3z133nVOaX76Pe5.jpg"
-    },
-    "movie_493922": {
-        "title": "Hereditary",
-        "genre": "thriller",
-        "date": "2026-09-13",
-        "backdrop_path": "/gJbTXKNTL6O7r7PzF6ZRkJGBlPp.jpg"
-    },
-    "movie_1356071": {
-        "title": "Eastern Western",
-        "genre": "western",
-        "date": "2026-09-13",
-        "backdrop_path": "/n8rWWhblCgWUOlYmpx54lkvHeGA.jpg"
     }
 }
