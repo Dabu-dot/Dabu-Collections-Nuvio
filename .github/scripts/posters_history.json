@@ -1,4 +1,106 @@
 {
+    "tv_108978": {
+        "title": "Reacher",
+        "genre": "action",
+        "date": "2026-10-04",
+        "backdrop_path": "/pF0qkRsrHkdYadPWY9AMeFZfcwk.jpg"
+    },
+    "tv_120089": {
+        "title": "SPY x FAMILY",
+        "genre": "animation-japonaise",
+        "date": "2026-10-04",
+        "backdrop_path": "/lysUnU6V0VfcthDbviuVlIqgHOR.jpg"
+    },
+    "tv_38693": {
+        "title": "Ninjago: Masters of Spinjitzu",
+        "genre": "animation",
+        "date": "2026-10-04",
+        "backdrop_path": "/ptEtIr3rVuAJpmbwaLJJqND6HVq.jpg"
+    },
+    "tv_120911": {
+        "title": "The Terminal List",
+        "genre": "aventure",
+        "date": "2026-10-04",
+        "backdrop_path": "/eqLwFXX0R7U0crdgQcj0Rxjb9uc.jpg"
+    },
+    "movie_1248832": {
+        "title": "Digger",
+        "genre": "comedie",
+        "date": "2026-10-04",
+        "backdrop_path": "/b7t3r39Oll5qPxBKzLZ8eHMBD7l.jpg"
+    },
+    "movie_505026": {
+        "title": "Death on the Nile",
+        "genre": "crime",
+        "date": "2026-10-04",
+        "backdrop_path": "/lRbDyjI7HEaXxflFQbYpqHRGFBJ.jpg"
+    },
+    "tv_298505": {
+        "title": "Coven Academy",
+        "genre": "drame",
+        "date": "2026-10-04",
+        "backdrop_path": "/mGFtH5pUXDd4hSXUfl8HnHlRWJV.jpg"
+    },
+    "tv_103540": {
+        "title": "Percy Jackson and the Olympians",
+        "genre": "famille",
+        "date": "2026-10-04",
+        "backdrop_path": "/sAxx25ijwYQ8xsT56wu2IzvIRss.jpg"
+    },
+    "tv_126027": {
+        "title": "Ghosts",
+        "genre": "fantastique",
+        "date": "2026-10-04",
+        "backdrop_path": "/3MmRal3Uw3O0TVMvhfM63Z3mPz3.jpg"
+    },
+    "movie_1594914": {
+        "title": "Lucky Strike",
+        "genre": "guerre",
+        "date": "2026-10-04",
+        "backdrop_path": "/uujYvxE9s6KY4SbBZ0ZFN3oBJhW.jpg"
+    },
+    "tv_116135": {
+        "title": "Vikings: Valhalla",
+        "genre": "histoire",
+        "date": "2026-10-04",
+        "backdrop_path": "/k47JEUTQsSMN532HRg6RCzZKBdB.jpg"
+    },
+    "movie_1400837": {
+        "title": "Other Mommy",
+        "genre": "horreur",
+        "date": "2026-10-04",
+        "backdrop_path": "/smZ8BT4Vzw4iCEppTLCnN8jNYtn.jpg"
+    },
+    "movie_1641629": {
+        "title": "You+Me - Against the World",
+        "genre": "romance",
+        "date": "2026-10-04",
+        "backdrop_path": "/nkEhDomjmPHJSA4Tx8pxv0NlKEy.jpg"
+    },
+    "movie_299536": {
+        "title": "Avengers: Infinity War",
+        "genre": "science-fiction",
+        "date": "2026-10-04",
+        "backdrop_path": "/bOGkgRGdhrBYJSLpXaxhXVstddV.jpg"
+    },
+    "tv_70573": {
+        "title": "GLOW",
+        "genre": "sport",
+        "date": "2026-10-04",
+        "backdrop_path": "/9GogAi8Q0uTaeWHmdK1fBpn0Udo.jpg"
+    },
+    "movie_1130948": {
+        "title": "Rosebush Pruning",
+        "genre": "thriller",
+        "date": "2026-10-04",
+        "backdrop_path": "/vcZ3UUVmFNk90DBSrTBlTKCdbbE.jpg"
+    },
+    "tv_73544": {
+        "title": "Warrior",
+        "genre": "western",
+        "date": "2026-10-04",
+        "backdrop_path": "/akshc6F3VmhJpvniRRlgqDt1ndT.jpg"
+    },
     "movie_1368337": {
         "title": "The Odyssey",
         "genre": "action",
@@ -1324,107 +1426,5 @@
         "genre": "western",
         "date": "2026-09-21",
         "backdrop_path": "/uQUHCqxHsG9blvtCoL7vluMG9Jp.jpg"
-    },
-    "tv_108978": {
-        "title": "Reacher",
-        "genre": "action",
-        "date": "2026-09-20",
-        "backdrop_path": "/pF0qkRsrHkdYadPWY9AMeFZfcwk.jpg"
-    },
-    "tv_120089": {
-        "title": "SPY x FAMILY",
-        "genre": "animation-japonaise",
-        "date": "2026-09-20",
-        "backdrop_path": "/lysUnU6V0VfcthDbviuVlIqgHOR.jpg"
-    },
-    "tv_127635": {
-        "title": "Spidey and His Amazing Friends",
-        "genre": "animation",
-        "date": "2026-09-20",
-        "backdrop_path": "/7CvmnHAVxhDbYE7jPp0PbKunqqs.jpg"
-    },
-    "movie_338953": {
-        "title": "Fantastic Beasts: The Secrets of Dumbledore",
-        "genre": "aventure",
-        "date": "2026-09-20",
-        "backdrop_path": "/zGLHX92Gk96O1DJvLil7ObJTbaL.jpg"
-    },
-    "movie_1248832": {
-        "title": "Digger",
-        "genre": "comedie",
-        "date": "2026-09-20",
-        "backdrop_path": "/u3EtxdmZeiliW98c5Oegk5LIGZa.jpg"
-    },
-    "movie_661374": {
-        "title": "Glass Onion: A Knives Out Mystery",
-        "genre": "crime",
-        "date": "2026-09-20",
-        "backdrop_path": "/dKqa850uvbNSCaQCV4Im1XlzEtQ.jpg"
-    },
-    "tv_112470": {
-        "title": "Ici tout commence",
-        "genre": "drame",
-        "date": "2026-09-20",
-        "backdrop_path": "/vgeDRVpSUa4Hvovg4C6dgm4dfUW.jpg"
-    },
-    "tv_103540": {
-        "title": "Percy Jackson and the Olympians",
-        "genre": "famille",
-        "date": "2026-09-20",
-        "backdrop_path": "/sAxx25ijwYQ8xsT56wu2IzvIRss.jpg"
-    },
-    "tv_103516": {
-        "title": "Star Trek: Strange New Worlds",
-        "genre": "fantastique",
-        "date": "2026-09-20",
-        "backdrop_path": "/627K48naKH2Y3Rz47Ydra4qktdI.jpg"
-    },
-    "tv_116135": {
-        "title": "Vikings: Valhalla",
-        "genre": "guerre",
-        "date": "2026-09-20",
-        "backdrop_path": "/k47JEUTQsSMN532HRg6RCzZKBdB.jpg"
-    },
-    "movie_1380417": {
-        "title": "By Any Means",
-        "genre": "histoire",
-        "date": "2026-09-20",
-        "backdrop_path": "/eAouIDoMDhLetm6CtmDKIGEaaCi.jpg"
-    },
-    "movie_1400837": {
-        "title": "Other Mommy",
-        "genre": "horreur",
-        "date": "2026-09-20",
-        "backdrop_path": "/ncm7djsVTHQQMX2HEbEVxMUFchG.jpg"
-    },
-    "movie_1641629": {
-        "title": "You+Me - Against the World",
-        "genre": "romance",
-        "date": "2026-09-20",
-        "backdrop_path": "/nkEhDomjmPHJSA4Tx8pxv0NlKEy.jpg"
-    },
-    "movie_299536": {
-        "title": "Avengers: Infinity War",
-        "genre": "science-fiction",
-        "date": "2026-09-20",
-        "backdrop_path": "/bOGkgRGdhrBYJSLpXaxhXVstddV.jpg"
-    },
-    "tv_70573": {
-        "title": "GLOW",
-        "genre": "sport",
-        "date": "2026-09-20",
-        "backdrop_path": "/9GogAi8Q0uTaeWHmdK1fBpn0Udo.jpg"
-    },
-    "movie_1130948": {
-        "title": "Rosebush Pruning",
-        "genre": "thriller",
-        "date": "2026-09-20",
-        "backdrop_path": "/vcZ3UUVmFNk90DBSrTBlTKCdbbE.jpg"
-    },
-    "tv_73544": {
-        "title": "Warrior",
-        "genre": "western",
-        "date": "2026-09-20",
-        "backdrop_path": "/akshc6F3VmhJpvniRRlgqDt1ndT.jpg"
     }
 }
