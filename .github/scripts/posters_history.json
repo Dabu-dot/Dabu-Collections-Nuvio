@@ -1,4 +1,106 @@
 {
+    "movie_1153576": {
+        "title": "Street Fighter",
+        "genre": "action",
+        "date": "2026-10-05",
+        "backdrop_path": "/zDE9hd1SG9695YncbZGjSf7Z9Jk.jpg"
+    },
+    "tv_73223": {
+        "title": "Black Clover",
+        "genre": "animation-japonaise",
+        "date": "2026-10-05",
+        "backdrop_path": "/qu9epTZh29fGUkY7ZYc9PVsv0Ig.jpg"
+    },
+    "movie_1315772": {
+        "title": "Minions & Monsters",
+        "genre": "animation",
+        "date": "2026-10-05",
+        "backdrop_path": "/kkcwhgSFd81QDlXo8ytrpHPQjhy.jpg"
+    },
+    "tv_69478": {
+        "title": "The Handmaid's Tale",
+        "genre": "aventure",
+        "date": "2026-10-05",
+        "backdrop_path": "/jXB3OoWPkojsOP2O2OoLCeAIDRS.jpg"
+    },
+    "movie_1288059": {
+        "title": "I Want Your Sex",
+        "genre": "comedie",
+        "date": "2026-10-05",
+        "backdrop_path": "/gQsjbxdjJUam7buy4U2TpVTiGSO.jpg"
+    },
+    "tv_67178": {
+        "title": "Marvel's The Punisher",
+        "genre": "crime",
+        "date": "2026-10-05",
+        "backdrop_path": "/bWuXk1MtLAeYJrR3UdqnJhMwhXP.jpg"
+    },
+    "tv_250307": {
+        "title": "The Pitt",
+        "genre": "drame",
+        "date": "2026-10-05",
+        "backdrop_path": "/z3BkMbCy5ajZPMyKEUwsPHuz2cV.jpg"
+    },
+    "movie_950387": {
+        "title": "A Minecraft Movie",
+        "genre": "famille",
+        "date": "2026-10-05",
+        "backdrop_path": "/2Nti3gYAX513wvhp8IiLL6ZDyOm.jpg"
+    },
+    "movie_1232569": {
+        "title": "Pinocchio: Unstrung",
+        "genre": "fantastique",
+        "date": "2026-10-05",
+        "backdrop_path": "/7RsPdXLDNugDIlwXPVeeprNfMx.jpg"
+    },
+    "movie_324786": {
+        "title": "Hacksaw Ridge",
+        "genre": "guerre",
+        "date": "2026-10-05",
+        "backdrop_path": "/vDKRMZGFTKP9nQolzeSB1rB1w6p.jpg"
+    },
+    "movie_1380417": {
+        "title": "By Any Means",
+        "genre": "histoire",
+        "date": "2026-10-05",
+        "backdrop_path": "/eAouIDoMDhLetm6CtmDKIGEaaCi.jpg"
+    },
+    "movie_1339713": {
+        "title": "Obsession",
+        "genre": "horreur",
+        "date": "2026-10-05",
+        "backdrop_path": "/5lTZyuBTNOfawsfPT8Q0cIg6qAF.jpg"
+    },
+    "movie_1072790": {
+        "title": "Anyone but You",
+        "genre": "romance",
+        "date": "2026-10-05",
+        "backdrop_path": "/nTPFkLUARmo1bYHfkfdNpRKgEOs.jpg"
+    },
+    "tv_103516": {
+        "title": "Star Trek: Strange New Worlds",
+        "genre": "science-fiction",
+        "date": "2026-10-05",
+        "backdrop_path": "/627K48naKH2Y3Rz47Ydra4qktdI.jpg"
+    },
+    "tv_127529": {
+        "title": "Bloodhounds",
+        "genre": "sport",
+        "date": "2026-10-05",
+        "backdrop_path": "/zhsEnDNCQX5dlI2wbKzV90pV0B9.jpg"
+    },
+    "tv_286801": {
+        "title": "Monster: The Ed Gein Story",
+        "genre": "thriller",
+        "date": "2026-10-05",
+        "backdrop_path": "/cm2oUAPiTE1ERoYYOzzgloQw4YZ.jpg"
+    },
+    "tv_118357": {
+        "title": "1883",
+        "genre": "western",
+        "date": "2026-10-05",
+        "backdrop_path": "/uQUHCqxHsG9blvtCoL7vluMG9Jp.jpg"
+    },
     "tv_108978": {
         "title": "Reacher",
         "genre": "action",
@@ -1324,107 +1426,5 @@
         "genre": "western",
         "date": "2026-09-22",
         "backdrop_path": "/o0X11m9s7rmiJULBaV6A11hwxe2.jpg"
-    },
-    "movie_324552": {
-        "title": "John Wick: Chapter 2",
-        "genre": "action",
-        "date": "2026-09-21",
-        "backdrop_path": "/Aa9Lx6gotP0szl9tlt5SPCN08oF.jpg"
-    },
-    "tv_67075": {
-        "title": "Mob Psycho 100",
-        "genre": "animation-japonaise",
-        "date": "2026-09-21",
-        "backdrop_path": "/kP5duNJEbTfXpBs6CITsaZ88pQi.jpg"
-    },
-    "movie_1315772": {
-        "title": "Minions & Monsters",
-        "genre": "animation",
-        "date": "2026-09-21",
-        "backdrop_path": "/kkcwhgSFd81QDlXo8ytrpHPQjhy.jpg"
-    },
-    "tv_224372": {
-        "title": "A Knight of the Seven Kingdoms",
-        "genre": "aventure",
-        "date": "2026-09-21",
-        "backdrop_path": "/7mkUu1F2hVUNgz24xO8HPx0D6mK.jpg"
-    },
-    "movie_1284186": {
-        "title": "Sacrifice",
-        "genre": "comedie",
-        "date": "2026-09-21",
-        "backdrop_path": "/1mImp4LczEYMx7c6LZUlUyAilJu.jpg"
-    },
-    "movie_392044": {
-        "title": "Murder on the Orient Express",
-        "genre": "crime",
-        "date": "2026-09-21",
-        "backdrop_path": "/2J283YNxKhxAqHeVegUJ5mzLfGb.jpg"
-    },
-    "tv_273207": {
-        "title": "Neagley",
-        "genre": "drame",
-        "date": "2026-09-21",
-        "backdrop_path": "/uYOYLFQ4q7asuhdiKXCqGaeAQUH.jpg"
-    },
-    "movie_950387": {
-        "title": "A Minecraft Movie",
-        "genre": "famille",
-        "date": "2026-09-21",
-        "backdrop_path": "/2Nti3gYAX513wvhp8IiLL6ZDyOm.jpg"
-    },
-    "movie_1232569": {
-        "title": "Pinocchio: Unstrung",
-        "genre": "fantastique",
-        "date": "2026-09-21",
-        "backdrop_path": "/mX1fXN3CnYgaUguwemrD6W32c6o.jpg"
-    },
-    "movie_324786": {
-        "title": "Hacksaw Ridge",
-        "genre": "guerre",
-        "date": "2026-09-21",
-        "backdrop_path": "/vDKRMZGFTKP9nQolzeSB1rB1w6p.jpg"
-    },
-    "movie_1317149": {
-        "title": "I Swear",
-        "genre": "histoire",
-        "date": "2026-09-21",
-        "backdrop_path": "/4mKczHAW4XPDXGk7V5k7Ui3dgUk.jpg"
-    },
-    "movie_1339713": {
-        "title": "Obsession",
-        "genre": "horreur",
-        "date": "2026-09-21",
-        "backdrop_path": "/r013C8Me2bZ0pUi0OWJRh0h7MzT.jpg"
-    },
-    "movie_1433367": {
-        "title": "One Night Only",
-        "genre": "romance",
-        "date": "2026-09-21",
-        "backdrop_path": "/2Got7QkJgecX5JAgoo4A4gzRneL.jpg"
-    },
-    "tv_69478": {
-        "title": "The Handmaid's Tale",
-        "genre": "science-fiction",
-        "date": "2026-09-21",
-        "backdrop_path": "/jXB3OoWPkojsOP2O2OoLCeAIDRS.jpg"
-    },
-    "movie_980489": {
-        "title": "Gran Turismo",
-        "genre": "sport",
-        "date": "2026-09-21",
-        "backdrop_path": "/xFYpUmB01nswPgbzi8EOCT1ZYFu.jpg"
-    },
-    "tv_286801": {
-        "title": "Monster: The Ed Gein Story",
-        "genre": "thriller",
-        "date": "2026-09-21",
-        "backdrop_path": "/cm2oUAPiTE1ERoYYOzzgloQw4YZ.jpg"
-    },
-    "tv_118357": {
-        "title": "1883",
-        "genre": "western",
-        "date": "2026-09-21",
-        "backdrop_path": "/uQUHCqxHsG9blvtCoL7vluMG9Jp.jpg"
     }
 }
