@@ -1,4 +1,106 @@
 {
+    "movie_931285": {
+        "title": "Mortal Kombat II",
+        "genre": "action",
+        "date": "2026-10-16",
+        "backdrop_path": "/4EAAwpylq313qrDqpCxulUrXBNF.jpg"
+    },
+    "tv_73833": {
+        "title": "The Ancient Magus' Bride",
+        "genre": "animation-japonaise",
+        "date": "2026-10-16",
+        "backdrop_path": "/KI2sFvqJHzc95WM7dcX9kM8tY1.jpg"
+    },
+    "tv_95557": {
+        "title": "INVINCIBLE",
+        "genre": "animation",
+        "date": "2026-10-16",
+        "backdrop_path": "/6UH52Fmau8RPsMAbQbjwN3wJSCj.jpg"
+    },
+    "tv_84773": {
+        "title": "The Lord of the Rings: The Rings of Power",
+        "genre": "aventure",
+        "date": "2026-10-16",
+        "backdrop_path": "/NNC08YmJFFlLi1prBkK8quk3dp.jpg"
+    },
+    "tv_79744": {
+        "title": "The Rookie",
+        "genre": "comedie",
+        "date": "2026-10-16",
+        "backdrop_path": "/6iNWfGVCEfASDdlNb05TP5nG0ll.jpg"
+    },
+    "movie_1439930": {
+        "title": "The Punisher: One Last Kill",
+        "genre": "crime",
+        "date": "2026-10-16",
+        "backdrop_path": "/mgmUVL0EQeu6OxvzFyda7wZ4CnU.jpg"
+    },
+    "tv_97546": {
+        "title": "Ted Lasso",
+        "genre": "drame",
+        "date": "2026-10-16",
+        "backdrop_path": "/8rDij8tYynUfu2hMVXynAp2pSjY.jpg"
+    },
+    "tv_71728": {
+        "title": "Young Sheldon",
+        "genre": "famille",
+        "date": "2026-10-16",
+        "backdrop_path": "/nlDBlCtorM7nx130wYnfR5ZmyLX.jpg"
+    },
+    "tv_76479": {
+        "title": "The Boys",
+        "genre": "fantastique",
+        "date": "2026-10-16",
+        "backdrop_path": "/n6vVs6z8obNbExdD3QHTr4Utu1Z.jpg"
+    },
+    "tv_126308": {
+        "title": "Shōgun",
+        "genre": "guerre",
+        "date": "2026-10-16",
+        "backdrop_path": "/5zmiBoMzeeVdQ62no55JOJMY498.jpg"
+    },
+    "movie_490132": {
+        "title": "Green Book",
+        "genre": "histoire",
+        "date": "2026-10-16",
+        "backdrop_path": "/2Xe9lISpwXKhvKiHttbFfVRERQX.jpg"
+    },
+    "movie_1038392": {
+        "title": "The Conjuring: Last Rites",
+        "genre": "horreur",
+        "date": "2026-10-16",
+        "backdrop_path": "/i8MupUe4xgmYXoRNAQMYvuoexSU.jpg"
+    },
+    "movie_1381078": {
+        "title": "Love of Your Life",
+        "genre": "romance",
+        "date": "2026-10-16",
+        "backdrop_path": "/mqYqKvrKTgMvK50VtEDZlYFsnHz.jpg"
+    },
+    "movie_687163": {
+        "title": "Project Hail Mary",
+        "genre": "science-fiction",
+        "date": "2026-10-16",
+        "backdrop_path": "/8Tfys3mDZVp4tNoH2ktm06a0Tau.jpg"
+    },
+    "movie_359724": {
+        "title": "Ford v Ferrari",
+        "genre": "sport",
+        "date": "2026-10-16",
+        "backdrop_path": "/n3UanIvmnBlH531pykuzNs4LbH6.jpg"
+    },
+    "tv_130853": {
+        "title": "Bad Monkey",
+        "genre": "thriller",
+        "date": "2026-10-16",
+        "backdrop_path": "/yj8g84iczcJVg3zCxVGpfdEMMxg.jpg"
+    },
+    "movie_1241983": {
+        "title": "Train Dreams",
+        "genre": "western",
+        "date": "2026-10-16",
+        "backdrop_path": "/u5NWHVhZ6HWc1fXnqn82cMar5St.jpg"
+    },
     "movie_460465": {
         "title": "Mortal Kombat",
         "genre": "action",
@@ -1324,107 +1426,5 @@
         "genre": "western",
         "date": "2026-10-03",
         "backdrop_path": "/qVu5MC7DiDOrlcKNZsb9rEJJ1UI.jpg"
-    },
-    "movie_1168190": {
-        "title": "The Wrecking Crew",
-        "genre": "action",
-        "date": "2026-10-02",
-        "backdrop_path": "/cz4vLJrmaV1zJlRYbxqtvLzeLWB.jpg"
-    },
-    "movie_1311031": {
-        "title": "Demon Slayer: Kimetsu no Yaiba Infinity Castle",
-        "genre": "animation-japonaise",
-        "date": "2026-10-02",
-        "backdrop_path": "/1RgPyOhN4DRs225BGTlHJqCudII.jpg"
-    },
-    "tv_456": {
-        "title": "The Simpsons",
-        "genre": "animation",
-        "date": "2026-10-02",
-        "backdrop_path": "/hpU2cHC9tk90hswCFEpf5AtbqoL.jpg"
-    },
-    "tv_84773": {
-        "title": "The Lord of the Rings: The Rings of Power",
-        "genre": "aventure",
-        "date": "2026-10-02",
-        "backdrop_path": "/NNC08YmJFFlLi1prBkK8quk3dp.jpg"
-    },
-    "tv_97546": {
-        "title": "Ted Lasso",
-        "genre": "comedie",
-        "date": "2026-10-02",
-        "backdrop_path": "/8rDij8tYynUfu2hMVXynAp2pSjY.jpg"
-    },
-    "movie_1439930": {
-        "title": "The Punisher: One Last Kill",
-        "genre": "crime",
-        "date": "2026-10-02",
-        "backdrop_path": "/mgmUVL0EQeu6OxvzFyda7wZ4CnU.jpg"
-    },
-    "tv_79744": {
-        "title": "The Rookie",
-        "genre": "drame",
-        "date": "2026-10-02",
-        "backdrop_path": "/6iNWfGVCEfASDdlNb05TP5nG0ll.jpg"
-    },
-    "tv_71728": {
-        "title": "Young Sheldon",
-        "genre": "famille",
-        "date": "2026-10-02",
-        "backdrop_path": "/nlDBlCtorM7nx130wYnfR5ZmyLX.jpg"
-    },
-    "tv_63174": {
-        "title": "Lucifer",
-        "genre": "fantastique",
-        "date": "2026-10-02",
-        "backdrop_path": "/wbiPjTWpZMIB8ffBq7HvzAph4Ft.jpg"
-    },
-    "tv_126308": {
-        "title": "Shōgun",
-        "genre": "guerre",
-        "date": "2026-10-02",
-        "backdrop_path": "/5zmiBoMzeeVdQ62no55JOJMY498.jpg"
-    },
-    "tv_109907": {
-        "title": "First Ladies",
-        "genre": "histoire",
-        "date": "2026-10-02",
-        "backdrop_path": "/3NJcsZn78l23Jw17vBeyRdD6scJ.jpg"
-    },
-    "movie_1038392": {
-        "title": "The Conjuring: Last Rites",
-        "genre": "horreur",
-        "date": "2026-10-02",
-        "backdrop_path": "/i8MupUe4xgmYXoRNAQMYvuoexSU.jpg"
-    },
-    "movie_792307": {
-        "title": "Poor Things",
-        "genre": "romance",
-        "date": "2026-10-02",
-        "backdrop_path": "/gsVC7HMf4VR2XFOyqjTSklY2Tms.jpg"
-    },
-    "movie_687163": {
-        "title": "Project Hail Mary",
-        "genre": "science-fiction",
-        "date": "2026-10-02",
-        "backdrop_path": "/8Tfys3mDZVp4tNoH2ktm06a0Tau.jpg"
-    },
-    "movie_359724": {
-        "title": "Ford v Ferrari",
-        "genre": "sport",
-        "date": "2026-10-02",
-        "backdrop_path": "/n3UanIvmnBlH531pykuzNs4LbH6.jpg"
-    },
-    "movie_1288445": {
-        "title": "Mutiny",
-        "genre": "thriller",
-        "date": "2026-10-02",
-        "backdrop_path": "/frG3IO5kCrnyXDt1q9x4JtToSw3.jpg"
-    },
-    "tv_122235": {
-        "title": "Joe Pickett",
-        "genre": "western",
-        "date": "2026-10-02",
-        "backdrop_path": "/gazijGFhqouUBvrTiFE9f0ZqF07.jpg"
     }
 }
