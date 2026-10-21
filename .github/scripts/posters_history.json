@@ -1,4 +1,106 @@
 {
+    "movie_324552": {
+        "title": "John Wick: Chapter 2",
+        "genre": "action",
+        "date": "2026-10-21",
+        "backdrop_path": "/Aa9Lx6gotP0szl9tlt5SPCN08oF.jpg"
+    },
+    "tv_216467": {
+        "title": "Mission: Yozakura Family",
+        "genre": "animation-japonaise",
+        "date": "2026-10-21",
+        "backdrop_path": "/xlMVEbNl7ZBGFyhX2WEhQ8Kifm4.jpg"
+    },
+    "tv_105248": {
+        "title": "Cyberpunk: Edgerunners",
+        "genre": "animation",
+        "date": "2026-10-21",
+        "backdrop_path": "/3UbHGmu9vIMSC5uNfnGt7DjetqT.jpg"
+    },
+    "movie_447365": {
+        "title": "Guardians of the Galaxy Vol. 3",
+        "genre": "aventure",
+        "date": "2026-10-21",
+        "backdrop_path": "/5YZbUmjbMa3ClvSW1Wj3D6XGolb.jpg"
+    },
+    "movie_1198654": {
+        "title": "Bad Apples",
+        "genre": "comedie",
+        "date": "2026-10-21",
+        "backdrop_path": "/ch1g1X6TfezRwbmiBiYRpALTQjN.jpg"
+    },
+    "tv_259909": {
+        "title": "Dexter: Resurrection",
+        "genre": "crime",
+        "date": "2026-10-21",
+        "backdrop_path": "/vcpj6rRDS93ImHCLPY8bwBuFGjR.jpg"
+    },
+    "tv_91555": {
+        "title": "All Elite Wrestling: Dynamite",
+        "genre": "drame",
+        "date": "2026-10-21",
+        "backdrop_path": "/veIrzS2AkYm0UaYYcVw9ziWkJoB.jpg"
+    },
+    "movie_1204680": {
+        "title": "Coyote vs. Acme",
+        "genre": "famille",
+        "date": "2026-10-21",
+        "backdrop_path": "/viZqGq9TNvQ5uXSD4ahg2RpRONT.jpg"
+    },
+    "tv_83631": {
+        "title": "What We Do in the Shadows",
+        "genre": "fantastique",
+        "date": "2026-10-21",
+        "backdrop_path": "/gIHRclgvuTYERfdbnSvnTNuoFho.jpg"
+    },
+    "tv_66857": {
+        "title": "Shooter",
+        "genre": "guerre",
+        "date": "2026-10-21",
+        "backdrop_path": "/gOmiB7hFpRSI5AwksTPOAqzOYV1.jpg"
+    },
+    "tv_80715": {
+        "title": "Firing Line with Margaret Hoover",
+        "genre": "histoire",
+        "date": "2026-10-21",
+        "backdrop_path": "/qtrGIULBsMXXtXP8pyDIKAgIfIh.jpg"
+    },
+    "movie_1062722": {
+        "title": "Frankenstein",
+        "genre": "horreur",
+        "date": "2026-10-21",
+        "backdrop_path": "/sy7Y4jCDsGPCzoQIEmxqAgPjAgr.jpg"
+    },
+    "movie_1302904": {
+        "title": "Practical Magic 2",
+        "genre": "romance",
+        "date": "2026-10-21",
+        "backdrop_path": "/nUcauJ000dFBYkgGpxyxJ5aWEH2.jpg"
+    },
+    "movie_858035": {
+        "title": "Klara and the Sun",
+        "genre": "science-fiction",
+        "date": "2026-10-21",
+        "backdrop_path": "/s4E7NDJCOG3wqc5psv2RLr9QfUm.jpg"
+    },
+    "tv_96716": {
+        "title": "Big Shot",
+        "genre": "sport",
+        "date": "2026-10-21",
+        "backdrop_path": "/oNw5yVJLF8ouKHjXZlIVhseVcyv.jpg"
+    },
+    "tv_125282": {
+        "title": "The Cleaning Lady",
+        "genre": "thriller",
+        "date": "2026-10-21",
+        "backdrop_path": "/eVGaiNUPhwKyiuWH6LfNa60JFyQ.jpg"
+    },
+    "tv_118357": {
+        "title": "1883",
+        "genre": "western",
+        "date": "2026-10-21",
+        "backdrop_path": "/uQUHCqxHsG9blvtCoL7vluMG9Jp.jpg"
+    },
     "movie_1003596": {
         "title": "Avengers: Doomsday",
         "genre": "action",
@@ -1324,107 +1426,5 @@
         "genre": "western",
         "date": "2026-10-08",
         "backdrop_path": "/rIycDdkLET20EVW2LPytLNuyOp3.jpg"
-    },
-    "movie_324552": {
-        "title": "John Wick: Chapter 2",
-        "genre": "action",
-        "date": "2026-10-07",
-        "backdrop_path": "/Aa9Lx6gotP0szl9tlt5SPCN08oF.jpg"
-    },
-    "tv_207347": {
-        "title": "Blue Box",
-        "genre": "animation-japonaise",
-        "date": "2026-10-07",
-        "backdrop_path": "/8p39Ud6ZKMixBQ7R4frg2o3idzc.jpg"
-    },
-    "tv_57532": {
-        "title": "PAW Patrol",
-        "genre": "animation",
-        "date": "2026-10-07",
-        "backdrop_path": "/7OrV2aAH5Yp7hA9zCCvUloLvZtl.jpg"
-    },
-    "movie_1204680": {
-        "title": "Coyote vs. Acme",
-        "genre": "aventure",
-        "date": "2026-10-07",
-        "backdrop_path": "/viZqGq9TNvQ5uXSD4ahg2RpRONT.jpg"
-    },
-    "movie_346698": {
-        "title": "Barbie",
-        "genre": "comedie",
-        "date": "2026-10-07",
-        "backdrop_path": "/ctMserH8g2SeOAnCw5gFjdQF8mo.jpg"
-    },
-    "movie_1306368": {
-        "title": "The Rip",
-        "genre": "crime",
-        "date": "2026-10-07",
-        "backdrop_path": "/3F2EXWF1thX0BdrVaKvnm6mAhqh.jpg"
-    },
-    "tv_71790": {
-        "title": "S.W.A.T.",
-        "genre": "drame",
-        "date": "2026-10-07",
-        "backdrop_path": "/jD7rNZDOrTP0ESP7S7Lmq6zYSAP.jpg"
-    },
-    "tv_66203": {
-        "title": "Soy Luna",
-        "genre": "famille",
-        "date": "2026-10-07",
-        "backdrop_path": "/mXVr88l7877i0P4cLQl1mUvaXGJ.jpg"
-    },
-    "tv_119051": {
-        "title": "Wednesday",
-        "genre": "fantastique",
-        "date": "2026-10-07",
-        "backdrop_path": "/iHSwvRVsRyxpX7FE7GbviaDvgGZ.jpg"
-    },
-    "tv_80715": {
-        "title": "Firing Line with Margaret Hoover",
-        "genre": "guerre",
-        "date": "2026-10-07",
-        "backdrop_path": "/qtrGIULBsMXXtXP8pyDIKAgIfIh.jpg"
-    },
-    "movie_381284": {
-        "title": "Hidden Figures",
-        "genre": "histoire",
-        "date": "2026-10-07",
-        "backdrop_path": "/m4YxwcRdbt2O2f6CflpbTDZJMM3.jpg"
-    },
-    "movie_501170": {
-        "title": "Doctor Sleep",
-        "genre": "horreur",
-        "date": "2026-10-07",
-        "backdrop_path": "/ap6Zc5NDOfbZaMhkRDyghbGeLf0.jpg"
-    },
-    "movie_1302904": {
-        "title": "Practical Magic 2",
-        "genre": "romance",
-        "date": "2026-10-07",
-        "backdrop_path": "/nUcauJ000dFBYkgGpxyxJ5aWEH2.jpg"
-    },
-    "movie_798645": {
-        "title": "The Running Man",
-        "genre": "science-fiction",
-        "date": "2026-10-07",
-        "backdrop_path": "/aHj7d7wSLqrg5cjAcgHhiGr97Ih.jpg"
-    },
-    "movie_385687": {
-        "title": "Fast X",
-        "genre": "sport",
-        "date": "2026-10-07",
-        "backdrop_path": "/fSd5MjJNcauyEbHuzUdCE1TKttK.jpg"
-    },
-    "tv_125282": {
-        "title": "The Cleaning Lady",
-        "genre": "thriller",
-        "date": "2026-10-07",
-        "backdrop_path": "/eVGaiNUPhwKyiuWH6LfNa60JFyQ.jpg"
-    },
-    "tv_1018": {
-        "title": "Bonanza",
-        "genre": "western",
-        "date": "2026-10-07",
-        "backdrop_path": "/61OxoiBHvGFOB4gufYfypHyCbI4.jpg"
     }
 }
