@@ -57,10 +57,11 @@ BANNED_IDS = {12361, 219416, 156096, 12543, 193204, 230113, 195669}
 BANNED_WORDS = ["ecchi", "harem", "fan service", "fanservice", "soft-core", "suggestive",
                 "sinful", "nudity", "erotic", "sensual"]
 
+REPO_ROOT = SCRIPT_DIR.parent.parent
 FONT_CANDIDATES = [
+    str(REPO_ROOT / ".github" / "assets" / "fonts" / "SF-Pro-Display-Bold.otf"),  # police du dépôt
+    "LiberationSans-Bold.ttf",
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-    "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-    "DejaVuSans-Bold.ttf",
 ]
 
 
