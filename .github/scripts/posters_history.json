@@ -1,4 +1,106 @@
 {
+    "movie_1368337": {
+        "title": "The Odyssey",
+        "genre": "action",
+        "date": "2026-10-31",
+        "backdrop_path": "/twiVn9oFXOVR0uoYgawyEBlnFu8.jpg"
+    },
+    "tv_262259": {
+        "title": "Wandance",
+        "genre": "animation-japonaise",
+        "date": "2026-10-31",
+        "backdrop_path": "/b6ZtSMxji30liJBCDViqqcK3gPD.jpg"
+    },
+    "tv_61923": {
+        "title": "Star vs. the Forces of Evil",
+        "genre": "animation",
+        "date": "2026-10-31",
+        "backdrop_path": "/2UElp7Dkm3SiB9ZEdKEWNmAOijB.jpg"
+    },
+    "tv_82856": {
+        "title": "The Mandalorian",
+        "genre": "aventure",
+        "date": "2026-10-31",
+        "backdrop_path": "/o7qi2v4uWQ8bZ1tW3KI0Ztn2epk.jpg"
+    },
+    "tv_81332": {
+        "title": "Lovely Horribly",
+        "genre": "comedie",
+        "date": "2026-10-31",
+        "backdrop_path": "/8euBWjpN9NJhEXwq8YCih3WqYzW.jpg"
+    },
+    "tv_70523": {
+        "title": "Dark",
+        "genre": "crime",
+        "date": "2026-10-31",
+        "backdrop_path": "/2VpSajCTI26zddsp5cSjqfCBKEa.jpg"
+    },
+    "tv_100088": {
+        "title": "The Last of Us",
+        "genre": "drame",
+        "date": "2026-10-31",
+        "backdrop_path": "/uDgy6hyPd82kOHh6I95FLtLnj6p.jpg"
+    },
+    "movie_939243": {
+        "title": "Sonic the Hedgehog 3",
+        "genre": "famille",
+        "date": "2026-10-31",
+        "backdrop_path": "/zOpe0eHsq0A2NvNyBbtT6sj53qV.jpg"
+    },
+    "tv_76479": {
+        "title": "The Boys",
+        "genre": "fantastique",
+        "date": "2026-10-31",
+        "backdrop_path": "/n6vVs6z8obNbExdD3QHTr4Utu1Z.jpg"
+    },
+    "tv_203857": {
+        "title": "The Diplomat",
+        "genre": "guerre",
+        "date": "2026-10-31",
+        "backdrop_path": "/hzznrBI07C2chXivlLYvEmQESP7.jpg"
+    },
+    "tv_67026": {
+        "title": "Designated Survivor",
+        "genre": "histoire",
+        "date": "2026-10-31",
+        "backdrop_path": "/AhufsCP0kYIkpr0Iy2GrLSM1noL.jpg"
+    },
+    "movie_1400940": {
+        "title": "Clayface",
+        "genre": "horreur",
+        "date": "2026-10-31",
+        "backdrop_path": "/kVtOcoUJ68chBD2tmERkdWz7lK5.jpg"
+    },
+    "movie_1340206": {
+        "title": "Tuner",
+        "genre": "romance",
+        "date": "2026-10-31",
+        "backdrop_path": "/y04gpYp8rJoUud6vf8okqHIdP4V.jpg"
+    },
+    "movie_1081003": {
+        "title": "Supergirl",
+        "genre": "science-fiction",
+        "date": "2026-10-31",
+        "backdrop_path": "/6nlqYWDUpNem3v2bDCxQNSg41aY.jpg"
+    },
+    "movie_911430": {
+        "title": "F1",
+        "genre": "sport",
+        "date": "2026-10-31",
+        "backdrop_path": "/rZWkXnIyTLzUJpHSUpOb7vgB0BL.jpg"
+    },
+    "tv_72879": {
+        "title": "Tomorrow Is Ours",
+        "genre": "thriller",
+        "date": "2026-10-31",
+        "backdrop_path": "/c6nAwZgiMobI3HrmZR78wpIjSnr.jpg"
+    },
+    "tv_10980": {
+        "title": "Have Gun, Will Travel",
+        "genre": "western",
+        "date": "2026-10-31",
+        "backdrop_path": "/7z1QYCB1cu06u3oJwIupRlZ8SrX.jpg"
+    },
     "movie_931285": {
         "title": "Mortal Kombat II",
         "genre": "action",
@@ -1324,107 +1426,5 @@
         "genre": "western",
         "date": "2026-10-18",
         "backdrop_path": "/akshc6F3VmhJpvniRRlgqDt1ndT.jpg"
-    },
-    "movie_1368337": {
-        "title": "The Odyssey",
-        "genre": "action",
-        "date": "2026-10-17",
-        "backdrop_path": "/twiVn9oFXOVR0uoYgawyEBlnFu8.jpg"
-    },
-    "tv_256721": {
-        "title": "Gachiakuta",
-        "genre": "animation-japonaise",
-        "date": "2026-10-17",
-        "backdrop_path": "/vlFoUig0nHKH0cH0OY1tk2uxGRL.jpg"
-    },
-    "tv_456": {
-        "title": "The Simpsons",
-        "genre": "animation",
-        "date": "2026-10-17",
-        "backdrop_path": "/hpU2cHC9tk90hswCFEpf5AtbqoL.jpg"
-    },
-    "movie_338953": {
-        "title": "Fantastic Beasts: The Secrets of Dumbledore",
-        "genre": "aventure",
-        "date": "2026-10-17",
-        "backdrop_path": "/zGLHX92Gk96O1DJvLil7ObJTbaL.jpg"
-    },
-    "movie_1284186": {
-        "title": "Sacrifice",
-        "genre": "comedie",
-        "date": "2026-10-17",
-        "backdrop_path": "/x3hAXFjdQPwccW8AMIrqpgJV9gv.jpg"
-    },
-    "tv_70523": {
-        "title": "Dark",
-        "genre": "crime",
-        "date": "2026-10-17",
-        "backdrop_path": "/2VpSajCTI26zddsp5cSjqfCBKEa.jpg"
-    },
-    "tv_72879": {
-        "title": "Tomorrow Is Ours",
-        "genre": "drame",
-        "date": "2026-10-17",
-        "backdrop_path": "/c6nAwZgiMobI3HrmZR78wpIjSnr.jpg"
-    },
-    "movie_447273": {
-        "title": "Snow White",
-        "genre": "famille",
-        "date": "2026-10-17",
-        "backdrop_path": "/tyfO9jHgkhypUFizRVYD0bytPjP.jpg"
-    },
-    "tv_63174": {
-        "title": "Lucifer",
-        "genre": "fantastique",
-        "date": "2026-10-17",
-        "backdrop_path": "/wbiPjTWpZMIB8ffBq7HvzAph4Ft.jpg"
-    },
-    "tv_203857": {
-        "title": "The Diplomat",
-        "genre": "guerre",
-        "date": "2026-10-17",
-        "backdrop_path": "/v6f9FUDDQfGIv8MLRQwlL0zvRjI.jpg"
-    },
-    "tv_67026": {
-        "title": "Designated Survivor",
-        "genre": "histoire",
-        "date": "2026-10-17",
-        "backdrop_path": "/AhufsCP0kYIkpr0Iy2GrLSM1noL.jpg"
-    },
-    "movie_1400940": {
-        "title": "Clayface",
-        "genre": "horreur",
-        "date": "2026-10-17",
-        "backdrop_path": "/kVtOcoUJ68chBD2tmERkdWz7lK5.jpg"
-    },
-    "movie_792307": {
-        "title": "Poor Things",
-        "genre": "romance",
-        "date": "2026-10-17",
-        "backdrop_path": "/gsVC7HMf4VR2XFOyqjTSklY2Tms.jpg"
-    },
-    "movie_1081003": {
-        "title": "Supergirl",
-        "genre": "science-fiction",
-        "date": "2026-10-17",
-        "backdrop_path": "/6nlqYWDUpNem3v2bDCxQNSg41aY.jpg"
-    },
-    "movie_911430": {
-        "title": "F1",
-        "genre": "sport",
-        "date": "2026-10-17",
-        "backdrop_path": "/rZWkXnIyTLzUJpHSUpOb7vgB0BL.jpg"
-    },
-    "tv_299939": {
-        "title": "Monster: The Lizzie Borden Story",
-        "genre": "thriller",
-        "date": "2026-10-17",
-        "backdrop_path": "/mtxP1MsB452DeSe2eAuNsqnJQWf.jpg"
-    },
-    "tv_283304": {
-        "title": "Little House on the Prairie",
-        "genre": "western",
-        "date": "2026-10-17",
-        "backdrop_path": "/fBieUo3SdItUrXZE16YxbpjwXIe.jpg"
     }
 }
