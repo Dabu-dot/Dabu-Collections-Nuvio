@@ -1,4 +1,106 @@
 {
+    "movie_603692": {
+        "title": "John Wick: Chapter 4",
+        "genre": "action",
+        "date": "2026-11-07",
+        "backdrop_path": "/i8dshLvq4LE3s0v8PrkDdUyb1ae.jpg"
+    },
+    "tv_216467": {
+        "title": "Mission: Yozakura Family",
+        "genre": "animation-japonaise",
+        "date": "2026-11-07",
+        "backdrop_path": "/xlMVEbNl7ZBGFyhX2WEhQ8Kifm4.jpg"
+    },
+    "tv_456": {
+        "title": "The Simpsons",
+        "genre": "animation",
+        "date": "2026-11-07",
+        "backdrop_path": "/hpU2cHC9tk90hswCFEpf5AtbqoL.jpg"
+    },
+    "movie_1263337": {
+        "title": "Heart of the Beast",
+        "genre": "aventure",
+        "date": "2026-11-07",
+        "backdrop_path": "/kpqsljPQtWqPKJBTAEtoXtQZ9Ko.jpg"
+    },
+    "movie_1570488": {
+        "title": "A Dog's Perfect Christmas",
+        "genre": "comedie",
+        "date": "2026-11-07",
+        "backdrop_path": "/6OOiqbY4Di0I6dNw0fyOBIxzK5k.jpg"
+    },
+    "tv_94372": {
+        "title": "FBI: Most Wanted",
+        "genre": "crime",
+        "date": "2026-11-07",
+        "backdrop_path": "/4BrWdbv2Cqe0zLqvNzkoednZQAb.jpg"
+    },
+    "tv_112470": {
+        "title": "Ici tout commence",
+        "genre": "drame",
+        "date": "2026-11-07",
+        "backdrop_path": "/vgeDRVpSUa4Hvovg4C6dgm4dfUW.jpg"
+    },
+    "tv_65291": {
+        "title": "Stuck in the Middle",
+        "genre": "famille",
+        "date": "2026-11-07",
+        "backdrop_path": "/4yFC6KpX7bq45qNulUgP57wWP3r.jpg"
+    },
+    "tv_95057": {
+        "title": "Superman & Lois",
+        "genre": "fantastique",
+        "date": "2026-11-07",
+        "backdrop_path": "/pPKiIJEEcV0E1hpVcWRXyp73ZpX.jpg"
+    },
+    "movie_1697911": {
+        "title": "Drummer Boy",
+        "genre": "guerre",
+        "date": "2026-11-07",
+        "backdrop_path": "/p8iTqFPWHWeynwkUzAVXSMnXGsX.jpg"
+    },
+    "tv_46518": {
+        "title": "Masters of the Air",
+        "genre": "histoire",
+        "date": "2026-11-07",
+        "backdrop_path": "/6snBXmgkscLEJQmxx46qEIlqYlB.jpg"
+    },
+    "movie_1304313": {
+        "title": "Lee Cronin's The Mummy",
+        "genre": "horreur",
+        "date": "2026-11-07",
+        "backdrop_path": "/xugEpZk9YQ0DIz1aFvH5HGkqpZK.jpg"
+    },
+    "movie_1669915": {
+        "title": "Angel and the Badman",
+        "genre": "romance",
+        "date": "2026-11-07",
+        "backdrop_path": "/qsXgcngz1gH7kRzJfzxU4gCktDn.jpg"
+    },
+    "tv_127235": {
+        "title": "Invasion",
+        "genre": "science-fiction",
+        "date": "2026-11-07",
+        "backdrop_path": "/i9IEOD1Li1y89xRHKH9kiE8dt9z.jpg"
+    },
+    "tv_82428": {
+        "title": "All American",
+        "genre": "sport",
+        "date": "2026-11-07",
+        "backdrop_path": "/w9c2tuwPGF1f219fFqhUMpqpOfw.jpg"
+    },
+    "tv_236235": {
+        "title": "The Gentlemen",
+        "genre": "thriller",
+        "date": "2026-11-07",
+        "backdrop_path": "/PqIW7PA74YBURz5slZkxc0K5Pl.jpg"
+    },
+    "tv_1018": {
+        "title": "Bonanza",
+        "genre": "western",
+        "date": "2026-11-07",
+        "backdrop_path": "/61OxoiBHvGFOB4gufYfypHyCbI4.jpg"
+    },
     "movie_969681": {
         "title": "Spider-Man: Brand New Day",
         "genre": "action",
@@ -1324,107 +1426,5 @@
         "genre": "western",
         "date": "2026-10-25",
         "backdrop_path": "/1Rzdd9VjqXOE7rzMlaMdwHOTmkr.jpg"
-    },
-    "movie_603692": {
-        "title": "John Wick: Chapter 4",
-        "genre": "action",
-        "date": "2026-10-24",
-        "backdrop_path": "/i8dshLvq4LE3s0v8PrkDdUyb1ae.jpg"
-    },
-    "tv_114410": {
-        "title": "Chainsaw Man",
-        "genre": "animation-japonaise",
-        "date": "2026-10-24",
-        "backdrop_path": "/5DUMPBSnHOZsbBv81GFXZXvDpo6.jpg"
-    },
-    "movie_446893": {
-        "title": "Trolls World Tour",
-        "genre": "animation",
-        "date": "2026-10-24",
-        "backdrop_path": "/qsxhnirlp7y4Ae9bd11oYJSX59j.jpg"
-    },
-    "movie_696506": {
-        "title": "Mickey 17",
-        "genre": "aventure",
-        "date": "2026-10-24",
-        "backdrop_path": "/hNA73rnG4PjSwgojaC2gbO1f8Rt.jpg"
-    },
-    "movie_701387": {
-        "title": "Bugonia",
-        "genre": "comedie",
-        "date": "2026-10-24",
-        "backdrop_path": "/jihTSrMksmU5ujqRZnc6SBFSyfq.jpg"
-    },
-    "tv_94372": {
-        "title": "FBI: Most Wanted",
-        "genre": "crime",
-        "date": "2026-10-24",
-        "backdrop_path": "/4BrWdbv2Cqe0zLqvNzkoednZQAb.jpg"
-    },
-    "tv_112470": {
-        "title": "Ici tout commence",
-        "genre": "drame",
-        "date": "2026-10-24",
-        "backdrop_path": "/vgeDRVpSUa4Hvovg4C6dgm4dfUW.jpg"
-    },
-    "tv_63623": {
-        "title": "Fuller House",
-        "genre": "famille",
-        "date": "2026-10-24",
-        "backdrop_path": "/aiXDRO3jglLdpkBjTJTJ1o8yQbL.jpg"
-    },
-    "tv_70528": {
-        "title": "Chicago Typewriter",
-        "genre": "fantastique",
-        "date": "2026-10-24",
-        "backdrop_path": "/f44Ykw0MnAcFvBeYhmdKekcX35J.jpg"
-    },
-    "movie_49046": {
-        "title": "All Quiet on the Western Front",
-        "genre": "guerre",
-        "date": "2026-10-24",
-        "backdrop_path": "/xBwtP27cx8WfjHJVFkpuV6F1RES.jpg"
-    },
-    "tv_46518": {
-        "title": "Masters of the Air",
-        "genre": "histoire",
-        "date": "2026-10-24",
-        "backdrop_path": "/6snBXmgkscLEJQmxx46qEIlqYlB.jpg"
-    },
-    "movie_419430": {
-        "title": "Get Out",
-        "genre": "horreur",
-        "date": "2026-10-24",
-        "backdrop_path": "/vZ7EVk7FaNEWYqlVWbFLHP8Z0LU.jpg"
-    },
-    "movie_1669915": {
-        "title": "Angel and the Badman",
-        "genre": "romance",
-        "date": "2026-10-24",
-        "backdrop_path": "/qsXgcngz1gH7kRzJfzxU4gCktDn.jpg"
-    },
-    "tv_127235": {
-        "title": "Invasion",
-        "genre": "science-fiction",
-        "date": "2026-10-24",
-        "backdrop_path": "/i9IEOD1Li1y89xRHKH9kiE8dt9z.jpg"
-    },
-    "tv_82428": {
-        "title": "All American",
-        "genre": "sport",
-        "date": "2026-10-24",
-        "backdrop_path": "/w9c2tuwPGF1f219fFqhUMpqpOfw.jpg"
-    },
-    "tv_236235": {
-        "title": "The Gentlemen",
-        "genre": "thriller",
-        "date": "2026-10-24",
-        "backdrop_path": "/PqIW7PA74YBURz5slZkxc0K5Pl.jpg"
-    },
-    "tv_1018": {
-        "title": "Bonanza",
-        "genre": "western",
-        "date": "2026-10-24",
-        "backdrop_path": "/61OxoiBHvGFOB4gufYfypHyCbI4.jpg"
     }
 }
