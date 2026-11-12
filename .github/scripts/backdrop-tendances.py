@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """
-Backdrop "Tendances cette semaine" - Concept : Podium de la semaine.
+Backdrop "Tendances cette semaine" - Concept : Podium de la semaine (finition premium).
 
-Le top 3 de /trending/all/week est posé sur un podium (2 - 1 - 3), le numéro 1 au centre
-et plus haut. Le podium est décalé à droite pour laisser la zone gauche libre, comme dans
-les backdrops de streaming (titre de la collection affiché par l'application).
+Le top 3 de /trending/all/week est posé sur un podium de verre (2 - 1 - 3), le numéro 1 au
+centre et plus haut. Le podium est décalé à droite pour laisser la zone gauche libre, comme
+dans les backdrops de streaming (titre de la collection affiché par l'application).
+
+Rendu : lueur ambiante tirée du poster n°1, faisceau de lumière, marches en verre avec reflet
+diagonal et liseré lumineux, posters avec lumière de bord, ombres portées et reflet au sol,
+chiffres de rang en dégradé.
 
 Usage :
-    python3 backdrop-tendances.py --api-key "$TMDB_API_KEY" --output "chemin/tendances.jpg"
+    python3 backdrop-tendances.py --api-key "$TMDB_API_KEY" --output "chemin/trending.jpg"
     python3 backdrop-tendances.py --demo --output "apercu.jpg"   # sans clé, posters factices
 """
 
@@ -20,9 +24,10 @@ import time
 from pathlib import Path
 
 import requests
-from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent.parent
 TMDB_BASE = "https://api.themoviedb.org/3"
 TMDB_IMG_BASE = "https://image.tmdb.org/t/p"
 POSTER_SIZE = "w780"
@@ -42,22 +47,29 @@ SIZE_PRESETS = {
 PALETTE = {"base": (22, 8, 2), "mid": (120, 42, 6), "light": (242, 112, 32)}
 
 # --- GÉOMÉTRIE DU PODIUM (valeurs en pixels pour du 1080p, multipliées par `scale`) ---
-CARD_RADIUS = 22
-PODIUM_CENTER_X = 1300       # centre horizontal du podium (la zone gauche reste libre)
-STEP_W = 340
-STEP_GAP = 24
-STEP_TOPS = {1: 650, 2: 730, 3: 790}          # ordonnée du haut de chaque marche
-POSTER_SIZES = {1: (336, 504), 2: (300, 450), 3: (300, 450)}
-POSTER_MARGIN = 18           # espace entre le poster et sa marche
-RANK_FONT_SIZE = 150
+CARD_RADIUS = 24
+PODIUM_CENTER_X = 1290       # centre horizontal du podium (la zone gauche reste libre)
+STEP_W = 350
+STEP_GAP = 28
+STEP_TOPS = {1: 640, 2: 722, 3: 790}          # ordonnée du haut de chaque marche
+POSTER_SIZES = {1: (360, 540), 2: (320, 480), 3: (320, 480)}
 DISPLAY_ORDER = (2, 1, 3)    # de gauche à droite
+
+# --- RÉGLAGES DE FINITION ---
+SIDE_DIM = 0.10              # assombrissement des posters 2 et 3 (le n°1 reste le point focal)
+REFLECTION_H = 120           # hauteur du reflet sous chaque poster
+REFLECTION_ALPHA = 85        # opacité du reflet à la base du poster (0-255)
+RANK_FONT_SIZE = 170
+RANK_CENTER_Y = 195          # centre du chiffre, mesuré depuis le haut de la marche
+AMBIENT_ALPHA = 110          # intensité de la lueur tirée du poster n°1 (0-255)
+GLOW_ALPHA = 120             # halo chaud derrière le poster n°1 (0-255)
+BEAM_ALPHA = 34              # faisceau de lumière vertical (0-255)
 
 # --- SÉCURITÉ DE CONTENU (identique au script streaming) ---
 BANNED_IDS = {12361, 219416, 156096, 12543, 193204, 230113, 195669}
 BANNED_WORDS = ["ecchi", "harem", "fan service", "fanservice", "soft-core", "suggestive",
                 "sinful", "nudity", "erotic", "sensual"]
 
-REPO_ROOT = SCRIPT_DIR.parent.parent
 FONT_CANDIDATES = [
     str(REPO_ROOT / ".github" / "assets" / "fonts" / "SF-Pro-Display-Bold.otf"),  # police du dépôt
     "LiberationSans-Bold.ttf",
@@ -175,7 +187,7 @@ def make_demo_posters(count=3):
 
 
 # ==============================================================================
-# RENDU
+# OUTILS DE RENDU
 # ==============================================================================
 def load_font(size):
     for path in FONT_CANDIDATES:
@@ -184,6 +196,23 @@ def load_font(size):
         except Exception:
             continue
     return ImageFont.load_default(size=size)
+
+
+def composite_at(dst, src, x, y):
+    """Compose `src` sur `dst` en (x, y) avec un vrai alpha-blending, découpé aux bords."""
+    x0, y0 = max(0, x), max(0, y)
+    x1, y1 = min(dst.width, x + src.width), min(dst.height, y + src.height)
+    if x0 >= x1 or y0 >= y1:
+        return
+    part = src.crop((x0 - x, y0 - y, x1 - x, y1 - y))
+    region = dst.crop((x0, y0, x1, y1))
+    dst.paste(Image.alpha_composite(region, part), (x0, y0))
+
+
+def vertical_fade(width, height, top_value, bottom_value):
+    """Image 'L' en dégradé vertical, de `top_value` (haut) à `bottom_value` (bas)."""
+    grad = Image.linear_gradient("L").resize((width, height))
+    return grad.point(lambda v: int(top_value + (bottom_value - top_value) * v / 255))
 
 
 def generate_diagonal_gradient(width, height, palette):
@@ -215,46 +244,24 @@ def add_grain(image):
     return rgb.convert("RGBA")
 
 
-def make_premium_tile(image, tile_width, tile_height, scale):
-    """Poster recadré, coins arrondis et ombre portée (identique au script streaming)."""
-    src_w, src_h = image.size
-    target_ratio = tile_width / tile_height
-    src_ratio = src_w / src_h
-
-    if src_ratio > target_ratio:
-        new_w = int(src_h * target_ratio)
-        left = (src_w - new_w) // 2
-        image = image.crop((left, 0, left + new_w, src_h))
-    else:
-        new_h = int(src_w / target_ratio)
-        top = (src_h - new_h) // 2
-        image = image.crop((0, top, src_w, top + new_h))
-
-    image = image.resize((tile_width, tile_height), Image.LANCZOS)
-
-    radius = max(14, int(CARD_RADIUS * scale))
-    mask = Image.new("L", (tile_width, tile_height), 0)
-    ImageDraw.Draw(mask).rounded_rectangle([0, 0, tile_width - 1, tile_height - 1], radius=radius, fill=255)
-
-    poster_card = Image.new("RGBA", (tile_width, tile_height), (0, 0, 0, 0))
-    poster_card.paste(image, mask=mask)
-
-    shadow_padding = int(36 * scale)
-    shadow_w = tile_width + (shadow_padding * 2)
-    shadow_h = tile_height + (shadow_padding * 2)
-
-    shadow_layer = Image.new("RGBA", (shadow_w, shadow_h), (0, 0, 0, 0))
-    ImageDraw.Draw(shadow_layer).rounded_rectangle(
-        [shadow_padding, shadow_padding, shadow_padding + tile_width - 1, shadow_padding + tile_height - 1],
-        radius=radius,
-        fill=(0, 0, 0, 210),
-    )
-    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(radius=int(14 * scale)))
-
-    tile_container = Image.new("RGBA", (shadow_w, shadow_h), (0, 0, 0, 0))
-    tile_container.paste(shadow_layer, (0, int(8 * scale)))
-    tile_container.paste(poster_card, (shadow_padding, shadow_padding), poster_card)
-    return tile_container
+# ==============================================================================
+# ÉCLAIRAGE
+# ==============================================================================
+def make_ambient(hero, canvas_size, center, scale):
+    """Lueur douce aux couleurs du poster n°1 (principe des fonds d'Apple TV)."""
+    w, h = int(1100 * scale), int(1300 * scale)
+    art = hero.convert("RGB").resize((32, 48), Image.LANCZOS)
+    art = ImageEnhance.Color(art).enhance(1.5).resize((w, h), Image.BICUBIC)
+    art = art.filter(ImageFilter.GaussianBlur(int(90 * scale)))
+    # Ellipse floutée qui s'éteint bien avant les bords (radial_gradient n'atteint pas 0 sur les côtés)
+    falloff = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(falloff).ellipse([int(w * 0.2), int(h * 0.2), int(w * 0.8), int(h * 0.8)], fill=AMBIENT_ALPHA)
+    falloff = falloff.filter(ImageFilter.GaussianBlur(int(110 * scale)))
+    layer = art.convert("RGBA")
+    layer.putalpha(falloff)
+    out = Image.new("RGBA", canvas_size, (0, 0, 0, 0))
+    composite_at(out, layer, center[0] - w // 2, center[1] - h // 2)
+    return out
 
 
 def make_glow(canvas_size, center, radius, color, alpha):
@@ -268,43 +275,148 @@ def make_glow(canvas_size, center, radius, color, alpha):
     return layer
 
 
-def draw_step(layer, x, top, width, rank, scale):
-    """Marche translucide à coins supérieurs arrondis, qui se prolonge sous le canevas."""
-    canvas_h = layer.size[1]
+def make_beam(canvas_size, cx, bottom_y, scale):
+    """Faisceau de lumière qui descend du haut de l'image jusqu'au podium."""
+    mask = Image.new("L", canvas_size, 0)
+    half_top, half_bottom = int(70 * scale), int(400 * scale)
+    ImageDraw.Draw(mask).polygon(
+        [(cx - half_top, 0), (cx + half_top, 0), (cx + half_bottom, bottom_y), (cx - half_bottom, bottom_y)],
+        fill=BEAM_ALPHA,
+    )
+    mask = mask.filter(ImageFilter.GaussianBlur(int(70 * scale)))
+    layer = Image.new("RGBA", canvas_size, (255, 214, 170, 0))
+    layer.putalpha(mask)
+    return layer
+
+
+# ==============================================================================
+# POSTERS
+# ==============================================================================
+def make_poster_card(image, tile_width, tile_height, scale, dim=0.0):
+    """Poster recadré, coins arrondis, lumière de bord (plus vive en haut)."""
+    src_w, src_h = image.size
+    target_ratio = tile_width / tile_height
+
+    if src_w / src_h > target_ratio:
+        new_w = int(src_h * target_ratio)
+        left = (src_w - new_w) // 2
+        image = image.crop((left, 0, left + new_w, src_h))
+    else:
+        new_h = int(src_w / target_ratio)
+        top = (src_h - new_h) // 2
+        image = image.crop((0, top, src_w, top + new_h))
+
+    image = image.resize((tile_width, tile_height), Image.LANCZOS).convert("RGB")
+    if dim:
+        image = ImageEnhance.Brightness(image).enhance(1.0 - dim)
+
     radius = max(14, int(CARD_RADIUS * scale))
-    height = canvas_h - top + radius
+    mask = Image.new("L", (tile_width, tile_height), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, tile_width - 1, tile_height - 1], radius=radius, fill=255)
 
-    fade = Image.linear_gradient("L").resize((width, height))
-    alpha = fade.point(lambda v: int(100 - 84 * v / 255))
-    corners = Image.new("L", (width, height), 0)
-    ImageDraw.Draw(corners).rounded_rectangle(
-        [0, 0, width - 1, height - 1], radius=radius, fill=255, corners=(True, True, False, False)
-    )
-    alpha = ImageChops.multiply(alpha, corners)
+    card = Image.new("RGBA", (tile_width, tile_height), (0, 0, 0, 0))
+    card.paste(image, mask=mask)
 
-    step = Image.new("RGBA", (width, height), (255, 255, 255, 0))
-    step.putalpha(alpha)
-    layer.paste(step, (x, top), step)
+    outline = Image.new("L", (tile_width, tile_height), 0)
+    ImageDraw.Draw(outline).rounded_rectangle(
+        [0, 0, tile_width - 1, tile_height - 1], radius=radius, outline=255, width=max(2, int(2 * scale))
+    )
+    rim_alpha = ImageChops.multiply(outline, vertical_fade(tile_width, tile_height, 190, 40))
+    rim = Image.new("RGBA", (tile_width, tile_height), (255, 255, 255, 0))
+    rim.putalpha(rim_alpha)
+    return Image.alpha_composite(card, rim)
 
-    draw = ImageDraw.Draw(layer)
-    draw.rounded_rectangle(
-        [x, top, x + width - 1, top + height - 1],
-        radius=radius,
-        outline=(255, 255, 255, 80),
-        width=max(1, int(2 * scale)),
-        corners=(True, True, False, False),
+
+def make_poster_tile(card, scale):
+    """Poster + ombre portée en deux couches (large et diffuse + serrée au contact)."""
+    pad = int(80 * scale)
+    w, h = card.size
+    radius = max(14, int(CARD_RADIUS * scale))
+    tile = Image.new("RGBA", (w + 2 * pad, h + 2 * pad), (0, 0, 0, 0))
+
+    for blur, offset, alpha in ((30, 26, 150), (8, 7, 130)):
+        shadow = Image.new("RGBA", tile.size, (0, 0, 0, 0))
+        ImageDraw.Draw(shadow).rounded_rectangle(
+            [pad, pad + int(offset * scale), pad + w - 1, pad + int(offset * scale) + h - 1],
+            radius=radius,
+            fill=(0, 0, 0, alpha),
+        )
+        shadow = shadow.filter(ImageFilter.GaussianBlur(int(blur * scale)))
+        tile = Image.alpha_composite(tile, shadow)
+
+    tile.alpha_composite(card, dest=(pad, pad))
+    return tile, pad
+
+
+def make_reflection(card, scale):
+    """Reflet du poster sur le verre : image retournée, estompée vers le bas."""
+    w, h = card.size
+    rh = int(REFLECTION_H * scale)
+    flipped = card.transpose(Image.FLIP_TOP_BOTTOM).crop((0, 0, w, rh))
+    fade = Image.linear_gradient("L").resize((w, rh)).point(
+        lambda v: int(REFLECTION_ALPHA * (1 - v / 255) ** 1.6)
     )
-    draw.text(
-        (x + width // 2, top + int(130 * scale)),
-        str(rank),
-        font=load_font(int(RANK_FONT_SIZE * scale)),
-        fill=(255, 255, 255, 90),
-        anchor="mm",
+    flipped.putalpha(ImageChops.multiply(flipped.getchannel("A"), fade))
+    return flipped
+
+
+# ==============================================================================
+# PODIUM
+# ==============================================================================
+def make_step(width, height, scale):
+    """Marche de verre : corps dégradé, reflet diagonal, liseré lumineux qui s'estompe vers le bas."""
+    radius = max(14, int(CARD_RADIUS * scale))
+    corners = (True, True, False, False)
+
+    shape = Image.new("L", (width, height), 0)
+    ImageDraw.Draw(shape).rounded_rectangle([0, 0, width - 1, height - 1], radius=radius, fill=255, corners=corners)
+
+    gloss = Image.new("L", (width, height), 0)
+    ImageDraw.Draw(gloss).polygon(
+        [(0, 0), (int(width * 0.62), 0), (int(width * 0.18), int(height * 0.8)), (0, int(height * 0.8))], fill=26
     )
+    gloss = gloss.filter(ImageFilter.GaussianBlur(int(18 * scale)))
+
+    alpha = ImageChops.add(vertical_fade(width, height, 74, 12), gloss)
+    body = Image.new("RGBA", (width, height), (255, 238, 226, 0))
+    body.putalpha(ImageChops.multiply(alpha, shape))
+
+    edge = Image.new("L", (width, height), 0)
+    ImageDraw.Draw(edge).rounded_rectangle(
+        [0, 0, width - 1, height - 1], radius=radius, outline=255, width=max(2, int(2 * scale)), corners=corners
+    )
+    edge = ImageChops.multiply(edge, vertical_fade(width, height, 215, 25))
+    rim = Image.new("RGBA", (width, height), (255, 255, 255, 0))
+    rim.putalpha(edge)
+    return Image.alpha_composite(body, rim)
+
+
+def make_step_shadow(width, height, scale):
+    """Ombre portée diffuse de la marche sur le fond."""
+    pad = int(60 * scale)
+    radius = max(14, int(CARD_RADIUS * scale))
+    shadow = Image.new("RGBA", (width + 2 * pad, height + pad), (0, 0, 0, 0))
+    ImageDraw.Draw(shadow).rounded_rectangle(
+        [pad, pad, pad + width - 1, pad + height + pad], radius=radius, fill=(0, 0, 0, 120)
+    )
+    return shadow.filter(ImageFilter.GaussianBlur(int(30 * scale))), pad
+
+
+def make_rank_numeral(rank, scale):
+    """Chiffre de rang rempli d'un dégradé vertical blanc, plus lumineux en haut."""
+    font = load_font(int(RANK_FONT_SIZE * scale))
+    left, top, right, bottom = font.getbbox(str(rank))
+    w, h = right - left + 8, bottom - top + 8
+    mask = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(mask).text((w // 2, h // 2), str(rank), font=font, fill=255, anchor="mm")
+    alpha = ImageChops.multiply(mask, vertical_fade(w, h, 215, 35))
+    numeral = Image.new("RGBA", (w, h), (255, 255, 255, 0))
+    numeral.putalpha(alpha)
+    return numeral
 
 
 def build_podium(posters, width, height, scale):
-    """Assemble le podium : halo, marches, puis posters (avec leur ombre)."""
+    """Assemble : lumière, ombres des marches, marches, reflets, chiffres, puis posters."""
     canvas_size = (width, height)
     step_w = int(STEP_W * scale)
     gap = int(STEP_GAP * scale)
@@ -313,28 +425,61 @@ def build_podium(posters, width, height, scale):
 
     steps_layer = Image.new("RGBA", canvas_size, (0, 0, 0, 0))
     posters_layer = Image.new("RGBA", canvas_size, (0, 0, 0, 0))
-    glow_layer = Image.new("RGBA", canvas_size, (0, 0, 0, 0))
-    shadow_padding = int(36 * scale)
+    light_layer = Image.new("RGBA", canvas_size, (0, 0, 0, 0))
 
+    slots = []
     for slot, rank in enumerate(DISPLAY_ORDER):
         if rank > len(posters):
             continue
         step_x = left + slot * (step_w + gap)
         step_top = int(STEP_TOPS[rank] * scale)
-        draw_step(steps_layer, step_x, step_top, step_w, rank, scale)
-
         pw, ph = (int(v * scale) for v in POSTER_SIZES[rank])
-        px = step_x + (step_w - pw) // 2
-        py = step_top - int(POSTER_MARGIN * scale) - ph
+        slots.append((rank, step_x, step_top, pw, ph))
 
-        tile = make_premium_tile(posters[rank - 1], pw, ph, scale)
-        posters_layer.paste(tile, (px - shadow_padding, py - shadow_padding), tile)
-
+    # 1) lumière derrière le poster n°1
+    for rank, step_x, step_top, pw, ph in slots:
         if rank == 1:
-            glow_layer = make_glow(canvas_size, (px + pw // 2, py + ph // 2), int(380 * scale),
-                                   PALETTE["light"], 120)
+            cx = step_x + step_w // 2
+            light_layer = Image.alpha_composite(light_layer, make_beam(canvas_size, cx, step_top, scale))
+            light_layer = Image.alpha_composite(
+                light_layer,
+                make_glow(canvas_size, (cx, step_top - ph // 2), int(420 * scale), PALETTE["light"], GLOW_ALPHA),
+            )
 
-    return Image.alpha_composite(Image.alpha_composite(glow_layer, steps_layer), posters_layer)
+    # 2) ombres portées de toutes les marches (avant les corps, pour ne pas empiéter sur les voisines)
+    for rank, step_x, step_top, pw, ph in slots:
+        step_h = height - step_top + int(CARD_RADIUS * scale)
+        shadow, spad = make_step_shadow(step_w, step_h, scale)
+        composite_at(steps_layer, shadow, step_x - spad, step_top - spad + int(10 * scale))
+
+    # 3) marches, chiffres, reflets, puis posters
+    for rank, step_x, step_top, pw, ph in slots:
+        step_h = height - step_top + int(CARD_RADIUS * scale)
+        composite_at(steps_layer, make_step(step_w, step_h, scale), step_x, step_top)
+
+        numeral = make_rank_numeral(rank, scale)
+        composite_at(
+            steps_layer, numeral,
+            step_x + (step_w - numeral.width) // 2,
+            step_top + int(RANK_CENTER_Y * scale) - numeral.height // 2,
+        )
+
+        card = make_poster_card(posters[rank - 1], pw, ph, scale, dim=0.0 if rank == 1 else SIDE_DIM)
+        px = step_x + (step_w - pw) // 2
+        py = step_top - ph
+
+        contact = Image.new("RGBA", canvas_size, (0, 0, 0, 0))
+        ImageDraw.Draw(contact).rounded_rectangle(
+            [px + int(pw * 0.05), step_top - int(5 * scale), px + int(pw * 0.95), step_top + int(7 * scale)],
+            radius=int(6 * scale), fill=(0, 0, 0, 170),
+        )
+        steps_layer = Image.alpha_composite(steps_layer, contact.filter(ImageFilter.GaussianBlur(int(6 * scale))))
+        composite_at(steps_layer, make_reflection(card, scale), px, step_top + int(2 * scale))
+
+        tile, tpad = make_poster_tile(card, scale)
+        composite_at(posters_layer, tile, px - tpad, py - tpad)
+
+    return Image.alpha_composite(Image.alpha_composite(light_layer, steps_layer), posters_layer), slots
 
 
 def main():
@@ -354,16 +499,26 @@ def main():
         print("Compiling Podium 'Tendances cette semaine'")
         posters = fetch_top_posters(args.api_key, count=3)
 
+    render_and_save(posters, args.output, args.size)
+
+
+def render_and_save(posters, output, size="1080p"):
     if len(posters) < 3:
         print(f"Error: {len(posters)}/3 posters récupérés, podium incomplet. Aucun fichier écrit.")
         sys.exit(1)
 
-    width, height, scale = SIZE_PRESETS[args.size]
-    background = add_grain(generate_diagonal_gradient(width, height, PALETTE))
-    podium = build_podium(posters, width, height, scale)
+    width, height, scale = SIZE_PRESETS[size]
+    podium, slots = build_podium(posters, width, height, scale)
+
+    hero_slot = next(s for s in slots if s[0] == 1)
+    hero_center = (hero_slot[1] + int(STEP_W * scale) // 2, hero_slot[2] - hero_slot[4] // 2)
+
+    background = generate_diagonal_gradient(width, height, PALETTE)
+    background = Image.alpha_composite(background, make_ambient(posters[0], (width, height), hero_center, scale))
+    background = add_grain(background)
     final = Image.alpha_composite(background, podium).convert("RGB")
 
-    out_path = Path(args.output)
+    out_path = Path(output)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     settings = QUALITY_PRESETS["compressed"]
     final.save(out_path, "JPEG", quality=settings["quality"], optimize=True, progressive=settings["progressive"])
