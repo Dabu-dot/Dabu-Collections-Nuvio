@@ -1,4 +1,106 @@
 {
+    "movie_1300968": {
+        "title": "The Hunger Games: Sunrise on the Reaping",
+        "genre": "action",
+        "date": "2026-11-17",
+        "backdrop_path": "/qW47xOGl0dOMRUtAS2XugBlOO1t.jpg"
+    },
+    "tv_73833": {
+        "title": "The Ancient Magus' Bride",
+        "genre": "animation-japonaise",
+        "date": "2026-11-17",
+        "backdrop_path": "/KI2sFvqJHzc95WM7dcX9kM8tY1.jpg"
+    },
+    "tv_67175": {
+        "title": "Elena of Avalor",
+        "genre": "animation",
+        "date": "2026-11-17",
+        "backdrop_path": "/uxLHhhb7C19JD85DN1I4GTiEDgh.jpg"
+    },
+    "movie_693134": {
+        "title": "Dune: Part Two",
+        "genre": "aventure",
+        "date": "2026-11-17",
+        "backdrop_path": "/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg"
+    },
+    "tv_76331": {
+        "title": "Succession",
+        "genre": "comedie",
+        "date": "2026-11-17",
+        "backdrop_path": "/brC6qt6QLcWhVl1wsDp1dX9Lim.jpg"
+    },
+    "tv_247718": {
+        "title": "MobLand",
+        "genre": "crime",
+        "date": "2026-11-17",
+        "backdrop_path": "/h0OC7ouop8YLwbAVfS3UUE2Lw4T.jpg"
+    },
+    "tv_194766": {
+        "title": "The Summer I Turned Pretty",
+        "genre": "drame",
+        "date": "2026-11-17",
+        "backdrop_path": "/jCQV3rHNbgHKo3N4G6CARbVEjPV.jpg"
+    },
+    "tv_3497": {
+        "title": "Moesha",
+        "genre": "famille",
+        "date": "2026-11-17",
+        "backdrop_path": "/eQuNP6LUFKJmP4f4iNLJWoi3g3h.jpg"
+    },
+    "tv_63174": {
+        "title": "Lucifer",
+        "genre": "fantastique",
+        "date": "2026-11-17",
+        "backdrop_path": "/wbiPjTWpZMIB8ffBq7HvzAph4Ft.jpg"
+    },
+    "movie_1422041": {
+        "title": "La Bola Negra",
+        "genre": "guerre",
+        "date": "2026-11-17",
+        "backdrop_path": "/dshLPYcXKL1vomSUx2FVXzSXEK0.jpg"
+    },
+    "tv_40619": {
+        "title": "The Young Turks",
+        "genre": "histoire",
+        "date": "2026-11-17",
+        "backdrop_path": "/dp5dQ4TnvNMfRxkiAonYD1YGfuv.jpg"
+    },
+    "movie_1432306": {
+        "title": "Sleepwalker",
+        "genre": "horreur",
+        "date": "2026-11-17",
+        "backdrop_path": "/5ZuadLWN0vYEa0Ab0K6HWhezpIG.jpg"
+    },
+    "movie_399783": {
+        "title": "Summer with Mika",
+        "genre": "romance",
+        "date": "2026-11-17",
+        "backdrop_path": "/eeuafT0yXn0T7YA9ScmAbp1XMoO.jpg"
+    },
+    "movie_1003596": {
+        "title": "Avengers: Doomsday",
+        "genre": "science-fiction",
+        "date": "2026-11-17",
+        "backdrop_path": "/6KDDoTq8Vq3HuQHULzuvPiCJbMI.jpg"
+    },
+    "tv_87083": {
+        "title": "Formula 1: Drive to Survive",
+        "genre": "sport",
+        "date": "2026-11-17",
+        "backdrop_path": "/xefmNmSGCApfRPaqhIRTaAjFlpo.jpg"
+    },
+    "movie_1543469": {
+        "title": "Heartland",
+        "genre": "thriller",
+        "date": "2026-11-17",
+        "backdrop_path": "/psTMZj8gvsfYVfvd7FZCHH4xL6P.jpg"
+    },
+    "tv_61865": {
+        "title": "When Calls the Heart",
+        "genre": "western",
+        "date": "2026-11-17",
+        "backdrop_path": "/mTC6WbMEgZ6LLdwRqSDR5NVEslr.jpg"
+    },
     "movie_931285": {
         "title": "Mortal Kombat II",
         "genre": "action",
@@ -1324,107 +1426,5 @@
         "genre": "western",
         "date": "2026-11-04",
         "backdrop_path": "/gmQbEibys6LuPTgB7is3AEKTdrE.jpg"
-    },
-    "movie_460458": {
-        "title": "Resident Evil: Welcome to Raccoon City",
-        "genre": "action",
-        "date": "2026-11-03",
-        "backdrop_path": "/wYtEvBmpBRXPdwGgr1gcWiwJSI7.jpg"
-    },
-    "tv_112613": {
-        "title": "Ranking of Kings",
-        "genre": "animation-japonaise",
-        "date": "2026-11-03",
-        "backdrop_path": "/1d23ENJQrn4TIKhnWF85Eb56Zk8.jpg"
-    },
-    "tv_67175": {
-        "title": "Elena of Avalor",
-        "genre": "animation",
-        "date": "2026-11-03",
-        "backdrop_path": "/uxLHhhb7C19JD85DN1I4GTiEDgh.jpg"
-    },
-    "movie_693134": {
-        "title": "Dune: Part Two",
-        "genre": "aventure",
-        "date": "2026-11-03",
-        "backdrop_path": "/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg"
-    },
-    "tv_77345": {
-        "title": "The Dangerous Book for Boys",
-        "genre": "comedie",
-        "date": "2026-11-03",
-        "backdrop_path": "/dnsDc7RVqsBnohXwFL3sO0kk3DS.jpg"
-    },
-    "tv_247718": {
-        "title": "MobLand",
-        "genre": "crime",
-        "date": "2026-11-03",
-        "backdrop_path": "/h0OC7ouop8YLwbAVfS3UUE2Lw4T.jpg"
-    },
-    "tv_82104": {
-        "title": "The Order",
-        "genre": "drame",
-        "date": "2026-11-03",
-        "backdrop_path": "/6nlNDzsiqgHM4fOuMvMRhg9Royv.jpg"
-    },
-    "tv_82199": {
-        "title": "Find Me in Paris",
-        "genre": "famille",
-        "date": "2026-11-03",
-        "backdrop_path": "/wz0MnLWZmUOdVwMFJgAQeLqU2US.jpg"
-    },
-    "tv_63174": {
-        "title": "Lucifer",
-        "genre": "fantastique",
-        "date": "2026-11-03",
-        "backdrop_path": "/wbiPjTWpZMIB8ffBq7HvzAph4Ft.jpg"
-    },
-    "movie_1422041": {
-        "title": "LA BOLA NEGRA",
-        "genre": "guerre",
-        "date": "2026-11-03",
-        "backdrop_path": "/dshLPYcXKL1vomSUx2FVXzSXEK0.jpg"
-    },
-    "movie_1380417": {
-        "title": "By Any Means",
-        "genre": "histoire",
-        "date": "2026-11-03",
-        "backdrop_path": "/nw9Q3idNO8EsTPnvr8vBJTpkWGA.jpg"
-    },
-    "movie_1564614": {
-        "title": "Leviticus",
-        "genre": "horreur",
-        "date": "2026-11-03",
-        "backdrop_path": "/xcGNm0JlkrGpDbgdPSW9mR52tbv.jpg"
-    },
-    "movie_1126097": {
-        "title": "Charlie Harper",
-        "genre": "romance",
-        "date": "2026-11-03",
-        "backdrop_path": "/wNj3vgm13CyKb04xIq7NQ8zTY1e.jpg"
-    },
-    "movie_1300968": {
-        "title": "The Hunger Games: Sunrise on the Reaping",
-        "genre": "science-fiction",
-        "date": "2026-11-03",
-        "backdrop_path": "/9B3AMSs7A3bqqFLKlOv6W4LyAHG.jpg"
-    },
-    "tv_87083": {
-        "title": "Formula 1: Drive to Survive",
-        "genre": "sport",
-        "date": "2026-11-03",
-        "backdrop_path": "/xefmNmSGCApfRPaqhIRTaAjFlpo.jpg"
-    },
-    "tv_299939": {
-        "title": "Monster: The Lizzie Borden Story",
-        "genre": "thriller",
-        "date": "2026-11-03",
-        "backdrop_path": "/mtxP1MsB452DeSe2eAuNsqnJQWf.jpg"
-    },
-    "tv_61865": {
-        "title": "When Calls the Heart",
-        "genre": "western",
-        "date": "2026-11-03",
-        "backdrop_path": "/mTC6WbMEgZ6LLdwRqSDR5NVEslr.jpg"
     }
 }
