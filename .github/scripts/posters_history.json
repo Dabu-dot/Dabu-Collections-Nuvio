@@ -1,4 +1,106 @@
 {
+    "movie_969681": {
+        "title": "Spider-Man: Brand New Day",
+        "genre": "action",
+        "date": "2026-11-20",
+        "backdrop_path": "/sYsaVy047cfGTLMfcRihee3ShnM.jpg"
+    },
+    "movie_1218925": {
+        "title": "Chainsaw Man - The Movie: Reze Arc",
+        "genre": "animation-japonaise",
+        "date": "2026-11-20",
+        "backdrop_path": "/kfXgo2rMF1A19celCwLyQ4Xwpf8.jpg"
+    },
+    "tv_95557": {
+        "title": "INVINCIBLE",
+        "genre": "animation",
+        "date": "2026-11-20",
+        "backdrop_path": "/6UH52Fmau8RPsMAbQbjwN3wJSCj.jpg"
+    },
+    "tv_100757": {
+        "title": "Outer Banks",
+        "genre": "aventure",
+        "date": "2026-11-20",
+        "backdrop_path": "/fjJ0aqDeDXFzmFXXJ4CF3ryB19b.jpg"
+    },
+    "tv_86893": {
+        "title": "Tacoma FD",
+        "genre": "comedie",
+        "date": "2026-11-20",
+        "backdrop_path": "/ocsH8PJJT98WSqenT3egNIevZqY.jpg"
+    },
+    "tv_19885": {
+        "title": "Sherlock",
+        "genre": "crime",
+        "date": "2026-11-20",
+        "backdrop_path": "/hmLTIRtVyTHShJl2Wb8LHmvUgJm.jpg"
+    },
+    "tv_253376": {
+        "title": "The Girlfriend",
+        "genre": "drame",
+        "date": "2026-11-20",
+        "backdrop_path": "/zD0suCnley99BRXgquDT8xMt2F.jpg"
+    },
+    "tv_66203": {
+        "title": "Soy Luna",
+        "genre": "famille",
+        "date": "2026-11-20",
+        "backdrop_path": "/mXVr88l7877i0P4cLQl1mUvaXGJ.jpg"
+    },
+    "movie_1195803": {
+        "title": "Wicker",
+        "genre": "fantastique",
+        "date": "2026-11-20",
+        "backdrop_path": "/xVh1ypMoVkMf5IB7y3hnRplJ14c.jpg"
+    },
+    "tv_83867": {
+        "title": "Andor",
+        "genre": "guerre",
+        "date": "2026-11-20",
+        "backdrop_path": "/q8qNN1voEOYzxWhBezHZG9soWWW.jpg"
+    },
+    "movie_1461490": {
+        "title": "Hershey",
+        "genre": "histoire",
+        "date": "2026-11-20",
+        "backdrop_path": "/mFAalGTR6PBJPPNbjVklMJ6OhSB.jpg"
+    },
+    "movie_1474226": {
+        "title": "Evil Dress",
+        "genre": "horreur",
+        "date": "2026-11-20",
+        "backdrop_path": "/ftfnS4ABocBNkwrvkIjkkxaBjgH.jpg"
+    },
+    "movie_1400336": {
+        "title": "Focker-in-Law",
+        "genre": "romance",
+        "date": "2026-11-20",
+        "backdrop_path": "/AttXyiHvoOlqYXmAgO8EmgSt5ZC.jpg"
+    },
+    "movie_299534": {
+        "title": "Avengers: Endgame",
+        "genre": "science-fiction",
+        "date": "2026-11-20",
+        "backdrop_path": "/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg"
+    },
+    "movie_385687": {
+        "title": "Fast X",
+        "genre": "sport",
+        "date": "2026-11-20",
+        "backdrop_path": "/fSd5MjJNcauyEbHuzUdCE1TKttK.jpg"
+    },
+    "tv_153312": {
+        "title": "Tulsa King",
+        "genre": "thriller",
+        "date": "2026-11-20",
+        "backdrop_path": "/mNHRGO1gFpR2CYZdANe72kcKq7G.jpg"
+    },
+    "tv_13887": {
+        "title": "Lawman",
+        "genre": "western",
+        "date": "2026-11-20",
+        "backdrop_path": "/ip8YxqNF5xNg4A8jQP9cBmZ6muv.jpg"
+    },
     "tv_111110": {
         "title": "ONE PIECE",
         "genre": "action",
@@ -1324,107 +1426,5 @@
         "genre": "western",
         "date": "2026-11-07",
         "backdrop_path": "/61OxoiBHvGFOB4gufYfypHyCbI4.jpg"
-    },
-    "movie_969681": {
-        "title": "Spider-Man: Brand New Day",
-        "genre": "action",
-        "date": "2026-11-06",
-        "backdrop_path": "/sYsaVy047cfGTLMfcRihee3ShnM.jpg"
-    },
-    "tv_210879": {
-        "title": "Rurouni Kenshin",
-        "genre": "animation-japonaise",
-        "date": "2026-11-06",
-        "backdrop_path": "/xV0Xro8G20SgxYfGrXun26k7eVp.jpg"
-    },
-    "tv_1877": {
-        "title": "Phineas and Ferb",
-        "genre": "animation",
-        "date": "2026-11-06",
-        "backdrop_path": "/qHJHyew2GCDa7n1zChZjLKmEC1X.jpg"
-    },
-    "tv_100757": {
-        "title": "Outer Banks",
-        "genre": "aventure",
-        "date": "2026-11-06",
-        "backdrop_path": "/fjJ0aqDeDXFzmFXXJ4CF3ryB19b.jpg"
-    },
-    "tv_153312": {
-        "title": "Tulsa King",
-        "genre": "comedie",
-        "date": "2026-11-06",
-        "backdrop_path": "/mNHRGO1gFpR2CYZdANe72kcKq7G.jpg"
-    },
-    "tv_19885": {
-        "title": "Sherlock",
-        "genre": "crime",
-        "date": "2026-11-06",
-        "backdrop_path": "/hmLTIRtVyTHShJl2Wb8LHmvUgJm.jpg"
-    },
-    "tv_253376": {
-        "title": "The Girlfriend",
-        "genre": "drame",
-        "date": "2026-11-06",
-        "backdrop_path": "/zD0suCnley99BRXgquDT8xMt2F.jpg"
-    },
-    "tv_66203": {
-        "title": "Soy Luna",
-        "genre": "famille",
-        "date": "2026-11-06",
-        "backdrop_path": "/mXVr88l7877i0P4cLQl1mUvaXGJ.jpg"
-    },
-    "tv_288673": {
-        "title": "Carrie",
-        "genre": "fantastique",
-        "date": "2026-11-06",
-        "backdrop_path": "/9yCJtipMeDe8uAdSJKvw8BnYfRz.jpg"
-    },
-    "tv_83867": {
-        "title": "Andor",
-        "genre": "guerre",
-        "date": "2026-11-06",
-        "backdrop_path": "/q8qNN1voEOYzxWhBezHZG9soWWW.jpg"
-    },
-    "tv_279388": {
-        "title": "Pursuit of Jade",
-        "genre": "histoire",
-        "date": "2026-11-06",
-        "backdrop_path": "/yiUZ8Ck86FF3obLztVvSQqeBi0Y.jpg"
-    },
-    "movie_1474226": {
-        "title": "Evil Dress",
-        "genre": "horreur",
-        "date": "2026-11-06",
-        "backdrop_path": "/hXRw0AVY8avc0koUXj2rMY6q2N8.jpg"
-    },
-    "movie_1195803": {
-        "title": "Wicker",
-        "genre": "romance",
-        "date": "2026-11-06",
-        "backdrop_path": "/xVh1ypMoVkMf5IB7y3hnRplJ14c.jpg"
-    },
-    "movie_1058424": {
-        "title": "Hope",
-        "genre": "science-fiction",
-        "date": "2026-11-06",
-        "backdrop_path": "/3KvGTuNX47Pdqlg9ossua2TFKrZ.jpg"
-    },
-    "tv_224": {
-        "title": "Match of the Day",
-        "genre": "sport",
-        "date": "2026-11-06",
-        "backdrop_path": "/qI2o5l4fJq2GY70DljFrshlNIwG.jpg"
-    },
-    "movie_1101412": {
-        "title": "Fall 2: Deadpoint",
-        "genre": "thriller",
-        "date": "2026-11-06",
-        "backdrop_path": "/nGau0KBOaRILSK5MqFcuTfv7GMl.jpg"
-    },
-    "tv_4324": {
-        "title": "Dr. Quinn, Medicine Woman",
-        "genre": "western",
-        "date": "2026-11-06",
-        "backdrop_path": "/tXJf6radpACrCQPYIU0ARFsVV7z.jpg"
     }
 }
