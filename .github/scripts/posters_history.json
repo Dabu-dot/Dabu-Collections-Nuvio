@@ -1,4 +1,106 @@
 {
+    "tv_67198": {
+        "title": "Star Trek: Discovery",
+        "genre": "action",
+        "date": "2026-11-24",
+        "backdrop_path": "/p3McpsDNTNmpbkNBKdNxOFZJeKX.jpg"
+    },
+    "tv_209867": {
+        "title": "Frieren: Beyond Journey's End",
+        "genre": "animation-japonaise",
+        "date": "2026-11-24",
+        "backdrop_path": "/rBOnrVlck7BIlGeWVlzYiZeg4l2.jpg"
+    },
+    "tv_33880": {
+        "title": "The Legend of Korra",
+        "genre": "animation",
+        "date": "2026-11-24",
+        "backdrop_path": "/qdp77eXAZjy5cYYitZP37d3re3K.jpg"
+    },
+    "movie_1228710": {
+        "title": "The Mandalorian and Grogu",
+        "genre": "aventure",
+        "date": "2026-11-24",
+        "backdrop_path": "/ysLlsAxwgNSxBWHCgTKJrmjxpRQ.jpg"
+    },
+    "tv_242965": {
+        "title": "After Midnight",
+        "genre": "comedie",
+        "date": "2026-11-24",
+        "backdrop_path": "/ge4mIJjh3kZ1oXGblRoVB5h6xPo.jpg"
+    },
+    "tv_80240": {
+        "title": "The Queen of Flow",
+        "genre": "crime",
+        "date": "2026-11-24",
+        "backdrop_path": "/uxKS3Wmi5xH3zRxZCo7retMpvPR.jpg"
+    },
+    "tv_81723": {
+        "title": "The Gilded Age",
+        "genre": "drame",
+        "date": "2026-11-24",
+        "backdrop_path": "/afUVsProh46h31w2EvL7qyHXrqj.jpg"
+    },
+    "tv_234337": {
+        "title": "Die Landarztpraxis",
+        "genre": "famille",
+        "date": "2026-11-24",
+        "backdrop_path": "/lIkw6GkbgQ6FZv83nTWomY1RhLy.jpg"
+    },
+    "tv_82104": {
+        "title": "The Order",
+        "genre": "fantastique",
+        "date": "2026-11-24",
+        "backdrop_path": "/6nlNDzsiqgHM4fOuMvMRhg9Royv.jpg"
+    },
+    "movie_1594914": {
+        "title": "Lucky Strike",
+        "genre": "guerre",
+        "date": "2026-11-24",
+        "backdrop_path": "/1ebY06Gc1eUZcCoO7IoD4tWCFxm.jpg"
+    },
+    "movie_324786": {
+        "title": "Hacksaw Ridge",
+        "genre": "histoire",
+        "date": "2026-11-24",
+        "backdrop_path": "/vDKRMZGFTKP9nQolzeSB1rB1w6p.jpg"
+    },
+    "movie_1212763": {
+        "title": "Evil Dead Burn",
+        "genre": "horreur",
+        "date": "2026-11-24",
+        "backdrop_path": "/o0jkkpcN81QqSl8DMLScBCXyUH9.jpg"
+    },
+    "movie_1611767": {
+        "title": "Clashing Through the Snow",
+        "genre": "romance",
+        "date": "2026-11-24",
+        "backdrop_path": "/x6kwEsxxqLIoqpIrZOXRV0LORqm.jpg"
+    },
+    "tv_225171": {
+        "title": "Pluribus",
+        "genre": "science-fiction",
+        "date": "2026-11-24",
+        "backdrop_path": "/vNCNUxNHHgP0WsA19hxztUsG3yG.jpg"
+    },
+    "tv_301507": {
+        "title": "Heated Rivalry",
+        "genre": "sport",
+        "date": "2026-11-24",
+        "backdrop_path": "/3vuBfAuAltIR6UdANUQ1lLXOeia.jpg"
+    },
+    "tv_69740": {
+        "title": "Ozark",
+        "genre": "thriller",
+        "date": "2026-11-24",
+        "backdrop_path": "/aSgOK5wpu6axS1mG3qBN74bNQM5.jpg"
+    },
+    "tv_63247": {
+        "title": "Westworld",
+        "genre": "western",
+        "date": "2026-11-24",
+        "backdrop_path": "/yGNnjoIGOdQy3douq60tULY8teK.jpg"
+    },
     "tv_52814": {
         "title": "Halo",
         "genre": "action",
@@ -1324,107 +1426,5 @@
         "genre": "western",
         "date": "2026-11-11",
         "backdrop_path": "/vIioWssbxRtEkIzgj8r0pCWYkYM.jpg"
-    },
-    "tv_67198": {
-        "title": "Star Trek: Discovery",
-        "genre": "action",
-        "date": "2026-11-10",
-        "backdrop_path": "/p3McpsDNTNmpbkNBKdNxOFZJeKX.jpg"
-    },
-    "tv_209867": {
-        "title": "Frieren: Beyond Journey's End",
-        "genre": "animation-japonaise",
-        "date": "2026-11-10",
-        "backdrop_path": "/rBOnrVlck7BIlGeWVlzYiZeg4l2.jpg"
-    },
-    "movie_354912": {
-        "title": "Coco",
-        "genre": "animation",
-        "date": "2026-11-10",
-        "backdrop_path": "/askg3SMvhqEl4OL52YuvdtY40Yb.jpg"
-    },
-    "movie_1228710": {
-        "title": "The Mandalorian and Grogu",
-        "genre": "aventure",
-        "date": "2026-11-10",
-        "backdrop_path": "/ysLlsAxwgNSxBWHCgTKJrmjxpRQ.jpg"
-    },
-    "movie_891621": {
-        "title": "Wild Horse Nine",
-        "genre": "comedie",
-        "date": "2026-11-10",
-        "backdrop_path": "/3uLA0ujne91bkzFStZICCYeqhnt.jpg"
-    },
-    "tv_67744": {
-        "title": "MINDHUNTER",
-        "genre": "crime",
-        "date": "2026-11-10",
-        "backdrop_path": "/71mGbXGwWHIN9TnAVzcpWUwhJhz.jpg"
-    },
-    "tv_79593": {
-        "title": "Magnum P.I.",
-        "genre": "drame",
-        "date": "2026-11-10",
-        "backdrop_path": "/kpp4DMF5Inif2xzMiLgnNoJNg95.jpg"
-    },
-    "tv_287556": {
-        "title": "Mírame así, el camino de Noa",
-        "genre": "famille",
-        "date": "2026-11-10",
-        "backdrop_path": "/ir485FZlwSPuTIiw1KEZRlFjV3x.jpg"
-    },
-    "tv_63247": {
-        "title": "Westworld",
-        "genre": "fantastique",
-        "date": "2026-11-10",
-        "backdrop_path": "/yGNnjoIGOdQy3douq60tULY8teK.jpg"
-    },
-    "tv_271855": {
-        "title": "Sandokan",
-        "genre": "guerre",
-        "date": "2026-11-10",
-        "backdrop_path": "/1AA5xIVt1PTrbLxCCBxRyvjdpqO.jpg"
-    },
-    "movie_977942": {
-        "title": "The Uprising",
-        "genre": "histoire",
-        "date": "2026-11-10",
-        "backdrop_path": "/kAlAFblqBI6aGXItR4DRpT5Tozg.jpg"
-    },
-    "movie_1128204": {
-        "title": "Feed",
-        "genre": "horreur",
-        "date": "2026-11-10",
-        "backdrop_path": "/4ZeaWA6DzFVOjWTi70b9ZAaQktf.jpg"
-    },
-    "movie_1032863": {
-        "title": "The Love Hypothesis",
-        "genre": "romance",
-        "date": "2026-11-10",
-        "backdrop_path": "/o7Oy9Gbx1CCyaweL8xUhtMW4Puq.jpg"
-    },
-    "movie_1403676": {
-        "title": "April X",
-        "genre": "science-fiction",
-        "date": "2026-11-10",
-        "backdrop_path": "/e5HtlJjrEJDoRZOkM6UDXbSokH6.jpg"
-    },
-    "tv_3231": {
-        "title": "Match of the Day 2",
-        "genre": "sport",
-        "date": "2026-11-10",
-        "backdrop_path": "/uz74E24XvlmfXhXjIenBhNpjWA5.jpg"
-    },
-    "movie_1228834": {
-        "title": "The Fix",
-        "genre": "thriller",
-        "date": "2026-11-10",
-        "backdrop_path": "/dJTWIecL2vxsCRl5G0lRhPsfrhc.jpg"
-    },
-    "tv_1781": {
-        "title": "Little House on the Prairie",
-        "genre": "western",
-        "date": "2026-11-10",
-        "backdrop_path": "/uCvpgfY4oTeZxEcFqm1ATJkDDmu.jpg"
     }
 }
